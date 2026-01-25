@@ -209,8 +209,8 @@ PROJECTS
             "success": True,
             "resume_text": resume_text,
             "txt_file": file_name,
-            # "score":score,
-            # "missing skills":missing_skills
+            "score":score,
+            "missing skills":missing_skills
         })
 
     except Exception as e:
