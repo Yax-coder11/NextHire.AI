@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 40px;
+      line-height: 1.4;
+      color: #000;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .contact {
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #000;
+      font-size: 13px;
+    }
+    ul {
+      margin-top: 6px;
+      margin-bottom: 12px;
+    }
+    li {
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .text {
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>{{ name }}</h1>
+  <div class="contact">
+    Email: {{ email }} | GitHub: {{ github }} | Phone: {{ phone }}
+  </div>
+
+  <div class="section-title">PROFILE SNAPSHOT</div>
+  <p class="text">{{ profile }}</p>
+
+  <div class="section-title">CORE SKILLS</div>
+  <ul>
+    {% for skill in skills %}
+      <li>{{ skill }}</li>
+    {% endfor %}
+  </ul>
+
+  <div class="section-title">PROJECTS</div>
+  <ul>
+    {% for project in projects %}
+      <li>{{ project }}</li>
+    {% endfor %}
+  </ul>
+
+  <div class="section-title">EDUCATION</div>
+  <p class="text">{{ college }} - {{degree}}</p>
+
+  <div class="section-title">INTERESTS</div>
+  <p class="text">{{ interests }}</p>
+
+</body>
+</html>
