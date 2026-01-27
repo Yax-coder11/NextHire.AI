@@ -43,12 +43,33 @@
         <p class="text-muted">Manage users and monitor resume submissions</p>
     </div>
 
+    <!-- Dashboard Statistics - Match website stats section -->
+    <section class="py-4 mb-5" style="background-color: var(--background); border-radius: var(--radius);">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-6">
+                    <div class="py-3">
+                        <h2 class="mb-0 fw-bold" style="font-size: 3rem; color: var(--primary); line-height: 1;">{{ users|length }}</h2>
+                        <p class="mb-0" style="font-size: 1.2rem; color: var(--foreground); font-weight: 500;">registered users</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="py-3">
+                        <h2 class="mb-0 fw-bold" style="font-size: 3rem; color: var(--primary); line-height: 1;">{{ resumes|length }}</h2>
+                        <p class="mb-0" style="font-size: 1.2rem; color: var(--foreground); font-weight: 500;">resume submissions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="border-top mb-5"></div>
+
     <!-- USERS TABLE -->
     <div class="panel mb-5">
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <div class="panel-icon">
-                <i class="bi bi-people"></i>
-            </div>
+        <div class="section-heading-container">
+            <i class="bi bi-people section-heading-icon"></i>
             <div>
                 <h3 class="mb-0">Registered Users</h3>
                 <p class="text-muted small mb-0">{{ users|length }} total users</p>
@@ -58,22 +79,22 @@
         <div class="table-responsive">
             <table class="table">
                 <thead>
-                    <tr class="border-bottom">
-                        <th class="text-muted small fw-bold">#</th>
-                        <th class="text-muted small fw-bold">Email Address</th>
+                    <tr>
+                        <th>#</th>
+                        <th>Email Address</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in users %}
-                    <tr class="border-bottom">
-                        <td class="py-3">{{ loop.index }}</td>
-                        <td class="py-3">{{ user[0] }}</td>
+                    <tr>
+                        <td class="secondary-data">{{ loop.index }}</td>
+                        <td class="primary-data">{{ user[0] }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="2" class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox" style="font-size: 2rem; opacity: 0.5;"></i>
-                            <p class="mt-2 mb-0">No users found</p>
+                        <td colspan="2" class="table-empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <p>No users found</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -82,12 +103,13 @@
         </div>
     </div>
 
+    <!-- Section Divider -->
+    <div class="border-top mb-5"></div>
+
     <!-- RESUMES TABLE -->
     <div class="panel">
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <div class="panel-icon">
-                <i class="bi bi-file-earmark-text"></i>
-            </div>
+        <div class="section-heading-container">
+            <i class="bi bi-file-earmark-text section-heading-icon"></i>
             <div>
                 <h3 class="mb-0">Submitted Resumes</h3>
                 <p class="text-muted small mb-0">{{ resumes|length }} total submissions</p>
@@ -97,43 +119,46 @@
         <div class="table-responsive">
             <table class="table">
                 <thead>
-                    <tr class="border-bottom">
-                        <th class="text-muted small fw-bold">#</th>
-                        <th class="text-muted small fw-bold">Name</th>
-                        <th class="text-muted small fw-bold">Email</th>
-                        <th class="text-muted small fw-bold">Degree</th>
-                        <th class="text-muted small fw-bold">CGPA</th>
-                        <th class="text-muted small fw-bold">Actions</th>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Degree</th>
+                        <th>CGPA</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for r in resumes %}
-                    <tr class="border-bottom">
-                        <td class="py-3">{{ loop.index }}</td>
-                        <td class="py-3 fw-500">{{ r[0] }}</td>
-                        <td class="py-3">{{ r[1] }}</td>
-                        <td class="py-3">{{ r[2] }}</td>
-                        <td class="py-3">
-                            <span class="badge" style="background-color: var(--primary); color: white; padding: 0.25rem 0.5rem; border-radius: var(--radius); font-size: 0.75rem;">
+                    <tr>
+                        <td class="secondary-data">{{ loop.index }}</td>
+                        <td class="primary-data">{{ r[0] }}</td>
+                        <td class="secondary-data">{{ r[1] }}</td>
+                        <td class="secondary-data">{{ r[2] }}</td>
+                        <td>
+                            <span class="dashboard-badge">
                                 {{ r[3] }}
                             </span>
                         </td>
-                        <td class="py-3">
+                        <td>
                             <a href="/download/{{ r[4].split('/')[-1] }}" 
-                               class="comic-button" 
-                               style="padding: 0.5rem 1rem; font-size: 0.875rem; display: inline-block;">
-                                <i class="bi bi-download me-1"></i> Download
+                               class="dashboard-action-btn">
+                                <i class="bi bi-download"></i>
+                                Download
                             </a>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox" style="font-size: 2rem; opacity: 0.5;"></i>
-                            <p class="mt-2 mb-0">No resumes found</p>
+                        <td colspan="6" class="table-empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <p>No resumes found</p>
                         </td>
                     </tr>
                     {% endfor %}
+                </tbody>
+            </table>
+        </div>
                 </tbody>
             </table>
         </div>

@@ -33,9 +33,131 @@ header.border-bottom {
   border-bottom: 1px solid var(--border) !important;
 }
 
+/* Fixed navbar - stays at top while scrolling */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--background); /* Use existing background color */
+  z-index: 1030; /* Bootstrap-compatible z-index for fixed navbar */
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* Subtle shadow for visual separation */
+}
+
+/* Compact navbar - reduced height for sleeker appearance */
+header.py-3 {
+  padding-top: 0.75rem !important; /* Reduced from default 1rem (py-3) */
+  padding-bottom: 0.75rem !important; /* Reduced from default 1rem (py-3) */
+}
+
+/* Body offset to prevent content from hiding behind fixed navbar */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding-top: 4rem; /* Approximate height: 0.75rem + 0.75rem + h5 line-height + border */
+  transition: background-color 0.3s ease;
+}
+
+/* Subtle gradient background for enhanced visual appeal */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 30%, hsla(16, 60%, 85%, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, hsla(210, 40%, 85%, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, hsla(40, 50%, 90%, 0.1) 0%, transparent 60%),
+    linear-gradient(135deg, hsla(16, 30%, 92%, 0.08) 0%, hsla(210, 25%, 95%, 0.06) 100%);
+  filter: blur(40px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Scrolled state - subtle background color shift */
+body.scrolled {
+  background-color: hsl(40, 25%, 95%); /* Slightly lighter and more neutral than var(--background) */
+}
+
+/* Enhanced gradient for scrolled state */
+body.scrolled::before {
+  background: 
+    radial-gradient(circle at 25% 25%, hsla(16, 50%, 88%, 0.12) 0%, transparent 55%),
+    radial-gradient(circle at 75% 75%, hsla(210, 35%, 88%, 0.1) 0%, transparent 55%),
+    radial-gradient(circle at 50% 90%, hsla(40, 45%, 92%, 0.08) 0%, transparent 65%),
+    linear-gradient(135deg, hsla(16, 25%, 94%, 0.06) 0%, hsla(210, 20%, 96%, 0.05) 100%);
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+  
+  body::before,
+  body.scrolled::before {
+    filter: blur(20px); /* Reduce blur intensity for motion sensitivity */
+  }
+}
+
+/* Responsive navbar adjustments */
+@media (max-width: 768px) {
+  header.py-3 {
+    padding-top: 0.6rem !important; /* Slightly more compact on tablet */
+    padding-bottom: 0.6rem !important;
+  }
+  
+  body {
+    padding-top: 3.5rem; /* Adjusted for smaller navbar height on tablet */
+  }
+}
+
+@media (max-width: 576px) {
+  header.py-3 {
+    padding-top: 0.5rem !important; /* Most compact on mobile */
+    padding-bottom: 0.5rem !important;
+  }
+  
+  body {
+    padding-top: 3rem; /* Adjusted for smallest navbar height on mobile */
+  }
+}
+
 /* Footer gets top border for clean separation */
 footer.border-top {
   border-top: 1px solid var(--border) !important;
+}
+
+/* Scroll offset for sections to prevent hiding behind fixed navbar */
+#home,
+#how-it-works,
+#features,
+#faq {
+  scroll-margin-top: 5rem; /* Fixed navbar height + buffer: 4rem + 1rem */
+}
+
+/* Responsive scroll margin adjustments */
+@media (max-width: 768px) {
+  #home,
+  #how-it-works,
+  #features,
+  #faq {
+    scroll-margin-top: 4.5rem; /* Adjusted for tablet navbar height: 3.5rem + 1rem */
+  }
+}
+
+@media (max-width: 576px) {
+  #home,
+  #how-it-works,
+  #features,
+  #faq {
+    scroll-margin-top: 4rem; /* Adjusted for mobile navbar height: 3rem + 1rem */
+  }
 }
 
 /* Special handling for CTA section - top border only */
@@ -74,13 +196,6 @@ footer.border-top {
     width: 1px;
     background-color: var(--border);
   }
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  -webkit-font-smoothing: antialiased;
 }
 
 /* Heading Typography - Condensed Editorial Style */
@@ -323,6 +438,13 @@ h6 {
   border-radius: var(--radius);
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.panel:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
 }
 
 .text-muted {
@@ -363,14 +485,102 @@ html {
   font-weight: 600;
 }
 
-/* Enhanced heading-icon combinations */
-.d-flex.align-items-center .panel-icon {
-  margin-right: 0; /* Remove margin since gap handles spacing */
+/* HEADING ICON ALIGNMENT - CRITICAL FIXES */
+/* Wrap all heading-icon combinations in flex containers with proper alignment */
+.heading-icon-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-/* Ensure consistent vertical alignment for all heading-icon pairs */
+/* Navigation links - proper flex alignment */
+.nav-link {
+  color: var(--foreground);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.nav-link i {
+  font-size: 1.25em; /* Use em for relative scaling */
+  flex-shrink: 0;
+  line-height: 1; /* Ensure icon doesn't affect text baseline */
+}
+
+/* Section heading containers - clean text-only layout */
+.section-heading-container {
+  margin-bottom: 1.5rem;
+}
+
+/* Admin dashboard section headings - slightly reduced font size */
+.section-heading-container h3 {
+  margin: 0; /* Remove heading margins for perfect alignment */
+  line-height: 1.2; /* Consistent line height for optical center */
+  font-size: 2.4rem; /* Reduced from default 2.8rem for better visual balance */
+}
+
+.section-heading-container p {
+  margin: 0; /* Remove paragraph margins */
+  line-height: 1.3; /* Consistent line height */
+}
+
+/* Responsive adjustments for admin section headings */
+@media (max-width: 768px) {
+  .section-heading-container h3 {
+    font-size: 2.1rem; /* Reduced from default 2.4rem */
+  }
+}
+
+@media (max-width: 576px) {
+  .section-heading-container h3 {
+    font-size: 1.9rem; /* Reduced from default 2.1rem */
+  }
+}
+
+.section-heading-container p {
+  margin: 0; /* Remove paragraph margins */
+  line-height: 1.3; /* Consistent line height */
+}
+
+/* Responsive adjustments for admin section headings */
+@media (max-width: 768px) {
+  .section-heading-container h3 {
+    font-size: 2.1rem; /* Reduced from default 2.4rem */
+  }
+}
+
+@media (max-width: 576px) {
+  .section-heading-container h3 {
+    font-size: 1.9rem; /* Reduced from default 2.1rem */
+  }
+}
+
+/* Feature step alignment - ensure icons and text are perfectly centered */
+.feature-step .d-flex {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.feature-step .panel-icon {
+  margin: 0; /* Remove any margins */
+  flex-shrink: 0;
+}
+
+.feature-step h6 {
+  margin: 0; /* Remove heading margins */
+  line-height: 1.2;
+}
+
+/* Enhanced alignment for all heading-icon pairs */
 .d-flex.align-items-center {
-  align-items: center !important; /* Force center alignment */
+  align-items: center !important;
+}
+
+.d-flex.align-items-center .panel-icon {
+  margin-right: 0; /* Remove margin since gap handles spacing */
 }
 
 /* Quote icons in reviews section */
@@ -456,7 +666,410 @@ html {
     }
 }
 
-/* Match all button variants to the same theme */
+/* ADMIN DASHBOARD - ALIGNED WITH WEBSITE THEME */
+/* Dashboard tables - match website panel style */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+  background-color: transparent;
+}
+
+/* Table headers - match website style */
+.table thead th {
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+  vertical-align: middle;
+  border-right: none;
+}
+
+/* Table body - clean and readable */
+.table tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+  border-right: none;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Primary data styling */
+.table td.primary-data {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+/* Secondary data styling */
+.table td.secondary-data {
+  color: var(--foreground);
+  opacity: 0.7;
+}
+
+/* Dashboard badges - match website accent style */
+.dashboard-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Dashboard action buttons - match comic-button style */
+.dashboard-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  background-color: var(--primary);
+  border: 2px solid #000;
+  border-radius: var(--radius);
+  box-shadow: 3px 3px 0px #000;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.dashboard-action-btn:hover {
+  background-color: #fff;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  box-shadow: 3px 3px 0px var(--primary);
+  text-decoration: none;
+}
+
+.dashboard-action-btn:active {
+  background-color: #fcf414;
+  box-shadow: none;
+  transform: translateY(2px);
+}
+
+.dashboard-action-btn i {
+  font-size: 0.875rem;
+}
+
+/* Empty state - match website style */
+.table-empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--foreground);
+  opacity: 0.6;
+}
+
+.table-empty-state i {
+  font-size: 2rem;
+  opacity: 0.5;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.table-empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Ensure table maintains responsive behavior */
+.table-responsive .table {
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments for dashboard */
+@media (max-width: 768px) {
+  .section-heading-container {
+    gap: 0.6rem;
+  }
+  
+  .section-heading-container .section-heading-icon {
+    font-size: 1.3rem;
+  }
+  
+  .section-heading-container h3 {
+    font-size: 2.1rem;
+  }
+  
+  .table thead th,
+  .table td {
+    padding: 0.875rem 0.625rem;
+  }
+  
+  .dashboard-action-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .dashboard-action-btn i {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .section-heading-container {
+    gap: 0.5rem;
+  }
+  
+  .section-heading-container .section-heading-icon {
+    font-size: 1.2rem;
+  }
+  
+  .section-heading-container h3 {
+    font-size: 1.9rem;
+  }
+  
+  .table thead th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .dashboard-action-btn {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+  }
+  
+  .dashboard-badge {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
+  }
+  
+  /* Hide index column on very small screens */
+  .table th:first-child,
+  .table td:first-child {
+    display: none;
+  }
+}
+
+/* RESUME PAGE STYLING - ALIGNED WITH WEBSITE THEME */
+/* Resume form styling */
+.resume-form .form-floating {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.resume-form .form-control {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  padding: 1rem 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.resume-form .form-control:focus {
+  background-color: var(--card);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 61, 0.15);
+  color: var(--foreground);
+  transform: translateY(-1px);
+}
+
+.resume-form .form-control:invalid {
+  border-color: #dc3545;
+}
+
+.resume-form .form-control:valid {
+  border-color: var(--border);
+}
+
+.resume-form .form-floating > label {
+  color: var(--foreground);
+  opacity: 0.7;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.resume-form .form-control:focus ~ label,
+.resume-form .form-control:not(:placeholder-shown) ~ label {
+  color: var(--primary);
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* Form field animations */
+.resume-form .form-floating {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Resume preview container */
+.resume-preview-container {
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin: 1.5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.resume-preview-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 107, 61, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.resume-preview-container.loading::before {
+  left: 100%;
+}
+
+.resume-preview-text {
+  background-color: transparent;
+  border: none;
+  color: var(--foreground);
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  position: relative;
+  z-index: 1;
+}
+
+/* Button loading states */
+.comic-button.loading {
+  position: relative;
+  color: transparent;
+}
+
+.comic-button.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Resume score display */
+.resume-score-display {
+  background-color: var(--background);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin: 1rem 0;
+}
+
+/* Missing skills list */
+.missing-skills-section {
+  background-color: var(--background);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  border-left: 4px solid #fbbf24;
+}
+
+.missing-skills-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.missing-skills-list li {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+.missing-skills-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments for resume page */
+@media (max-width: 768px) {
+  .resume-preview-container {
+    padding: 1.5rem;
+  }
+  
+  .resume-preview-text {
+    font-size: 0.8rem;
+  }
+  
+  .resume-score-display {
+    padding: 1.5rem;
+  }
+  
+  .missing-skills-section {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .resume-preview-container {
+    padding: 1rem;
+  }
+  
+  .resume-preview-text {
+    font-size: 0.75rem;
+  }
+  
+  .resume-score-display {
+    padding: 1rem;
+  }
+  
+  .missing-skills-section {
+    padding: 0.75rem;
+  }
+  
+  .comic-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  
+  .comic-button:last-child {
+    margin-bottom: 0;
+  }
+}
 .btn-success, .btn-danger {
   width: 9em;
   height: 3em;
@@ -536,12 +1149,12 @@ html {
   transition: all 0.3s ease;
 }
 
-.feature-step:hover .d-flex {
+.feature-step:hover .heading-icon-container {
   background-color: var(--card);
   box-shadow: 0 2px 4px rgba(0,0,0,0.04);
 }
 
-.feature-step.active .d-flex {
+.feature-step.active .heading-icon-container {
   background-color: var(--card);
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   border: 1px solid var(--border);
@@ -553,12 +1166,20 @@ html {
 }
 
 /* Enhanced alignment for feature step content */
-.feature-step .d-flex {
-  align-items: center; /* Ensure proper vertical alignment */
+.feature-step .heading-icon-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .feature-step .panel-icon {
-  margin-right: 0.75rem; /* Consistent spacing from gap */
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.feature-step h6 {
+  margin: 0;
+  line-height: 1.2;
 }
 
 /* Inline feature icons - smaller versions within content */

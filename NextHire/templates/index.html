@@ -90,10 +90,10 @@
   <div class="border-top"></div>
 
   <!-- How It Works Section -->
-  <section id="how-it-works" class="py-5">
+  <section id="how-it-works" class="py-5"></section>
     <div class="container">
       <div class="text-center mb-5">
-        <h2 class="hero-title" style="font-size: 2.5rem;">
+        <h2 class="hero-title" style="font-size: 4rem;">
           HOW IT <span class="hero-accent">WORKS</span>
         </h2>
         <p class="text-muted">Get hired in 3 simple steps</p>
@@ -136,11 +136,14 @@
     </div>
   </section>
 
+  <!-- Section Divider -->
+  <div class="border-top"></div>
+
   <!-- Features Section -->
-  <section id="features" class="py-5 border-top features-section"></section>
+  <section id="features" class="py-5 features-section"></section>
     <div class="container">
       <div class="text-center mb-5">
-        <h2 class="hero-title" style="font-size: 2.5rem;">
+        <h2 class="hero-title" style="font-size: 4rem;">
           POWERFUL FEATURES
         </h2>
         <p class="text-muted">Everything you need to land your dream job</p>
@@ -150,7 +153,7 @@
         <div class="col-lg-4">
           <div class="feature-steps">
             <div class="feature-step active" data-step="1">
-              <div class="d-flex align-items-center gap-3 p-3 rounded" style="cursor: pointer; transition: all 0.3s ease;">
+              <div class="heading-icon-container p-3 rounded" style="cursor: pointer; transition: all 0.3s ease;">
                 <div class="panel-icon">
                   <i class="bi bi-robot"></i>
                 </div>
@@ -161,7 +164,7 @@
               </div>
             </div>
             <div class="feature-step" data-step="2">
-              <div class="d-flex align-items-center gap-3 p-3 rounded" style="cursor: pointer; transition: all 0.3s ease;">
+              <div class="heading-icon-container p-3 rounded" style="cursor: pointer; transition: all 0.3s ease;">
                 <div class="panel-icon">
                   <i class="bi bi-speedometer2"></i>
                 </div>
@@ -172,7 +175,7 @@
               </div>
             </div>
             <div class="feature-step" data-step="3">
-              <div class="d-flex align-items-center gap-3 p-3 rounded" style="cursor: pointer; transition: all 0.3s ease;">
+              <div class="heading-icon-container p-3 rounded" style="cursor: pointer; transition: all 0.3s ease;">
                 <div class="panel-icon">
                   <i class="bi bi-tags"></i>
                 </div>
@@ -183,7 +186,7 @@
               </div>
             </div>
             <div class="feature-step" data-step="4">
-              <div class="d-flex align-items-center gap-3 p-3 rounded" style="cursor: pointer; transition: all 0.3s ease;">
+              <div class="heading-icon-container p-3 rounded" style="cursor: pointer; transition: all 0.3s ease;">
                 <div class="panel-icon">
                   <i class="bi bi-download"></i>
                 </div>
@@ -690,12 +693,13 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   
   <script>
-    // Smooth Scrolling for Navigation Links
+    // Smooth Scrolling for Navigation Links - works with CSS scroll-margin-top
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
+          // Use native scrollIntoView which respects CSS scroll-margin-top
           target.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
