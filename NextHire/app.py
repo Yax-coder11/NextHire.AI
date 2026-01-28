@@ -469,6 +469,29 @@ def evaluate_resume():
     })
 
 
+@app.route("/my_resumes")
+def my_resumes():
+    if "user_email" not in session:
+        return redirect("/login_page")
+
+    user_email = session["user_email"]
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, name, degree, cgpa, score, status, created_at, file_path
+        FROM resumes
+        WHERE user_email = ?
+        ORDER BY created_at DESC
+    """, (user_email,))
+
+    resumes = cur.fetchall()
+    conn.close()
+
+    return render_template("my_resumes.html", resumes=resumes)
+
+
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,6 +1,6 @@
 YAX
 ----------------------------------------
-AIDS | CGPA: 9.17
+CE | CGPA: 9.17
 
 CONTACT
 Phone: 6958741230
@@ -8,9 +8,9 @@ Email: tailoryax@gmail.com
 
 SKILLS
 ----------------------------------------
-- java
+- Java
 
 
 PROJECTS
 ----------------------------------------
-atm
+None
