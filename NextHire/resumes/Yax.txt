@@ -1,18 +1,16 @@
-WEEE
+YAX
 ----------------------------------------
-CE | CGPA: 8.9
+AIDS | CGPA: 9.17
 
 CONTACT
-Phone: 975088740
-Email: weee123@gmail.com
+Phone: 6958741230
+Email: tailoryax@gmail.com
 
 SKILLS
 ----------------------------------------
-- a
-- s
-- d
+- java
 
 
 PROJECTS
 ----------------------------------------
-qw,2rt
+atm

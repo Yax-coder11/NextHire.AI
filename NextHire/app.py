@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import os
 import sqlite3
@@ -5,16 +8,63 @@ import io
 from flask import Flask, render_template, request, jsonify, session, send_file, redirect, url_for
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+from python_modules.resume_history_ds import ResumeLinkedList
+from datetime import datetime
+
+
 
 app = Flask(__name__)
 app.secret_key = "placement_secret_key"
 
-DB_NAME = "database.db"
+DB_NAME = os.path.join(os.path.dirname(__file__), "database.db")
+print("DB IN USE ->", os.path.abspath(DB_NAME))
+
+
+
+user_resume_history = {}
+
 
 
 # ---------------- DB CONNECTION ----------------
 def get_db():
     return sqlite3.connect(DB_NAME)
+
+
+
+# ---------------- REBUILD DS FROM DB ----------------
+def rebuild_resume_history():
+    global user_resume_history
+    user_resume_history = {}
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT user_email, id, 
+            COALESCE(score, 'N/A'), 
+            COALESCE(status, 'N/A')
+        FROM resumes
+        ORDER BY id
+    """)
+
+
+    rows = cur.fetchall()
+
+    for row in rows:
+        user_email = row[0]
+
+        if user_email not in user_resume_history:
+            user_resume_history[user_email] = ResumeLinkedList()
+
+        user_resume_history[user_email].add_resume(
+            resume_id=row[1],
+            resume_score=row[2],
+            readiness_status=row[3],
+            created_at="Loaded from DB"
+        )
+
+
+    conn.close()
 
 
 # ---------------- HOME ----------------
@@ -113,6 +163,8 @@ def login():
 # ---------------- SAVE RESUME (TXT ONLY) ----------------
 @app.route("/save_resume", methods=["POST"])
 def save_resume():
+    conn = None
+    cur = None
     try:
         if "user_email" not in session:
             return jsonify({"success": False, "message": "Login required"})
@@ -172,38 +224,86 @@ PROJECTS
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(resume_text)
 
+        
+        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # ----- Placement Readiness Status (same logic as evaluator) -----
+        if score >= 80:
+            status = "Ready"
+        elif score >= 60:
+            status = "Partially Ready"
+        else:
+            status = "Not Ready"
+
         # -------- Save DB --------
         conn = get_db()
         cur = conn.cursor()
 
         cur.execute("""
-        CREATE TABLE IF NOT EXISTS resumes (
+                CREATE TABLE IF NOT EXISTS resumes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_email TEXT,
-            name TEXT,
-            phone TEXT,
-            email TEXT,
-            degree TEXT,
-            cgpa TEXT,
-            skills TEXT,
-            projects TEXT,
-            file_path TEXT
-        )
+
+            -- Registered user (login identity)
+            user_email TEXT NOT NULL,
+
+            -- Resume details
+            name TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            email TEXT NOT NULL,          -- email written inside resume
+            degree TEXT NOT NULL,
+            cgpa TEXT NOT NULL,
+            skills TEXT NOT NULL,
+            projects TEXT NOT NULL,
+
+            -- File system
+            file_path TEXT NOT NULL,
+
+            -- Evaluation
+            score INTEGER NOT NULL,
+            status TEXT NOT NULL,
+
+            -- Metadata
+            created_at TEXT NOT NULL
+        );
+
         """)
 
         cur.execute("""
-        INSERT INTO resumes (
-            user_email, name, phone, email,
-            degree, cgpa, skills, projects, file_path
-        )
-        VALUES (?,?,?,?,?,?,?,?,?)
+            INSERT INTO resumes (user_email, name, phone, email, degree, cgpa, skills, projects, file_path, score, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             user_email, name, phone, email,
-            degree, cgpa, skills, projects, file_path
+            degree, cgpa, skills, projects, file_path,score,status,created_at
         ))
 
-        conn.commit()
+        conn.commit()  
+        resume_id = cur.lastrowid   # ✅ ADD THIS LINE      
+
+        # ----- DS: Resume History Tracking -----
+
+        if user_email not in user_resume_history:
+            user_resume_history[user_email] = ResumeLinkedList()
+
+        user_resume_history[user_email].add_resume(
+            resume_id=resume_id,
+            resume_score=score,
+            readiness_status=status,
+            created_at=created_at
+        )
+
+
         conn.close()
+
+        print(os.path.abspath(DB_NAME))
+
+
+        # ----- DS DEBUG: Console Output -----
+        print("\n[DS] Resume Linked List State:")
+        for email, ll in user_resume_history.items():
+            print(f"User: {email}")
+            for node in ll.get_resume_history():
+                print("   ", node)
+
 
         return jsonify({
             "success": True,
@@ -216,6 +316,13 @@ PROJECTS
     except Exception as e:
         print("SAVE RESUME ERROR:", e)
         return jsonify({"success": False})
+    
+    finally:
+        if cur:
+            pass
+        if conn:
+            conn.close()
+
     
 
 # ---------------- RESUME SCORE ----------------
@@ -310,8 +417,13 @@ def admin_login():
 # ---------------- ADMIN DASHBOARD ----------------
 @app.route("/admin_dashboard")
 def admin_dashboard():
+    
     if not session.get("admin"):
         return "Unauthorized", 401
+    
+    if not user_resume_history:
+        rebuild_resume_history()
+
 
     conn = get_db()
     cur = conn.cursor()
@@ -320,14 +432,17 @@ def admin_dashboard():
     users = cur.fetchall()
 
     cur.execute("""
-    SELECT name, email, degree, cgpa, file_path
+    SELECT id, user_email, name, email, phone, degree, cgpa, score, status, file_path
     FROM resumes
     """)
+
+
     resumes = cur.fetchall()
 
     conn.close()
 
-    return render_template("admin.html", users=users, resumes=resumes)
+    return render_template("admin.html",users=users,resumes=resumes,ds_history=user_resume_history)
+
 
 # ---------------- RESUME EVALUATOR ----------------
 @app.route("/evaluate_resume")
