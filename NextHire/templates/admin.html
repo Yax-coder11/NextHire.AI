@@ -2,38 +2,100 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - NextHire.AI</title>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Heading Font - Condensed Editorial Style -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="container mt-4">
+<!-- Header -->
+<header class="border-bottom py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">NextHire.AI</h5>
+        <nav class="d-flex gap-4 align-items-center">
+            <span class="text-muted small">Admin Dashboard</span>
+            <a class="nav-link" href="/"><i class="bi bi-house"></i> Home</a>
+        </nav>
+    </div>
+</header>
 
-    <h2 class="mb-4">Admin Dashboard</h2>
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+        <h1 class="hero-title" style="font-size: 3.5rem;">
+            ADMIN <span class="hero-accent">DASHBOARD</span>
+        </h1>
+        <p class="text-muted">Manage users and monitor resume submissions</p>
+    </div>
+
+    <!-- Dashboard Statistics - Match website stats section -->
+    <section class="py-4 mb-5" style="background-color: var(--background); border-radius: var(--radius);">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-6">
+                    <div class="py-3">
+                        <h2 class="mb-0 fw-bold" style="font-size: 3rem; color: var(--primary); line-height: 1;">{{ users|length }}</h2>
+                        <p class="mb-0" style="font-size: 1.2rem; color: var(--foreground); font-weight: 500;">registered users</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="py-3">
+                        <h2 class="mb-0 fw-bold" style="font-size: 3rem; color: var(--primary); line-height: 1;">{{ resumes|length }}</h2>
+                        <p class="mb-0" style="font-size: 1.2rem; color: var(--foreground); font-weight: 500;">resume submissions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="border-top mb-5"></div>
 
     <!-- USERS TABLE -->
-    <div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-            Registered Users
+    <div class="panel mb-5">
+        <div class="section-heading-container">
+            <i class="bi bi-people section-heading-icon"></i>
+            <div>
+                <h3 class="mb-0">Registered Users</h3>
+                <p class="text-muted small mb-0">{{ users|length }} total users</p>
+            </div>
         </div>
-        <div class="card-body">
-            <table class="table table-bordered table-striped">
+        
+        <div class="table-responsive">
+            <table class="table">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Email</th>
+                        <th>Email Address</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in users %}
                     <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ user[0] }}</td>
+                        <td class="secondary-data">{{ loop.index }}</td>
+                        <td class="primary-data">{{ user[0] }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="2" class="text-center">No users found</td>
+                        <td colspan="2" class="table-empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <p>No users found</p>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -41,13 +103,21 @@
         </div>
     </div>
 
+    <!-- Section Divider -->
+    <div class="border-top mb-5"></div>
+
     <!-- RESUMES TABLE -->
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            Submitted Resumes
+    <div class="panel">
+        <div class="section-heading-container">
+            <i class="bi bi-file-earmark-text section-heading-icon"></i>
+            <div>
+                <h3 class="mb-0">Submitted Resumes</h3>
+                <p class="text-muted small mb-0">{{ resumes|length }} total submissions</p>
+            </div>
         </div>
-        <div class="card-body">
-            <table class="table table-bordered table-striped">
+        
+        <div class="table-responsive">
+            <table class="table">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -55,37 +125,56 @@
                         <th>Email</th>
                         <th>Degree</th>
                         <th>CGPA</th>
-                        <th>Download</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for r in resumes %}
                     <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ r[0] }}</td>
-                        <td>{{ r[1] }}</td>
-                        <td>{{ r[2] }}</td>
-                        <td>{{ r[3] }}</td>
+                        <td class="secondary-data">{{ loop.index }}</td>
+                        <td class="primary-data">{{ r[0] }}</td>
+                        <td class="secondary-data">{{ r[1] }}</td>
+                        <td class="secondary-data">{{ r[2] }}</td>
                         <td>
-                            <!-- <a href="/download/{{ r[4].split('/')[-1] }}"
-                               class="btn btn-sm btn-success">
+                            <span class="dashboard-badge">
+                                {{ r[3] }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="/download/{{ r[4].split('/')[-1] }}" 
+                               class="dashboard-action-btn">
+                                <i class="bi bi-download"></i>
                                 Download
-                            </a> -->
-                            <a href="/download/{{ r[4].split('/')[-1] }}">Download</a>
-
+                            </a>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center">No resumes found</td>
+                        <td colspan="6" class="table-empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <p>No resumes found</p>
+                        </td>
                     </tr>
                     {% endfor %}
+                </tbody>
+            </table>
+        </div>
                 </tbody>
             </table>
         </div>
     </div>
 
 </div>
+
+<!-- Footer -->
+<footer class="border-top py-4 mt-5">
+    <div class="container text-center text-muted small">
+        © 2026 NextHire.AI - Admin Dashboard
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

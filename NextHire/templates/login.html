@@ -19,6 +19,12 @@
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+  
+  <!-- Heading Font - Condensed Editorial Style -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+    rel="stylesheet"
+  />
 
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -43,8 +49,8 @@
   <!-- Login Section -->
   <section class="py-5">
     <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-6">
+      <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-lg-5 col-md-7">
           <div class="panel">
             <div class="text-center mb-4">
               <h1 class="hero-title" style="font-size: 2.5rem;">
@@ -57,29 +63,30 @@
             </div>
             
             <form id="loginForm">
-              <input type="email" class="form-control mb-3" placeholder="Email Address" id="loginEmail" required>
-              <input type="password" class="form-control mb-4" placeholder="Password" id="loginPassword" required>
+              <div class="mb-3">
+                <label for="loginEmail" class="form-label text-muted small">Email Address</label>
+                <input type="email" class="form-control" placeholder="Enter your email address" id="loginEmail" required>
+              </div>
               
-              <button type="button" class="btn btn-success w-100 mb-3" onclick="login()">
+              <div class="mb-4">
+                <label for="loginPassword" class="form-label text-muted small">Password</label>
+                <input type="password" class="form-control" placeholder="Enter your password" id="loginPassword" required>
+              </div>
+              
+              <button type="button" class="comic-button w-100 mb-4" onclick="login()" style="width: 100% !important; text-align: center;">
                 Sign In
               </button>
               
               <div class="text-center">
                 <p class="text-muted small">
                   Don't have an account? 
-                  <a href="/signup" class="text-decoration-none" style="color: var(--primary);">Create Account</a>
+                  <a href="/signup" class="text-decoration-none" style="color: var(--primary); font-weight: 500;">Create Account</a>
                 </p>
                 <p class="text-muted small">
-                  <a href="#" class="text-decoration-none" style="color: var(--accent);" data-bs-toggle="modal" data-bs-target="#adminModal">Admin Login</a>
+                  <a href="#" class="text-decoration-none" style="color: var(--accent); font-weight: 500;" data-bs-toggle="modal" data-bs-target="#adminModal">Admin Login</a>
                 </p>
               </div>
             </form>
-          </div>
-        </div>
-        
-        <div class="col-lg-6 d-none d-lg-block">
-          <div class="image-card">
-            <img src="{{ url_for('static', filename='images/hero.png') }}" alt="NextHire.AI Illustration" class="card-image">
           </div>
         </div>
       </div>
@@ -89,13 +96,26 @@
   <!-- Admin Modal -->
   <div class="modal fade" id="adminModal" tabindex="-1">
     <div class="modal-dialog">
-      <div class="modal-content p-3">
-        <h5 class="mb-3">Admin Login</h5>
-        <form id="adminForm">
-          <input type="email" class="form-control mb-2" placeholder="Admin Email" id="adminEmail" required>
-          <input type="password" class="form-control mb-3" placeholder="Admin Password" id="adminPassword" required>
-          <button type="button" class="btn btn-danger w-100" onclick="adminLogin()">Admin Login</button>
-        </form>
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <h5 class="modal-title hero-title" style="font-size: 1.5rem;">ADMIN <span class="hero-accent">LOGIN</span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="adminForm">
+            <div class="mb-3">
+              <label for="adminEmail" class="form-label text-muted small">Admin Email</label>
+              <input type="email" class="form-control" placeholder="Enter admin email" id="adminEmail" required>
+            </div>
+            <div class="mb-4">
+              <label for="adminPassword" class="form-label text-muted small">Admin Password</label>
+              <input type="password" class="form-control" placeholder="Enter admin password" id="adminPassword" required>
+            </div>
+            <button type="button" class="comic-button w-100" onclick="adminLogin()" style="width: 100% !important; text-align: center;">
+              Admin Login
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
