@@ -1,17 +1,17 @@
 YAX TAILOR
 ----------------------------------------
-CE | CGPA: 9.17
+CE | CGPA: 9.0
 
 CONTACT
-Phone: 6958741230
+Phone:  9313336852
 Email: tailoryax@gmail.com
 
 SKILLS
 ----------------------------------------
-- Java
-- python
+- ds
+- java
 
 
 PROJECTS
 ----------------------------------------
-braincrate
+p1,p2

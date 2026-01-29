@@ -892,6 +892,25 @@ html {
   border-color: var(--border);
 }
 
+/* Enhanced validation styling */
+.resume-form .form-control.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+}
+
+.resume-form .form-control.is-valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.15);
+}
+
+.resume-form .invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #dc3545;
+}
+
 .resume-form .form-floating > label {
   color: var(--foreground);
   opacity: 0.7;
@@ -931,6 +950,171 @@ html {
   margin: 1.5rem 0;
   position: relative;
   overflow: hidden;
+}
+
+/* Resume document styling - PDF-like format */
+.resume-document {
+  background-color: white;
+  color: #000;
+  font-family: 'Times New Roman', serif;
+  font-size: 11pt;
+  line-height: 1.4;
+  max-width: 8.5in;
+  margin: 0 auto;
+  padding: 0.75in;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  min-height: 11in;
+}
+
+/* Header section */
+.resume-header {
+  text-align: center;
+  margin-bottom: 1.5em;
+}
+
+.resume-name {
+  font-size: 18pt;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.resume-contact {
+  font-size: 10pt;
+  margin-bottom: 1em;
+}
+
+/* Professional summary */
+.resume-summary {
+  margin-bottom: 1.5em;
+  text-align: justify;
+  font-size: 11pt;
+}
+
+/* Section headings */
+.resume-section-title {
+  font-size: 12pt;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  border-bottom: 1px solid #000;
+  padding-bottom: 2px;
+  letter-spacing: 0.5px;
+}
+
+.resume-section-title:first-of-type {
+  margin-top: 0;
+}
+
+/* Skills section */
+.resume-skills {
+  margin-bottom: 1em;
+}
+
+.resume-skills-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resume-skills-list li {
+  margin-bottom: 0.3em;
+  font-size: 11pt;
+}
+
+/* Projects section */
+.resume-projects {
+  margin-bottom: 1em;
+}
+
+.resume-project {
+  margin-bottom: 1em;
+}
+
+.resume-project-title {
+  font-weight: bold;
+  font-size: 11pt;
+  margin-bottom: 0.2em;
+}
+
+.resume-project-tech {
+  font-style: italic;
+  font-size: 10pt;
+  margin-bottom: 0.3em;
+  color: #333;
+}
+
+.resume-project-description {
+  margin: 0;
+  padding-left: 1em;
+  list-style: none;
+}
+
+.resume-project-description li {
+  margin-bottom: 0.2em;
+  font-size: 11pt;
+}
+
+.resume-project-description li:before {
+  content: "• ";
+  margin-left: -1em;
+}
+
+/* Education section */
+.resume-education {
+  margin-bottom: 1em;
+}
+
+.resume-education-entry {
+  margin-bottom: 1em;
+}
+
+.resume-education-degree {
+  font-weight: bold;
+  font-size: 11pt;
+  margin-bottom: 0.1em;
+}
+
+.resume-education-institution {
+  font-size: 11pt;
+  margin-bottom: 0.1em;
+}
+
+.resume-education-year {
+  font-size: 10pt;
+  color: #333;
+  margin-bottom: 0.3em;
+}
+
+.resume-education-description {
+  font-size: 10pt;
+  color: #333;
+  margin-bottom: 0.3em;
+}
+
+/* Interests section */
+.resume-interests {
+  font-size: 11pt;
+  line-height: 1.4;
+}
+
+/* Print styles */
+@media print {
+  .resume-document {
+    box-shadow: none;
+    padding: 0.5in;
+    font-size: 10pt;
+  }
+  
+  .resume-name {
+    font-size: 16pt;
+  }
+  
+  .resume-section-title {
+    font-size: 11pt;
+  }
 }
 
 .resume-preview-container::before {
