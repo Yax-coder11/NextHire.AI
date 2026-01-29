@@ -136,6 +136,7 @@ footer.border-top {
 /* Scroll offset for sections to prevent hiding behind fixed navbar */
 #home,
 #how-it-works,
+#sample-resume,
 #features,
 #faq {
   scroll-margin-top: 5rem; /* Fixed navbar height + buffer: 4rem + 1rem */
@@ -145,6 +146,7 @@ footer.border-top {
 @media (max-width: 768px) {
   #home,
   #how-it-works,
+  #sample-resume,
   #features,
   #faq {
     scroll-margin-top: 4.5rem; /* Adjusted for tablet navbar height: 3.5rem + 1rem */
@@ -154,6 +156,7 @@ footer.border-top {
 @media (max-width: 576px) {
   #home,
   #how-it-works,
+  #sample-resume,
   #features,
   #faq {
     scroll-margin-top: 4rem; /* Adjusted for mobile navbar height: 3rem + 1rem */
@@ -966,6 +969,13 @@ html {
   min-height: 11in;
 }
 
+/* Resume section dividers - subtle separation */
+.resume-document .section-divider {
+  border-top: 1px solid #ddd;
+  margin: 1.5em 0 1em 0;
+  width: 100%;
+}
+
 /* Header section */
 .resume-header {
   text-align: center;
@@ -1100,20 +1110,59 @@ html {
   line-height: 1.4;
 }
 
-/* Print styles */
+/* Print styles - Optimized for PDF export */
 @media print {
   .resume-document {
     box-shadow: none;
     padding: 0.5in;
     font-size: 10pt;
+    line-height: 1.4;
+    max-width: none;
+    margin: 0;
+    page-break-inside: avoid;
+  }
+  
+  .resume-document .section-divider {
+    border-top: 1px solid #ccc;
+    margin: 1.2em 0 0.8em 0;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    page-break-after: avoid;
   }
   
   .resume-name {
     font-size: 16pt;
+    page-break-after: avoid;
   }
   
   .resume-section-title {
     font-size: 11pt;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+  
+  .resume-education-entry,
+  .resume-project {
+    page-break-inside: avoid;
+    margin-bottom: 0.8em;
+  }
+  
+  .resume-skills-list {
+    page-break-inside: avoid;
+  }
+  
+  .resume-header {
+    page-break-after: avoid;
+  }
+  
+  .resume-summary {
+    page-break-inside: avoid;
+  }
+  
+  /* Ensure consistent font rendering */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
 
@@ -1317,10 +1366,92 @@ html {
 .form-control::placeholder {
   color: rgba(0,0,0,0.55);
 }
-/* Features Section Background - Removed */
-/* .features-section {
-  background-color: #F05D22;
-} */
+/* Features Section Background */
+.features-section {
+  background-color: var(--primary);
+}
+
+/* Ensure all text is black in features section */
+.features-section,
+.features-section * {
+  color: black !important;
+}
+
+.features-section .hero-title {
+  color: black !important;
+}
+
+.features-section .text-muted {
+  color: black !important;
+}
+
+.features-section h6,
+.features-section h3,
+.features-section h1,
+.features-section h2,
+.features-section h4,
+.features-section h5 {
+  color: black !important;
+}
+
+.features-section p:not(.text-muted) {
+  color: black !important;
+}
+
+.features-section p {
+  color: black !important;
+}
+
+.features-section span,
+.features-section div,
+.features-section li {
+  color: black !important;
+}
+
+.features-section .panel-icon {
+  background-color: white;
+  color: var(--primary) !important;
+}
+
+/* Feature panels inside features section should maintain black text */
+.features-section .panel {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: black !important;
+}
+
+.features-section .panel .text-muted {
+  color: black !important;
+}
+
+.features-section .panel h3,
+.features-section .panel h1,
+.features-section .panel h2,
+.features-section .panel h4,
+.features-section .panel h5,
+.features-section .panel h6 {
+  color: black !important;
+}
+
+.features-section .panel p,
+.features-section .panel span,
+.features-section .panel div,
+.features-section .panel li {
+  color: black !important;
+}
+
+/* Adjust interactive states for orange background */
+.features-section .feature-step:hover .heading-icon-container {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.features-section .feature-step.active .heading-icon-container {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.features-section .feature-step.active .panel-icon {
+  background-color: var(--primary);
+  color: white !important;
+}
 
 /* Features Section Interactive Styles */
 .feature-steps {
@@ -1539,7 +1670,89 @@ html {
   outline: none;
   box-shadow: 5px 5px 0px #000, 0 0 0 3px hsla(16, 100%, 55%, 0.3);
 }
-/* Enhanced CTA Section with Scrollable Resume Background */
+/* Sample Resume Section */
+.sample-resume-container {
+  max-width: 100%;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+
+.sample-resume-image {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sample-resume-image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* Sample Resume Thumbnails */
+.sample-resume-thumbnails {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.sample-resume-thumbnail {
+  max-width: 120px;
+  height: auto;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.sample-resume-thumbnail:hover {
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.sample-resume-thumbnail.active {
+  opacity: 1;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(255, 107, 61, 0.3);
+}
+
+/* Responsive adjustments for sample resume */
+@media (max-width: 768px) {
+  .sample-resume-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .sample-resume-image {
+    border-radius: calc(var(--radius) / 2);
+  }
+  
+  .sample-resume-thumbnails {
+    gap: 0.75rem;
+  }
+  
+  .sample-resume-thumbnail {
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 576px) {
+  .sample-resume-container {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .sample-resume-thumbnails {
+    gap: 0.5rem;
+  }
+  
+  .sample-resume-thumbnail {
+    max-width: 80px;
+  }
+}
 .cta-section {
   background: linear-gradient(135deg, 
     hsl(340, 30%, 92%) 0%, 
@@ -1581,7 +1794,7 @@ html {
   flex-shrink: 0;
 }
 
-.resume-header {
+.resume-card .resume-header {
   height: 20px;
   background: var(--primary);
   border-radius: 2px;

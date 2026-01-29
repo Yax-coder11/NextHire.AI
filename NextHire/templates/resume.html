@@ -52,17 +52,17 @@
         <div class="col-lg-8">
           <div class="panel">
             <div class="section-heading-container">
-              <div class="mt-3 text-center">
-                <a href="/my_resumes" class="btn btn-outline-primary">
-                    📄 My Resume History
-                </a>
-            </div>
-
               <i class="bi bi-file-earmark-text section-heading-icon"></i>
               <div>
                 <h3 class="mb-0">Resume Details</h3>
                 <p class="text-muted small mb-0">Fill in your information to generate your resume</p>
               </div>
+            </div>
+            
+            <div class="text-center mb-4">
+              <a href="/my_resumes" class="comic-button">
+                <i class="bi bi-folder-open"></i> My Resume History
+              </a>
             </div>
             
             <form id="resumeForm" class="resume-form">
@@ -627,6 +627,7 @@
       // Professional Summary
       if (payload.about_yourself) {
         html += `
+          <div class="section-divider"></div>
           <div class="resume-summary">
             ${payload.about_yourself}
           </div>`;
@@ -635,6 +636,7 @@
       // Core Skills Section
       if (payload.skills) {
         html += `
+          <div class="section-divider"></div>
           <div class="resume-section-title">Core Skills</div>
           <div class="resume-skills">
             <ul class="resume-skills-list">`;
@@ -650,6 +652,7 @@
       // Projects Section
       if (payload.projects) {
         html += `
+          <div class="section-divider"></div>
           <div class="resume-section-title">Projects</div>
           <div class="resume-projects">
             <div class="resume-project">
@@ -670,6 +673,7 @@
       // Education Section
       if (payload.education && payload.education.length > 0) {
         html += `
+          <div class="section-divider"></div>
           <div class="resume-section-title">Education</div>
           <div class="resume-education">`;
         
@@ -691,6 +695,7 @@
       } else if (payload.degree && payload.cgpa) {
         // Fallback to single degree entry
         html += `
+          <div class="section-divider"></div>
           <div class="resume-section-title">Education</div>
           <div class="resume-education">
             <div class="resume-education-entry">
@@ -699,13 +704,6 @@
             </div>
           </div>`;
       }
-      
-      // Interests Section (placeholder)
-      html += `
-        <div class="resume-section-title">Interests</div>
-        <div class="resume-interests">
-          Technology, Software Development, Problem Solving
-        </div>`;
       
       resumeDocument.innerHTML = html;
       
