@@ -5,12 +5,19 @@ CE | CGPA: 9.0
 CONTACT
 Phone:  9313336852
 Email: tailoryax@gmail.com
+City: Ahmedabad
+GitHub: Yaxcoder-11
+
+ABOUT
+----------------------------------------
+hello aap sab kese ho i hope you r fine i am better than you i deserve mre salary thna you
 
 SKILLS
 ----------------------------------------
-- 
+- python
+- de
 
 
 PROJECTS
 ----------------------------------------
-
+p1 sjfheruihroieg

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #000;
+            margin: 0;
+            padding: 0.75in;
+            background-color: white;
+        }
+        
+        .resume-document {
+            background-color: white;
+            color: #000;
+            font-family: 'Times New Roman', serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 0;
+            min-height: 11in;
+        }
+        
+        .section-divider {
+            border-top: 2px solid #333;
+            margin: 1.8em 0 1.2em 0;
+            width: 100%;
+            page-break-after: avoid;
+        }
+        
+        /* Alternative divider style for better visual separation */
+        .section-divider::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 1px;
+            background-color: #666;
+            margin: 4px auto 0 0;
+        }
+        
+        .resume-header {
+            text-align: center;
+            margin-bottom: 1.5em;
+        }
+        
+        .resume-name {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 0.5em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .resume-contact {
+            font-size: 10pt;
+            margin-bottom: 1em;
+        }
+        
+        .resume-summary {
+            margin-bottom: 1.5em;
+            text-align: justify;
+            font-size: 11pt;
+        }
+        
+        .resume-section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+        
+        .resume-section-title:first-of-type {
+            margin-top: 0;
+        }
+        
+        .resume-skills {
+            margin-bottom: 1em;
+        }
+        
+        .resume-skills-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .resume-skills-list li {
+            margin-bottom: 0.3em;
+            font-size: 11pt;
+        }
+        
+        .resume-projects {
+            margin-bottom: 1em;
+        }
+        
+        .resume-project {
+            margin-bottom: 1em;
+        }
+        
+        .resume-project-title {
+            font-weight: bold;
+            font-size: 11pt;
+            margin-bottom: 0.2em;
+        }
+        
+        .resume-project-description {
+            margin: 0;
+            padding-left: 1em;
+            list-style: none;
+        }
+        
+        .resume-project-description li {
+            margin-bottom: 0.2em;
+            font-size: 11pt;
+        }
+        
+        .resume-project-description li:before {
+            content: "• ";
+            margin-left: -1em;
+        }
+        
+        .resume-education {
+            margin-bottom: 1em;
+        }
+        
+        .resume-education-entry {
+            margin-bottom: 1em;
+        }
+        
+        .resume-education-degree {
+            font-weight: bold;
+            font-size: 11pt;
+            margin-bottom: 0.1em;
+        }
+        
+        .resume-education-institution {
+            font-size: 11pt;
+            margin-bottom: 0.1em;
+        }
+        
+        .resume-education-year {
+            font-size: 10pt;
+            color: #333;
+            margin-bottom: 0.3em;
+        }
+        
+        .resume-education-description {
+            font-size: 10pt;
+            color: #333;
+            margin-bottom: 0.3em;
+        }
+        
+        /* Print-specific styles */
+        @page {
+            size: A4;
+            margin: 0.75in;
+        }
+        
+        /* Prevent page breaks inside elements */
+        .resume-education-entry,
+        .resume-project {
+            page-break-inside: avoid;
+        }
+        
+        .resume-section-title {
+            page-break-after: avoid;
+        }
+        
+        .section-divider {
+            page-break-after: avoid;
+            page-break-inside: avoid;
+        }
+        
+        /* Ensure dividers render consistently in print */
+        @media print {
+            .section-divider {
+                border-top: 2px solid #333 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .section-divider::after {
+                background-color: #666 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="resume-document">
+        <div class="resume-header">
+            <div class="resume-name">{{ resume_data.name }}</div>
+            <div class="resume-contact">
+                {{ resume_data.email }}
+                {%- if resume_data.phone %} | {{ resume_data.phone }}{% endif %}
+                {%- if resume_data.github_username %} | GitHub: {{ resume_data.github_username }}{% endif %}
+                {%- if resume_data.city %} | {{ resume_data.city }}{% endif %}
+            </div>
+        </div>
+
+        {% if resume_data.about_yourself and resume_data.about_yourself.strip() %}
+        <div class="section-divider"></div>
+        <div class="resume-summary">
+            {{ resume_data.about_yourself }}
+        </div>
+        {% endif %}
+
+        {% if resume_data.skills and resume_data.skills.strip() %}
+        <div class="section-divider"></div>
+        <div class="resume-section-title">Core Skills</div>
+        <div class="resume-skills">
+            <ul class="resume-skills-list">
+                {% for skill in resume_data.skills.split(',') %}
+                    {% if skill.strip() %}
+                    <li>{{ skill.strip() }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if resume_data.projects and resume_data.projects.strip() %}
+        <div class="section-divider"></div>
+        <div class="resume-section-title">Projects</div>
+        <div class="resume-projects">
+            <div class="resume-project">
+                <div class="resume-project-title">Academic and Personal Projects</div>
+                <ul class="resume-project-description">
+                    {% for line in resume_data.projects.split('\n') %}
+                        {% if line.strip() %}
+                        <li>{{ line.strip() }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if resume_data.education and resume_data.education|length > 0 %}
+        <div class="section-divider"></div>
+        <div class="resume-section-title">Education</div>
+        <div class="resume-education">
+            {% for edu in resume_data.education %}
+                {% if edu.degree or edu.institution %}
+                <div class="resume-education-entry">
+                    <div class="resume-education-degree">{{ edu.degree }}</div>
+                    <div class="resume-education-institution">{{ edu.institution }}</div>
+                    <div class="resume-education-year">{{ edu.start_year }} - {{ edu.end_year }}</div>
+                    {% if edu.description and edu.description.strip() %}
+                    <div class="resume-education-description">{{ edu.description }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% elif resume_data.degree and resume_data.degree.strip() %}
+        <div class="section-divider"></div>
+        <div class="resume-section-title">Education</div>
+        <div class="resume-education">
+            <div class="resume-education-entry">
+                <div class="resume-education-degree">{{ resume_data.degree }}</div>
+                {% if resume_data.cgpa and resume_data.cgpa.strip() %}
+                <div class="resume-education-year">CGPA: {{ resume_data.cgpa }}</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

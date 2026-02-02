@@ -28,10 +28,27 @@
   <header class="border-bottom py-3">
     <div class="container d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-bold">NextHire.AI</h5>
+      
+      <!-- Desktop Navigation -->
       <nav class="d-none d-md-flex gap-4">
         <a class="nav-link" href="/"><i class="bi bi-house"></i> Home</a>
         <a class="nav-link" href="/login_page"><i class="bi bi-person-fill-lock"></i> Sign In</a>
       </nav>
+      
+      <!-- Mobile Hamburger Button -->
+      <button class="navbar-toggler d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+    
+    <!-- Mobile Navigation Menu -->
+    <div class="collapse navbar-collapse d-md-none" id="mobileNav">
+      <div class="container">
+        <nav class="navbar-nav py-3">
+          <a class="nav-link mobile-nav-link" href="/"><i class="bi bi-house"></i> Home</a>
+          <a class="nav-link mobile-nav-link" href="/login_page"><i class="bi bi-person-fill-lock"></i> Sign In</a>
+        </nav>
+      </div>
     </div>
   </header>
 
@@ -294,6 +311,73 @@
       return emailRegex.test(email);
     }
 
+    function validateYear(year) {
+      // Check if year is a valid 4-digit number between 1900 and current year + 10
+      const currentYear = new Date().getFullYear();
+      const yearNum = parseInt(year);
+      return !isNaN(yearNum) && yearNum >= 1900 && yearNum <= (currentYear + 10) && year.length === 4;
+    }
+
+    function validateYearRange(startYear, endYear) {
+      // Both years must be valid first
+      if (!validateYear(startYear) || !validateYear(endYear)) {
+        return false;
+      }
+      
+      // Start year must be strictly less than end year
+      return parseInt(startYear) < parseInt(endYear);
+    }
+
+    function validateEducationEntry(entry, index) {
+      let isValid = true;
+      const startYearInput = entry.querySelector('.education-start-year');
+      const endYearInput = entry.querySelector('.education-end-year');
+      const startYearError = entry.querySelector('.education-start-year-error');
+      const endYearError = entry.querySelector('.education-end-year-error');
+      
+      const startYear = startYearInput.value.trim();
+      const endYear = endYearInput.value.trim();
+      
+      // Validate start year
+      if (startYear && !validateYear(startYear)) {
+        startYearInput.classList.add('is-invalid');
+        startYearInput.classList.remove('is-valid');
+        startYearError.textContent = 'Please enter a valid 4-digit year (1900-' + (new Date().getFullYear() + 10) + ').';
+        startYearError.style.display = 'block';
+        isValid = false;
+      } else {
+        startYearInput.classList.remove('is-invalid');
+        if (startYear) startYearInput.classList.add('is-valid');
+        startYearError.style.display = 'none';
+      }
+      
+      // Validate end year
+      if (endYear && !validateYear(endYear)) {
+        endYearInput.classList.add('is-invalid');
+        endYearInput.classList.remove('is-valid');
+        endYearError.textContent = 'Please enter a valid 4-digit year (1900-' + (new Date().getFullYear() + 10) + ').';
+        endYearError.style.display = 'block';
+        isValid = false;
+      } else {
+        endYearInput.classList.remove('is-invalid');
+        if (endYear) endYearInput.classList.add('is-valid');
+        endYearError.style.display = 'none';
+      }
+      
+      // Validate year range if both years are valid
+      if (startYear && endYear && validateYear(startYear) && validateYear(endYear)) {
+        if (!validateYearRange(startYear, endYear)) {
+          endYearInput.classList.add('is-invalid');
+          endYearInput.classList.remove('is-valid');
+          endYearError.textContent = 'End year must be greater than start year.';
+          endYearError.style.display = 'block';
+          isValid = false;
+        }
+      }
+      
+      return isValid;
+    }
+
     function showFieldError(fieldId, errorId, message) {
       const field = document.getElementById(fieldId);
       const errorDiv = document.getElementById(errorId);
@@ -341,6 +425,14 @@
         clearFieldError('email', 'emailError');
       }
       
+      // Validate all education entries
+      const educationEntries = document.querySelectorAll('.education-entry');
+      educationEntries.forEach((entry, index) => {
+        if (!validateEducationEntry(entry, index)) {
+          isValid = false;
+        }
+      });
+      
       return isValid;
     }
 
@@ -362,6 +454,30 @@
         clearFieldError('email', 'emailError');
       }
     });
+
+    // Add real-time validation for education year fields
+    document.addEventListener('input', function(e) {
+      if (e.target.classList.contains('education-start-year') || e.target.classList.contains('education-end-year')) {
+        const educationEntry = e.target.closest('.education-entry');
+        if (educationEntry) {
+          // Add a small delay to avoid excessive validation during typing
+          clearTimeout(educationEntry.validationTimeout);
+          educationEntry.validationTimeout = setTimeout(() => {
+            validateEducationEntry(educationEntry);
+          }, 500);
+        }
+      }
+    });
+
+    // Validate immediately when user leaves the field
+    document.addEventListener('blur', function(e) {
+      if (e.target.classList.contains('education-start-year') || e.target.classList.contains('education-end-year')) {
+        const educationEntry = e.target.closest('.education-entry');
+        if (educationEntry) {
+          validateEducationEntry(educationEntry);
+        }
+      }
+    }, true);
 
     function generateResume() {
       // Validate form before submission
@@ -561,12 +677,14 @@
               <div class="form-floating mb-3">
                 <input type="text" class="form-control education-start-year" placeholder="Start Year" required>
                 <label class="fw-500">Start Year</label>
+                <div class="invalid-feedback education-start-year-error" style="display: none;"></div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-floating mb-3">
                 <input type="text" class="form-control education-end-year" placeholder="End Year" required>
                 <label class="fw-500">End Year</label>
+                <div class="invalid-feedback education-end-year-error" style="display: none;"></div>
               </div>
             </div>
           </div>

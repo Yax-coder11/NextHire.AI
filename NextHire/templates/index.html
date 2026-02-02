@@ -39,6 +39,8 @@
   <header class="border-bottom py-3">
     <div class="container d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-bold">NextHire.AI</h5>
+      
+      <!-- Desktop Navigation -->
       <nav class="d-none d-md-flex gap-4">
         <a class="nav-link" href="#home"><i class="bi bi-house"></i> Home</a>
         <a class="nav-link" href="#how-it-works"><i class="bi bi-gear-wide-connected"></i> How It Works</a>
@@ -47,6 +49,24 @@
         <a class="nav-link" href="/login_page"><i class="bi bi-person-fill-lock"></i> Sign In</a>
         <!-- <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#adminModal" onclick="adminLogin()"><i class="bi bi-gear"></i> Admin</a> -->
       </nav>
+      
+      <!-- Mobile Hamburger Button -->
+      <button class="navbar-toggler d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+    
+    <!-- Mobile Navigation Menu -->
+    <div class="collapse navbar-collapse d-md-none" id="mobileNav">
+      <div class="container">
+        <nav class="navbar-nav py-3">
+          <a class="nav-link mobile-nav-link" href="#home"><i class="bi bi-house"></i> Home</a>
+          <a class="nav-link mobile-nav-link" href="#how-it-works"><i class="bi bi-gear-wide-connected"></i> How It Works</a>
+          <a class="nav-link mobile-nav-link" href="#features"><i class="bi bi-stars"></i> Features</a>
+          <a class="nav-link mobile-nav-link" href="#faq"><i class="bi bi-question-circle"></i> FAQ</a>
+          <a class="nav-link mobile-nav-link" href="/login_page"><i class="bi bi-person-fill-lock"></i> Sign In</a>
+        </nav>
+      </div>
     </div>
   </header>
 

@@ -179,10 +179,14 @@ def save_resume():
         name = data["name"]
         phone = data["phone"]
         email = data["email"]
+        city = data.get("city", "")
         degree = data["degree"]
+        github_username = data.get("github_username", "")
         cgpa = data["cgpa"]
+        about_yourself = data.get("about_yourself", "")
         skills = data["skills"]
         projects = data["projects"]
+        education_data = data.get("education", [])
 
         score, missing_skills = calculate_resume_score(
             cgpa=cgpa,
@@ -191,11 +195,8 @@ def save_resume():
             fields_present=True
         )
 
-
         session["last_score"] = score
         session["last_missing_skills"] = missing_skills
-
-
 
         # -------- Resume Text --------
         resume_text = f"""{name.upper()}
@@ -204,7 +205,21 @@ def save_resume():
 
 CONTACT
 Phone: {phone}
-Email: {email}
+Email: {email}"""
+
+        if city:
+            resume_text += f"\nCity: {city}"
+        if github_username:
+            resume_text += f"\nGitHub: {github_username}"
+
+        if about_yourself:
+            resume_text += f"""
+
+ABOUT
+----------------------------------------
+{about_yourself}"""
+
+        resume_text += f"""
 
 SKILLS
 ----------------------------------------
@@ -228,7 +243,6 @@ PROJECTS
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(resume_text)
 
-        
         created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # ----- Placement Readiness Status (same logic as evaluator) -----
@@ -244,7 +258,7 @@ PROJECTS
         cur = conn.cursor()
 
         cur.execute("""
-                CREATE TABLE IF NOT EXISTS resumes (
+        CREATE TABLE IF NOT EXISTS resumes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
 
             -- Registered user (login identity)
@@ -259,6 +273,11 @@ PROJECTS
             skills TEXT NOT NULL,
             projects TEXT NOT NULL,
 
+            -- Additional fields
+            about_yourself TEXT,
+            github_username TEXT,
+            city TEXT,
+
             -- File system
             file_path TEXT NOT NULL,
 
@@ -269,22 +288,52 @@ PROJECTS
             -- Metadata
             created_at TEXT NOT NULL
         );
+        """)
 
+        # Create education table if it doesn't exist
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS education (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resume_id INTEGER,
+            degree TEXT,
+            institution TEXT,
+            start_year TEXT,
+            end_year TEXT,
+            description TEXT,
+            FOREIGN KEY (resume_id) REFERENCES resumes (id)
+        );
         """)
 
         cur.execute("""
-            INSERT INTO resumes (user_email, name, phone, email, degree, cgpa, skills, projects, file_path, score, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO resumes (user_email, name, phone, email, degree, cgpa, skills, projects, 
+                               about_yourself, github_username, city, file_path, score, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            user_email, name, phone, email,
-            degree, cgpa, skills, projects, file_path,score,status,created_at
+            user_email, name, phone, email, degree, cgpa, skills, projects,
+            about_yourself, github_username, city, file_path, score, status, created_at
         ))
 
         conn.commit()  
-        resume_id = cur.lastrowid   # ✅ ADD THIS LINE      
+        resume_id = cur.lastrowid
+
+        # Save education data
+        for edu in education_data:
+            if edu.get('degree') or edu.get('institution'):  # Only save if there's meaningful data
+                cur.execute("""
+                    INSERT INTO education (resume_id, degree, institution, start_year, end_year, description)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (
+                    resume_id,
+                    edu.get('degree', ''),
+                    edu.get('institution', ''),
+                    edu.get('start_year', ''),
+                    edu.get('end_year', ''),
+                    edu.get('description', '')
+                ))
+
+        conn.commit()
 
         # ----- DS: Resume History Tracking -----
-
         if user_email not in user_resume_history:
             user_resume_history[user_email] = ResumeLinkedList()
 
@@ -295,11 +344,9 @@ PROJECTS
             created_at=created_at
         )
 
-
         conn.close()
 
         print(os.path.abspath(DB_NAME))
-
 
         # ----- DS DEBUG: Console Output -----
         print("\n[DS] Resume Linked List State:")
@@ -308,13 +355,12 @@ PROJECTS
             for node in ll.get_resume_history():
                 print("   ", node)
 
-
         return jsonify({
             "success": True,
             "resume_text": resume_text,
             "txt_file": file_name,
-            "score":score,
-            "missing skills":missing_skills
+            "score": score,
+            "missing skills": missing_skills
         })
 
     except Exception as e:
@@ -433,281 +479,6 @@ def get_resume_data_by_filename(filename):
         print(f"Error retrieving resume data: {e}")
         return None
 
-def generate_formatted_html_resume(resume_data):
-    """Generate formatted HTML resume matching the UI exactly"""
-    
-    # Complete HTML document with embedded CSS for PDF generation
-    html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body {{
-                font-family: 'Times New Roman', serif;
-                font-size: 11pt;
-                line-height: 1.4;
-                color: #000;
-                margin: 0;
-                padding: 0.75in;
-                background-color: white;
-            }}
-            
-            .resume-document {{
-                background-color: white;
-                color: #000;
-                font-family: 'Times New Roman', serif;
-                font-size: 11pt;
-                line-height: 1.4;
-                max-width: 8.5in;
-                margin: 0 auto;
-                padding: 0;
-                min-height: 11in;
-            }}
-            
-            .section-divider {{
-                border-top: 1px solid #ddd;
-                margin: 1.5em 0 1em 0;
-                width: 100%;
-            }}
-            
-            .resume-header {{
-                text-align: center;
-                margin-bottom: 1.5em;
-            }}
-            
-            .resume-name {{
-                font-size: 18pt;
-                font-weight: bold;
-                margin-bottom: 0.5em;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-            }}
-            
-            .resume-contact {{
-                font-size: 10pt;
-                margin-bottom: 1em;
-            }}
-            
-            .resume-summary {{
-                margin-bottom: 1.5em;
-                text-align: justify;
-                font-size: 11pt;
-            }}
-            
-            .resume-section-title {{
-                font-size: 12pt;
-                font-weight: bold;
-                text-transform: uppercase;
-                margin-top: 1.5em;
-                margin-bottom: 0.5em;
-                border-bottom: 1px solid #000;
-                padding-bottom: 2px;
-                letter-spacing: 0.5px;
-            }}
-            
-            .resume-section-title:first-of-type {{
-                margin-top: 0;
-            }}
-            
-            .resume-skills {{
-                margin-bottom: 1em;
-            }}
-            
-            .resume-skills-list {{
-                margin: 0;
-                padding: 0;
-                list-style: none;
-            }}
-            
-            .resume-skills-list li {{
-                margin-bottom: 0.3em;
-                font-size: 11pt;
-            }}
-            
-            .resume-projects {{
-                margin-bottom: 1em;
-            }}
-            
-            .resume-project {{
-                margin-bottom: 1em;
-            }}
-            
-            .resume-project-title {{
-                font-weight: bold;
-                font-size: 11pt;
-                margin-bottom: 0.2em;
-            }}
-            
-            .resume-project-description {{
-                margin: 0;
-                padding-left: 1em;
-                list-style: none;
-            }}
-            
-            .resume-project-description li {{
-                margin-bottom: 0.2em;
-                font-size: 11pt;
-            }}
-            
-            .resume-project-description li:before {{
-                content: "• ";
-                margin-left: -1em;
-            }}
-            
-            .resume-education {{
-                margin-bottom: 1em;
-            }}
-            
-            .resume-education-entry {{
-                margin-bottom: 1em;
-            }}
-            
-            .resume-education-degree {{
-                font-weight: bold;
-                font-size: 11pt;
-                margin-bottom: 0.1em;
-            }}
-            
-            .resume-education-institution {{
-                font-size: 11pt;
-                margin-bottom: 0.1em;
-            }}
-            
-            .resume-education-year {{
-                font-size: 10pt;
-                color: #333;
-                margin-bottom: 0.3em;
-            }}
-            
-            .resume-education-description {{
-                font-size: 10pt;
-                color: #333;
-                margin-bottom: 0.3em;
-            }}
-            
-            /* Print-specific styles */
-            @page {{
-                size: A4;
-                margin: 0.75in;
-            }}
-            
-            /* Prevent page breaks inside elements */
-            .resume-education-entry,
-            .resume-project {{
-                page-break-inside: avoid;
-            }}
-            
-            .resume-section-title {{
-                page-break-after: avoid;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="resume-document">
-            <div class="resume-header">
-                <div class="resume-name">{resume_data['name']}</div>
-                <div class="resume-contact">
-                    {resume_data['email']}"""
-    
-    # Build contact line
-    contact_parts = []
-    if resume_data['phone']:
-        contact_parts.append(resume_data['phone'])
-    if resume_data['github_username']:
-        contact_parts.append(f"GitHub: {resume_data['github_username']}")
-    if resume_data['city']:
-        contact_parts.append(resume_data['city'])
-    
-    if contact_parts:
-        html += " | " + " | ".join(contact_parts)
-    
-    html += """
-                </div>
-            </div>"""
-    
-    # Professional Summary
-    if resume_data['about_yourself'] and resume_data['about_yourself'].strip():
-        html += f"""
-            <div class="section-divider"></div>
-            <div class="resume-summary">
-                {resume_data['about_yourself']}
-            </div>"""
-    
-    # Core Skills Section
-    if resume_data['skills'] and resume_data['skills'].strip():
-        html += """
-            <div class="section-divider"></div>
-            <div class="resume-section-title">Core Skills</div>
-            <div class="resume-skills">
-                <ul class="resume-skills-list">"""
-        
-        skills = [skill.strip() for skill in resume_data['skills'].split(',') if skill.strip()]
-        for skill in skills:
-            html += f"<li>{skill}</li>"
-        
-        html += "</ul></div>"
-    
-    # Projects Section
-    if resume_data['projects'] and resume_data['projects'].strip():
-        html += """
-            <div class="section-divider"></div>
-            <div class="resume-section-title">Projects</div>
-            <div class="resume-projects">
-                <div class="resume-project">
-                    <div class="resume-project-title">Academic and Personal Projects</div>
-                    <ul class="resume-project-description">"""
-        
-        project_lines = [line.strip() for line in resume_data['projects'].split('\n') if line.strip()]
-        for line in project_lines:
-            html += f"<li>{line}</li>"
-        
-        html += "</ul></div></div>"
-    
-    # Education Section
-    if resume_data['education'] and len(resume_data['education']) > 0:
-        html += """
-            <div class="section-divider"></div>
-            <div class="resume-section-title">Education</div>
-            <div class="resume-education">"""
-        
-        for edu in resume_data['education']:
-            if edu['degree'] or edu['institution']:  # Only show if there's meaningful data
-                html += f"""
-                <div class="resume-education-entry">
-                    <div class="resume-education-degree">{edu['degree']}</div>
-                    <div class="resume-education-institution">{edu['institution']}</div>
-                    <div class="resume-education-year">{edu['start_year']} - {edu['end_year']}</div>"""
-                
-                if edu['description'] and edu['description'].strip():
-                    html += f"<div class=\"resume-education-description\">{edu['description']}</div>"
-                
-                html += "</div>"
-        
-        html += "</div>"
-    elif resume_data['degree'] and resume_data['degree'].strip():
-        # Fallback to single degree entry
-        html += f"""
-            <div class="section-divider"></div>
-            <div class="resume-section-title">Education</div>
-            <div class="resume-education">
-                <div class="resume-education-entry">
-                    <div class="resume-education-degree">{resume_data['degree']}</div>"""
-        
-        if resume_data['cgpa'] and resume_data['cgpa'].strip():
-            html += f"<div class=\"resume-education-year\">CGPA: {resume_data['cgpa']}</div>"
-        
-        html += """
-                </div>
-            </div>"""
-    
-    html += """
-        </div>
-    </body>
-    </html>"""
-    
-    return html
-
 @app.route("/download/<filename>")
 def download_resume(filename):
     # Get resume data from database
@@ -716,12 +487,12 @@ def download_resume(filename):
     if not resume_data:
         return "Resume not found", 404
     
-    # Generate formatted HTML
-    html_content = generate_formatted_html_resume(resume_data)
+    # Generate HTML using Jinja template
+    html_content = render_template('resume_pdf.html', resume_data=resume_data)
     
-    # Convert HTML to PDF using weasyprint (more reliable for HTML/CSS)
+    # Try WeasyPrint first, fall back to ReportLab
     try:
-        from weasyprint import HTML, CSS
+        from weasyprint import HTML
         
         # Create PDF from HTML
         pdf_buffer = io.BytesIO()
@@ -737,8 +508,10 @@ def download_resume(filename):
             mimetype="application/pdf"
         )
         
-    except ImportError:
-        # Fallback to reportlab if weasyprint is not available
+    except (ImportError, OSError) as e:
+        print(f"WeasyPrint not available ({e}), falling back to ReportLab")
+        
+        # Fallback to reportlab
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
         from reportlab.lib.units import inch
@@ -834,6 +607,9 @@ def download_resume(filename):
             download_name=pdf_name,
             mimetype="application/pdf"
         )
+    except Exception as e:
+        print(f"PDF generation error: {e}")
+        return "PDF generation failed", 500
 
 # ---------------- ADMIN LOGIN ----------------
 ADMIN_EMAIL = "admin@placement.com"

@@ -11,7 +11,7 @@ html {
   --secondary: hsl(215, 25%, 27%);
   --accent: hsl(210, 30%, 50%);
   --border: rgba(0, 0, 0, 0.25); /* Darkened from 0.12 to 0.25 */
-  --radius: 4px;
+  --radius: 8px; /* Increased from 4px for softer appearance */
 }
 
 /* Editorial Section Dividers */
@@ -2299,5 +2299,767 @@ html {
   
   section[style*="width: 100vw"] p {
     font-size: 1rem !important;
+  }
+}
+
+/* Global Rounded Corners Enhancement */
+/* Apply subtle rounded corners to common UI elements for a softer, modern appearance */
+
+/* Tables */
+.table {
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.table thead th:first-child {
+  border-top-left-radius: var(--radius);
+}
+
+.table thead th:last-child {
+  border-top-right-radius: var(--radius);
+}
+
+.table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--radius);
+}
+
+.table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: var(--radius);
+}
+
+/* Sections and containers */
+section {
+  border-radius: var(--radius);
+}
+
+/* Header */
+header {
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* Footer */
+footer {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+/* Images */
+img {
+  border-radius: var(--radius);
+}
+
+/* Specific image exceptions for logos and icons */
+.nav-link img,
+header img,
+.bi,
+[class*="bi-"] {
+  border-radius: 0;
+}
+
+/* Form elements that don't already have border-radius */
+.form-select {
+  border-radius: var(--radius);
+}
+
+.input-group {
+  border-radius: var(--radius);
+}
+
+.input-group .form-control:first-child {
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+
+.input-group .form-control:last-child {
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+/* Alert boxes */
+.alert {
+  border-radius: var(--radius);
+}
+
+/* Bootstrap cards that don't use the .panel class */
+.card {
+  border-radius: var(--radius);
+}
+
+.card-header {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.card-footer {
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* Badges and labels */
+.badge {
+  border-radius: calc(var(--radius) / 2);
+}
+
+/* Dropdowns */
+.dropdown-menu {
+  border-radius: var(--radius);
+}
+
+/* Progress bars */
+.progress {
+  border-radius: var(--radius);
+}
+
+.progress-bar {
+  border-radius: var(--radius);
+}
+
+/* Navigation pills/tabs */
+.nav-pills .nav-link {
+  border-radius: var(--radius);
+}
+
+.nav-tabs .nav-link {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+/* Pagination */
+.page-link {
+  border-radius: var(--radius);
+}
+
+.pagination .page-item:first-child .page-link {
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+
+.pagination .page-item:last-child .page-link {
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+/* Tooltips and popovers */
+.tooltip-inner {
+  border-radius: var(--radius);
+}
+
+.popover {
+  border-radius: var(--radius);
+}
+
+/* List groups */
+.list-group {
+  border-radius: var(--radius);
+}
+
+.list-group-item:first-child {
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
+
+.list-group-item:last-child {
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  /* Slightly reduce border-radius on mobile for better touch targets */
+  :root {
+    --radius: 6px;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Further reduce on very small screens */
+  :root {
+    --radius: 4px;
+  }
+}
+/* Mobile Navigation & Hamburger Menu Styles */
+
+/* Hamburger button styling */
+.navbar-toggler {
+  background: none;
+  border: 2px solid var(--foreground);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  color: var(--foreground);
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.navbar-toggler:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 61, 0.25);
+  outline: none;
+}
+
+.navbar-toggler i {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Mobile navigation menu */
+.navbar-collapse {
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.navbar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-nav-link {
+  color: var(--foreground) !important;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobile-nav-link:hover {
+  background-color: var(--card);
+  color: var(--primary) !important;
+  transform: translateX(0.25rem);
+}
+
+.mobile-nav-link i {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Ensure mobile menu appears above other content */
+.navbar-collapse.show,
+.navbar-collapse.collapsing {
+  position: relative;
+  z-index: 1020;
+}
+
+/* Smooth animation for mobile menu */
+.navbar-collapse {
+  transition: all 0.35s ease;
+}
+
+/* Mobile-specific responsive enhancements */
+@media (max-width: 767px) {
+  /* Ensure content doesn't overflow horizontally */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Stack form elements on mobile */
+  .row .col-md-6 {
+    margin-bottom: 1rem;
+  }
+  
+  /* Make buttons full width on mobile */
+  .comic-button {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Adjust table responsiveness */
+  .table-responsive {
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  /* Stack hero content on mobile */
+  .hero-title {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  /* Improve mobile form spacing */
+  .form-floating {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Mobile-friendly panel padding */
+  .panel {
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Adjust section spacing for mobile */
+  section.py-5 {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (max-width: 991px) and (min-width: 768px) {
+  /* Adjust spacing for tablet */
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  /* Tablet button sizing */
+  .comic-button {
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+/* Large mobile devices */
+@media (max-width: 480px) {
+  /* Extra small screens adjustments */
+  .hero-title {
+    font-size: 2.5rem !important;
+    line-height: 1.1;
+  }
+  
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .panel {
+    padding: 1rem;
+  }
+  
+  /* Compact mobile navigation */
+  .mobile-nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .mobile-nav-link i {
+    font-size: 1.1rem;
+  }
+}
+
+/* Landscape mobile orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+  /* Reduce vertical spacing in landscape */
+  section.py-5 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem !important;
+    margin-bottom: 1rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Ensure crisp rendering on retina displays */
+  .navbar-toggler {
+    border-width: 1px;
+  }
+  
+  .mobile-nav-link {
+    border: 1px solid transparent;
+  }
+  
+  .mobile-nav-link:hover {
+    border-color: var(--border);
+  }
+}
+/* Additional Responsive Table Improvements */
+@media (max-width: 767px) {
+  /* Make tables more mobile-friendly */
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.5rem 0.25rem;
+    vertical-align: middle;
+  }
+  
+  /* Hide less important columns on mobile */
+  .table th:nth-child(2),
+  .table td:nth-child(2) {
+    display: none; /* Hide Resume ID column */
+  }
+  
+  .table th:nth-child(4),
+  .table td:nth-child(4) {
+    display: none; /* Hide Degree column */
+  }
+  
+  .table th:nth-child(5),
+  .table td:nth-child(5) {
+    display: none; /* Hide CGPA column */
+  }
+  
+  /* Make action buttons smaller on mobile */
+  .dashboard-action-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .dashboard-action-btn i {
+    font-size: 0.75rem;
+  }
+  
+  /* Stack form rows on mobile */
+  .row .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  
+  /* Full width form controls */
+  .form-control,
+  .form-select {
+    width: 100%;
+  }
+  
+  /* Improve accordion spacing on mobile */
+  .accordion-item {
+    margin-bottom: 0.75rem;
+  }
+  
+  .accordion-button {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Better mobile spacing for panels */
+  .section-heading-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .section-heading-container i {
+    font-size: 1.5rem;
+  }
+}
+
+/* Tablet-specific table improvements */
+@media (max-width: 991px) and (min-width: 768px) {
+  .table th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+}
+
+/* Prevent horizontal scroll on all screen sizes */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.container-fluid,
+.container {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure images are responsive */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Make embedded content responsive */
+iframe,
+embed,
+object,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive text sizing */
+@media (max-width: 480px) {
+  /* Extra small text adjustments */
+  .text-muted {
+    font-size: 0.85rem;
+  }
+  
+  .small {
+    font-size: 0.8rem;
+  }
+  
+  /* Compact dashboard badges */
+  .dashboard-badge {
+    padding: 0.125rem 0.375rem;
+    font-size: 0.7rem;
+  }
+  
+  /* Smaller section icons */
+  .section-heading-icon {
+    font-size: 1.25rem;
+  }
+}
+
+/* Print styles - ensure responsive design doesn't break printing */
+@media print {
+  .navbar-toggler,
+  .mobile-nav-link,
+  .navbar-collapse {
+    display: none !important;
+  }
+  
+  .d-none.d-md-flex {
+    display: flex !important;
+  }
+  
+  body {
+    padding-top: 0;
+  }
+  
+  header {
+    position: static;
+  }
+}
+/* Mobile Spacing for Hero Section - Get Started Button and Image */
+@media (max-width: 991px) {
+  /* Add spacing between stacked hero content on tablet and mobile */
+  #home .row .col-lg-6:first-child {
+    margin-bottom: 2rem;
+  }
+  
+  /* Ensure the Get Started button has adequate spacing from content above */
+  #home .comic-button {
+    margin-top: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Increase spacing on mobile for better readability */
+  #home .row .col-lg-6:first-child {
+    margin-bottom: 2.5rem;
+  }
+  
+  /* Additional spacing for the button on mobile */
+  #home .comic-button {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Center align the button on mobile for better visual balance */
+  #home .col-lg-6:first-child {
+    text-align: center;
+  }
+  
+  /* Ensure hero title maintains left alignment on mobile */
+  #home .hero-title {
+    text-align: left;
+  }
+  
+  /* Keep paragraph text left-aligned but add some breathing room */
+  #home .text-muted {
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Extra spacing on very small screens */
+  #home .row .col-lg-6:first-child {
+    margin-bottom: 3rem;
+  }
+  
+  /* Generous button spacing on small screens */
+  #home .comic-button {
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Ensure no spacing issues on larger screens */
+@media (min-width: 992px) {
+  /* Reset any mobile spacing on desktop */
+  #home .row .col-lg-6:first-child {
+    margin-bottom: 0;
+  }
+  
+  #home .comic-button {
+    margin-top: 1rem; /* Keep original spacing */
+  }
+  
+  #home .col-lg-6:first-child {
+    text-align: left; /* Maintain original left alignment */
+  }
+}
+/* Education Section Mobile Layout Improvements */
+
+/* Tablet and mobile improvements */
+@media (max-width: 991px) {
+  /* Add spacing between education section header and container */
+  .mb-4 .d-flex.justify-content-between {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Ensure adequate spacing between education entries */
+  .education-entry {
+    margin-bottom: 2rem;
+  }
+  
+  /* Slightly smaller buttons on tablet */
+  #addEducationBtn {
+    font-size: 0.8rem !important;
+    padding: 0.3rem 0.6rem !important;
+  }
+  
+  .education-entry .comic-button {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 767px) {
+  /* Stack education section header on mobile */
+  .mb-4 .d-flex.justify-content-between {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* Full-width Add Education button on mobile */
+  #addEducationBtn {
+    width: 100%;
+    text-align: center;
+    font-size: 0.85rem !important;
+    padding: 0.5rem 1rem !important;
+  }
+  
+  /* Education entry header improvements */
+  .education-entry .d-flex.justify-content-between {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Remove button styling on mobile */
+  .education-entry .comic-button {
+    font-size: 0.75rem !important;
+    padding: 0.375rem 0.75rem !important;
+    align-self: flex-end;
+  }
+  
+  /* Better spacing for education entries */
+  .education-entry {
+    margin-bottom: 2.5rem;
+    padding: 1.25rem;
+  }
+  
+  /* Improve form field spacing within education entries */
+  .education-entry .form-floating {
+    margin-bottom: 1.25rem;
+  }
+  
+  /* Stack form columns on mobile */
+  .education-entry .row .col-md-6 {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Small mobile optimizations */
+@media (max-width: 576px) {
+  /* More compact spacing on very small screens */
+  .mb-4 .d-flex.justify-content-between {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Compact Add Education button */
+  #addEducationBtn {
+    font-size: 0.8rem !important;
+    padding: 0.4rem 0.8rem !important;
+  }
+  
+  /* Compact Remove buttons */
+  .education-entry .comic-button {
+    font-size: 0.7rem !important;
+    padding: 0.3rem 0.6rem !important;
+  }
+  
+  /* Tighter education entry spacing */
+  .education-entry {
+    margin-bottom: 2rem;
+    padding: 1rem;
+  }
+  
+  /* Compact form field spacing */
+  .education-entry .form-floating {
+    margin-bottom: 1rem;
+  }
+  
+  /* Education entry titles */
+  .education-entry h6 {
+    font-size: 0.9rem;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 767px) and (orientation: landscape) {
+  /* Reduce vertical spacing in landscape mode */
+  .mb-4 .d-flex.justify-content-between {
+    margin-bottom: 1rem;
+  }
+  
+  .education-entry {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+  }
+  
+  .education-entry .form-floating {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Touch target improvements for accessibility */
+@media (max-width: 767px) {
+  /* Ensure buttons meet minimum touch target size (44px) */
+  #addEducationBtn {
+    min-height: 44px;
+  }
+  
+  .education-entry .comic-button {
+    min-height: 40px;
+    min-width: 80px;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  @media (max-width: 767px) {
+    /* Slightly larger buttons on high DPI mobile screens */
+    #addEducationBtn {
+      padding: 0.55rem 1.1rem !important;
+    }
+    
+    .education-entry .comic-button {
+      padding: 0.4rem 0.8rem !important;
+    }
+  }
+}
+
+/* Focus states for better keyboard navigation on mobile */
+@media (max-width: 767px) {
+  #addEducationBtn:focus,
+  .education-entry .comic-button:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
   }
 }
