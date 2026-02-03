@@ -1,0 +1,23 @@
+SAD
+----------------------------------------
+CE | CGPA: 9.0
+
+CONTACT
+Phone: 9375088741
+Email: sadpanda@gmail.com
+City: beijing
+GitHub: bamboo
+
+ABOUT
+----------------------------------------
+me pure din sota hu
+
+SKILLS
+----------------------------------------
+- python
+- de
+
+
+PROJECTS
+----------------------------------------
+p1 description
