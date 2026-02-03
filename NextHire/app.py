@@ -12,24 +12,17 @@ from python_modules.resume_history_ds import ResumeLinkedList
 from datetime import datetime
 
 
-
 app = Flask(__name__)
 app.secret_key = "placement_secret_key"
 
 DB_NAME = os.path.join(os.path.dirname(__file__), "database.db")
 print("DB IN USE ->", os.path.abspath(DB_NAME))
 
-
-
 user_resume_history = {}
-
-
 
 # ---------------- DB CONNECTION ----------------
 def get_db():
     return sqlite3.connect(DB_NAME)
-
-
 
 # ---------------- REBUILD DS FROM DB ----------------
 def rebuild_resume_history():
