@@ -255,11 +255,391 @@
               <h5 class="mb-3"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Missing Skills</h5>
               <ul id="missingSkillsList" class="missing-skills-list"></ul>
             </div>
+            
+            <!-- Job-Specific Evaluation (Hidden by default) -->
+            <div id="job-specific-evaluation" class="missing-skills-section" style="display: none; margin-top: 2rem;">
+              <h5 class="mb-3"><i class="bi bi-briefcase text-primary me-2"></i>Job-Specific Evaluation</h5>
+              <div class="text-center mb-3">
+                <div class="resume-score-display">
+                  <h3 class="mb-0 fw-bold" style="font-size: 2.5rem; color: var(--primary); line-height: 1;" id="jobSpecificScore">--</h3>
+                  <p class="mb-0" style="font-size: 1rem; color: var(--foreground); font-weight: 500;">job fit score</p>
+                </div>
+              </div>
+              <div class="text-center mb-3">
+                <span class="dashboard-badge" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;" id="jobSpecificStatus">--</span>
+              </div>
+              <div id="jobSpecificSkills">
+                <p class="text-muted small mb-2" id="jobTitle">For: <strong>--</strong></p>
+                <ul id="jobMissingSkillsList" class="missing-skills-list"></ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Interest Field Modal -->
+  <div class="modal fade" id="interestFieldModal" tabindex="-1" aria-labelledby="interestFieldModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <h5 class="modal-title hero-title" id="interestFieldModalLabel" style="font-size: 1.5rem;">
+            INTERESTED <span class="hero-accent">FIELD</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <p class="text-muted mb-4">Select the fields you're interested in pursuing:</p>
+          
+          <!-- Tech & Engineering -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">💻 Tech & Engineering (your natural habitat)</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Software Development" id="field1">
+                  <label class="form-check-label" for="field1">Software Development</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Web Development (Frontend / Backend / Full Stack)" id="field2">
+                  <label class="form-check-label" for="field2">Web Development (Frontend / Backend / Full Stack)</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Data Science & Analytics" id="field3">
+                  <label class="form-check-label" for="field3">Data Science & Analytics</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Artificial Intelligence & Machine Learning" id="field4">
+                  <label class="form-check-label" for="field4">Artificial Intelligence & Machine Learning</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Cloud Computing" id="field5">
+                  <label class="form-check-label" for="field5">Cloud Computing</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Cybersecurity" id="field6">
+                  <label class="form-check-label" for="field6">Cybersecurity</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Database Management Systems" id="field7">
+                  <label class="form-check-label" for="field7">Database Management Systems</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="DevOps Engineering" id="field8">
+                  <label class="form-check-label" for="field8">DevOps Engineering</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Mobile App Development" id="field9">
+                  <label class="form-check-label" for="field9">Mobile App Development</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Business, Marketing & Strategy -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">📊 Business, Marketing & Strategy (when you want money)</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Digital Marketing" id="field10">
+                  <label class="form-check-label" for="field10">Digital Marketing</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Product Management" id="field11">
+                  <label class="form-check-label" for="field11">Product Management</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Business Analytics" id="field12">
+                  <label class="form-check-label" for="field12">Business Analytics</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Growth Marketing" id="field13">
+                  <label class="form-check-label" for="field13">Growth Marketing</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Sales Engineering" id="field14">
+                  <label class="form-check-label" for="field14">Sales Engineering</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Startup & Entrepreneurship" id="field15">
+                  <label class="form-check-label" for="field15">Startup & Entrepreneurship</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Operations Management" id="field16">
+                  <label class="form-check-label" for="field16">Operations Management</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Market Research" id="field17">
+                  <label class="form-check-label" for="field17">Market Research</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Design & Creative -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">🎨 Design & Creative (for people with taste)</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="UI/UX Design" id="field18">
+                  <label class="form-check-label" for="field18">UI/UX Design</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Graphic Design" id="field19">
+                  <label class="form-check-label" for="field19">Graphic Design</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Product Design" id="field20">
+                  <label class="form-check-label" for="field20">Product Design</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Motion Graphics" id="field21">
+                  <label class="form-check-label" for="field21">Motion Graphics</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Video Editing" id="field22">
+                  <label class="form-check-label" for="field22">Video Editing</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Creative Direction" id="field23">
+                  <label class="form-check-label" for="field23">Creative Direction</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Content Creation" id="field24">
+                  <label class="form-check-label" for="field24">Content Creation</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Writing, Media & Communication -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">✍️ Writing, Media & Communication (words pay rent too)</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Content Writing" id="field25">
+                  <label class="form-check-label" for="field25">Content Writing</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Technical Writing" id="field26">
+                  <label class="form-check-label" for="field26">Technical Writing</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Copywriting" id="field27">
+                  <label class="form-check-label" for="field27">Copywriting</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Journalism" id="field28">
+                  <label class="form-check-label" for="field28">Journalism</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Scriptwriting" id="field29">
+                  <label class="form-check-label" for="field29">Scriptwriting</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Corporate Communications" id="field30">
+                  <label class="form-check-label" for="field30">Corporate Communications</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Social Media Management" id="field31">
+                  <label class="form-check-label" for="field31">Social Media Management</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Research, Academia & Logic Enjoyers -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">🧠 Research, Academia & Logic Enjoyers</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Research & Development" id="field32">
+                  <label class="form-check-label" for="field32">Research & Development</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Academic Research" id="field33">
+                  <label class="form-check-label" for="field33">Academic Research</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Data Research" id="field34">
+                  <label class="form-check-label" for="field34">Data Research</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Computational Research" id="field35">
+                  <label class="form-check-label" for="field35">Computational Research</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Scientific Analysis" id="field36">
+                  <label class="form-check-label" for="field36">Scientific Analysis</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Core Science & Engineering -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">🧪 Core Science & Engineering (respectable, terrifying)</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Electronics Engineering" id="field37">
+                  <label class="form-check-label" for="field37">Electronics Engineering</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Embedded Systems" id="field38">
+                  <label class="form-check-label" for="field38">Embedded Systems</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Robotics" id="field39">
+                  <label class="form-check-label" for="field39">Robotics</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Internet of Things (IoT)" id="field40">
+                  <label class="form-check-label" for="field40">Internet of Things (IoT)</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Renewable Energy Systems" id="field41">
+                  <label class="form-check-label" for="field41">Renewable Energy Systems</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Mechanical Design" id="field42">
+                  <label class="form-check-label" for="field42">Mechanical Design</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Corporate & Professional -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">🧑‍💼 Corporate & Professional (buttoned-up energy)</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Human Resources" id="field43">
+                  <label class="form-check-label" for="field43">Human Resources</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Talent Acquisition" id="field44">
+                  <label class="form-check-label" for="field44">Talent Acquisition</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Project Management" id="field45">
+                  <label class="form-check-label" for="field45">Project Management</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Quality Assurance" id="field46">
+                  <label class="form-check-label" for="field46">Quality Assurance</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Business Consulting" id="field47">
+                  <label class="form-check-label" for="field47">Business Consulting</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Risk Management" id="field48">
+                  <label class="form-check-label" for="field48">Risk Management</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emerging & Modern Fields -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">🌍 Emerging & Modern Fields (sounds futuristic, actually real)</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Blockchain Development" id="field49">
+                  <label class="form-check-label" for="field49">Blockchain Development</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Web3 & Decentralized Systems" id="field50">
+                  <label class="form-check-label" for="field50">Web3 & Decentralized Systems</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="FinTech" id="field51">
+                  <label class="form-check-label" for="field51">FinTech</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="HealthTech" id="field52">
+                  <label class="form-check-label" for="field52">HealthTech</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="EdTech" id="field53">
+                  <label class="form-check-label" for="field53">EdTech</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="AI Product Strategy" id="field54">
+                  <label class="form-check-label" for="field54">AI Product Strategy</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Automation Engineering" id="field55">
+                  <label class="form-check-label" for="field55">Automation Engineering</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Soft-Skill Oriented / People-Facing -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">🎯 Soft-Skill Oriented / People-Facing</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Public Speaking & Anchoring" id="field56">
+                  <label class="form-check-label" for="field56">Public Speaking & Anchoring</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Client Relations" id="field57">
+                  <label class="form-check-label" for="field57">Client Relations</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Community Management" id="field58">
+                  <label class="form-check-label" for="field58">Community Management</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Training & Development" id="field59">
+                  <label class="form-check-label" for="field59">Training & Development</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="Event Management" id="field60">
+                  <label class="form-check-label" for="field60">Event Management</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="comic-button" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="comic-button" id="proceedBtn">
+            <i class="bi bi-search"></i> Proceed / Find Companies
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="border-top py-4 mt-5">
@@ -616,6 +996,12 @@
               behavior: 'smooth',
               block: 'start'
             });
+            
+            // Show interest field modal after scroll completes - extends existing flow
+            setTimeout(() => {
+              const interestModal = new bootstrap.Modal(document.getElementById('interestFieldModal'));
+              interestModal.show();
+            }, 500);
           }, 100);
 
         })
@@ -627,6 +1013,493 @@
           evaluateBtn.disabled = false;
         });
     });
+
+    // Function to collect selected interest fields - handles multi-select functionality
+    function getSelectedInterestFields() {
+      const selectedFields = [];
+      const checkboxes = document.querySelectorAll('#interestFieldModal input[type="checkbox"]:checked');
+      checkboxes.forEach(checkbox => {
+        selectedFields.push(checkbox.value);
+      });
+      return selectedFields;
+    }
+
+    // Handle Proceed button click - uses selected fields for company search
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('proceedBtn').addEventListener('click', function() {
+        const selectedFields = getSelectedInterestFields();
+        
+        if (selectedFields.length === 0) {
+          alert('Please select at least one field of interest.');
+          return;
+        }
+        
+        // Close modal first - prevent flickering during API calls
+        const interestModal = bootstrap.Modal.getInstance(document.getElementById('interestFieldModal'));
+        interestModal.hide();
+        
+        // Start job search with selected fields - maps to API queries
+        searchJobsByInterestFields(selectedFields);
+      });
+    });
+
+    // Map selected interest fields to job search API calls - extends existing evaluation flow
+    function searchJobsByInterestFields(selectedFields) {
+      console.log('Starting job search for fields:', selectedFields);
+      
+      // Show loading state for job search
+      const proceedBtn = document.getElementById('proceedBtn');
+      const originalText = proceedBtn.innerHTML;
+      proceedBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching Jobs...';
+      proceedBtn.disabled = true;
+      
+      let allJobResults = [];
+      let processedFields = 0;
+      
+      // Process each selected field sequentially - respects API rate limits
+      selectedFields.forEach((field, index) => {
+        setTimeout(() => {
+          searchJobsForField(field)
+            .then(results => {
+              // Merge results without duplicates - avoids overwriting existing data
+              allJobResults = mergeJobResults(allJobResults, results);
+              processedFields++;
+              
+              // Check if all fields processed
+              if (processedFields === selectedFields.length) {
+                handleJobSearchComplete(allJobResults, selectedFields);
+              }
+            })
+            .catch(error => {
+              console.error(`Error searching jobs for field: ${field}`, error);
+              processedFields++;
+              
+              // Continue even if one field fails
+              if (processedFields === selectedFields.length) {
+                handleJobSearchComplete(allJobResults, selectedFields);
+              }
+            });
+        }, index * 500); // Stagger API calls to respect rate limits
+      });
+    }
+
+    // Search jobs for a specific field - maps field labels to search queries
+    function searchJobsForField(field) {
+      return new Promise((resolve, reject) => {
+        // Map interest field to search query string - preserves existing logic
+        const searchQuery = mapFieldToSearchQuery(field);
+        
+        // Mock API call with India location constraint - targets India-based jobs only
+        fetch(`/api/jobs/search?q=${encodeURIComponent(searchQuery)}&limit=10&location=India`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Filter results to India-based jobs only - ensures location constraint
+            const indiaJobs = filterJobsToIndia(data.jobs || []);
+            resolve(indiaJobs);
+          })
+          .catch(error => {
+            // Fallback to skill-based search if field search fails - existing logic
+            console.log(`Field search failed for ${field}, trying skill-based search`);
+            fallbackToSkillBasedSearch(field)
+              .then(resolve)
+              .catch(reject);
+          });
+      });
+    }
+
+    // Map interest field labels to API search query strings - no new variables
+    function mapFieldToSearchQuery(field) {
+      const fieldMappings = {
+        'Software Development': 'software developer engineer',
+        'Web Development (Frontend / Backend / Full Stack)': 'web developer frontend backend fullstack',
+        'Data Science & Analytics': 'data scientist analyst',
+        'Artificial Intelligence & Machine Learning': 'AI ML machine learning engineer',
+        'Cloud Computing': 'cloud engineer AWS Azure',
+        'Cybersecurity': 'security engineer cybersecurity',
+        'Database Management Systems': 'database administrator DBA',
+        'DevOps Engineering': 'devops engineer',
+        'Mobile App Development': 'mobile developer iOS Android',
+        'Digital Marketing': 'digital marketing specialist',
+        'Product Management': 'product manager',
+        'Business Analytics': 'business analyst',
+        'Growth Marketing': 'growth marketing manager',
+        'Sales Engineering': 'sales engineer',
+        'Startup & Entrepreneurship': 'startup founder entrepreneur',
+        'Operations Management': 'operations manager',
+        'Market Research': 'market research analyst',
+        'UI/UX Design': 'UI UX designer',
+        'Graphic Design': 'graphic designer',
+        'Product Design': 'product designer',
+        'Motion Graphics': 'motion graphics designer',
+        'Video Editing': 'video editor',
+        'Creative Direction': 'creative director',
+        'Content Creation': 'content creator',
+        'Content Writing': 'content writer',
+        'Technical Writing': 'technical writer',
+        'Copywriting': 'copywriter',
+        'Journalism': 'journalist',
+        'Scriptwriting': 'scriptwriter',
+        'Corporate Communications': 'communications specialist',
+        'Social Media Management': 'social media manager',
+        'Research & Development': 'R&D researcher',
+        'Academic Research': 'research scientist',
+        'Data Research': 'data researcher',
+        'Computational Research': 'computational researcher',
+        'Scientific Analysis': 'research analyst',
+        'Electronics Engineering': 'electronics engineer',
+        'Embedded Systems': 'embedded systems engineer',
+        'Robotics': 'robotics engineer',
+        'Internet of Things (IoT)': 'IoT engineer',
+        'Renewable Energy Systems': 'renewable energy engineer',
+        'Mechanical Design': 'mechanical design engineer',
+        'Human Resources': 'HR specialist',
+        'Talent Acquisition': 'recruiter talent acquisition',
+        'Project Management': 'project manager',
+        'Quality Assurance': 'QA engineer tester',
+        'Business Consulting': 'business consultant',
+        'Risk Management': 'risk analyst',
+        'Blockchain Development': 'blockchain developer',
+        'Web3 & Decentralized Systems': 'web3 developer',
+        'FinTech': 'fintech developer',
+        'HealthTech': 'healthtech engineer',
+        'EdTech': 'edtech developer',
+        'AI Product Strategy': 'AI product manager',
+        'Automation Engineering': 'automation engineer',
+        'Public Speaking & Anchoring': 'public speaker anchor',
+        'Client Relations': 'client relations manager',
+        'Community Management': 'community manager',
+        'Training & Development': 'training specialist',
+        'Event Management': 'event manager'
+      };
+      
+      return fieldMappings[field] || field.toLowerCase();
+    }
+
+    // Fallback to skill-based search - uses existing evaluation logic
+    function fallbackToSkillBasedSearch(field) {
+      return new Promise((resolve) => {
+        // Get user skills from session or form - preserves existing data
+        const userSkills = document.getElementById('skills').value || '';
+        const searchQuery = userSkills.split(',').map(s => s.trim()).join(' ');
+        
+        // Mock skill-based search with India location constraint
+        setTimeout(() => {
+          resolve([
+            {
+              id: `skill-${Date.now()}`,
+              title: `${field} Position`,
+              company: 'Skills-Based Match',
+              location: 'India', // Ensure fallback jobs are also India-based
+              type: 'Full-time',
+              description: `Position matching your skills: ${searchQuery}`,
+              missing_skills: [] // Skills-based match assumes no missing skills
+            }
+          ]);
+        }, 200);
+      });
+    }
+
+    // Filter job results to India-based positions only - ensures location constraint
+    function filterJobsToIndia(jobs) {
+      if (!jobs || jobs.length === 0) {
+        return [];
+      }
+      
+      // Filter jobs by location containing India - preserves existing data structure
+      return jobs.filter(job => {
+        if (!job.location) {
+          return false;
+        }
+        
+        const location = job.location.toLowerCase();
+        // Check for India in various formats - handles different API response formats
+        return location.includes('india') || 
+               location.includes('indian') ||
+               location.includes('mumbai') ||
+               location.includes('delhi') ||
+               location.includes('bangalore') ||
+               location.includes('bengaluru') ||
+               location.includes('hyderabad') ||
+               location.includes('chennai') ||
+               location.includes('kolkata') ||
+               location.includes('pune') ||
+               location.includes('ahmedabad') ||
+               location.includes('jaipur') ||
+               location.includes('surat') ||
+               location.includes('lucknow') ||
+               location.includes('kanpur') ||
+               location.includes('nagpur') ||
+               location.includes('indore') ||
+               location.includes('thane') ||
+               location.includes('bhopal') ||
+               location.includes('visakhapatnam') ||
+               location.includes('pimpri') ||
+               location.includes('patna') ||
+               location.includes('vadodara') ||
+               location.includes('ghaziabad') ||
+               location.includes('ludhiana') ||
+               location.includes('agra') ||
+               location.includes('nashik') ||
+               location.includes('faridabad') ||
+               location.includes('meerut') ||
+               location.includes('rajkot');
+      });
+    }
+
+    // Merge job results without duplicates - avoids overwriting existing data
+    function mergeJobResults(existingResults, newResults) {
+      const merged = [...existingResults];
+      const existingIds = new Set(existingResults.map(job => job.id));
+      
+      newResults.forEach(job => {
+        if (!existingIds.has(job.id)) {
+          merged.push(job);
+          existingIds.add(job.id);
+        }
+      });
+      
+      return merged;
+    }
+
+    // Handle job search completion - compute readiness and render results
+    function handleJobSearchComplete(jobResults, selectedFields) {
+      console.log(`Job search complete. Found ${jobResults.length} jobs for ${selectedFields.length} fields.`);
+      
+      // Reset button state
+      const proceedBtn = document.getElementById('proceedBtn');
+      proceedBtn.innerHTML = '<i class="bi bi-search"></i> Proceed / Find Companies';
+      proceedBtn.disabled = false;
+      
+      if (jobResults.length === 0) {
+        // No India-based results found - show graceful message without crashing UI
+        renderNoJobsMessage(selectedFields);
+      } else {
+        renderJobResults(jobResults, selectedFields);
+      }
+    }
+
+    // Render no jobs message for India - graceful handling when no India jobs found
+    function renderNoJobsMessage(selectedFields) {
+      // Create results section if it doesn't exist
+      let resultsSection = document.getElementById('job-results-section');
+      if (!resultsSection) {
+        resultsSection = document.createElement('section');
+        resultsSection.id = 'job-results-section';
+        resultsSection.className = 'py-5';
+        resultsSection.style.display = 'none';
+        
+        const evaluationSection = document.getElementById('evaluation-section');
+        evaluationSection.parentNode.insertBefore(resultsSection, evaluationSection.nextSibling);
+      }
+      
+      // Show no jobs message - preserves existing styling
+      resultsSection.innerHTML = `
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="panel text-center">
+                <div class="section-heading-container">
+                  <i class="bi bi-search section-heading-icon"></i>
+                  <div>
+                    <h3 class="mb-0">No Jobs Found in India</h3>
+                    <p class="text-muted small mb-0">No positions found in India for your selected fields</p>
+                  </div>
+                </div>
+                <div class="py-4">
+                  <i class="bi bi-geo-alt" style="font-size: 3rem; color: var(--muted);"></i>
+                  <p class="mt-3 text-muted">
+                    We couldn't find any job opportunities in India for your selected interests: 
+                    <strong>${selectedFields.join(', ')}</strong>
+                  </p>
+                  <p class="text-muted small">
+                    Try selecting different fields or check back later for new opportunities.
+                  </p>
+                  <button class="comic-button mt-3" onclick="document.getElementById('interestFieldModal').querySelector('[data-bs-dismiss=modal]').click()">
+                    <i class="bi bi-arrow-left"></i> Select Different Fields
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Show results section
+      resultsSection.style.display = 'block';
+      
+      // Scroll to results - maintains existing scroll behavior
+      setTimeout(() => {
+        resultsSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+
+    // Render job results - extends existing UI without changing structure
+    function renderJobResults(jobResults, selectedFields) {
+      // Create results section if it doesn't exist
+      let resultsSection = document.getElementById('job-results-section');
+      if (!resultsSection) {
+        resultsSection = document.createElement('section');
+        resultsSection.id = 'job-results-section';
+        resultsSection.className = 'py-5';
+        resultsSection.style.display = 'none';
+        
+        const evaluationSection = document.getElementById('evaluation-section');
+        evaluationSection.parentNode.insertBefore(resultsSection, evaluationSection.nextSibling);
+      }
+      
+      // Populate results section - preserves existing styling
+      resultsSection.innerHTML = `
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-10">
+              <div class="panel">
+                <div class="section-heading-container">
+                  <i class="bi bi-briefcase section-heading-icon"></i>
+                  <div>
+                    <h3 class="mb-0">Job Opportunities</h3>
+                    <p class="text-muted small mb-0">Found ${jobResults.length} positions matching your interests</p>
+                  </div>
+                </div>
+                <div class="row" id="jobCardsContainer">
+                  ${jobResults.map(job => `
+                    <div class="col-md-6 mb-4">
+                      <div class="panel" style="height: 100%;">
+                        <h5 class="mb-2">${job.title}</h5>
+                        <p class="text-muted mb-2"><i class="bi bi-building"></i> ${job.company}</p>
+                        <p class="text-muted mb-2"><i class="bi bi-geo-alt"></i> ${job.location}</p>
+                        <p class="text-muted mb-3"><i class="bi bi-clock"></i> ${job.type}</p>
+                        <p class="small">${job.description}</p>
+                        <div id="skills-${job.id}" class="missing-skills-display" style="display: none; margin-top: 10px;">
+                          <h6 class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Skills Needed</h6>
+                          <div class="missing-skills-content">
+                            ${job.missing_skills && job.missing_skills.length > 0 
+                              ? `<ul class="missing-skills-list">${job.missing_skills.map(skill => `<li>${skill}</li>`).join('')}</ul>`
+                              : '<p class="text-success small"><i class="bi bi-check-circle me-1"></i>You meet all required skills</p>'
+                            }
+                          </div>
+                        </div>
+                        <div class="mt-auto">
+                          <button class="comic-button" onclick="toggleJobSkills('${job.id}')">
+                            <i class="bi bi-list-check"></i> Skills Needed
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Show results section
+      resultsSection.style.display = 'block';
+      
+      // Scroll to results - maintains existing scroll behavior
+      setTimeout(() => {
+        resultsSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+
+    // Toggle job skills display - shows/hides missing skills for specific job
+    function toggleJobSkills(jobId, jobRequiredSkills) {
+      const skillsDiv = document.getElementById(`skills-${jobId}`);
+      if (skillsDiv.style.display === 'none') {
+        // Get user skills from resume form - reuses existing skill extraction logic
+        const userSkillsInput = document.getElementById('skills').value || '';
+        const userSkills = userSkillsInput.split(',').map(s => s.trim().toLowerCase());
+        
+        // Compare job skills against resume skills - filter ONLY missing skills
+        const actuallyMissingSkills = jobRequiredSkills.filter(jobSkill => {
+          return !userSkills.some(userSkill => 
+            userSkill.includes(jobSkill.toLowerCase()) || 
+            jobSkill.toLowerCase().includes(userSkill)
+          );
+        });
+        
+        // Update skills display with ONLY missing skills - uses existing UI containers
+        const skillsContent = skillsDiv.querySelector('.missing-skills-content');
+        if (actuallyMissingSkills.length > 0) {
+          skillsContent.innerHTML = `<ul class="missing-skills-list">${actuallyMissingSkills.map(skill => `<li>${skill}</li>`).join('')}</ul>`;
+        } else {
+          skillsContent.innerHTML = '<p class="text-success small"><i class="bi bi-check-circle me-1"></i>No additional skills required for this role</p>';
+        }
+        
+        // Calculate job-specific score based on missing skills - derives from existing evaluation
+        calculateJobSpecificScore(jobId, jobRequiredSkills, actuallyMissingSkills);
+        
+        skillsDiv.style.display = 'block'; // Show missing skills for this job
+      } else {
+        skillsDiv.style.display = 'none'; // Hide missing skills for this job
+        // Hide job-specific evaluation when skills are hidden
+        document.getElementById('job-specific-evaluation').style.display = 'none';
+      }
+    }
+
+    // Calculate job-specific score based on missing skills - adjusts score using existing logic
+    function calculateJobSpecificScore(jobId, jobRequiredSkills, actuallyMissingSkills) {
+      // Get base resume score from existing evaluation - preserves global score
+      const baseScore = parseInt(document.getElementById('resumeScore').innerText) || 0;
+      
+      // Calculate job-specific score reduction based on missing skills
+      let jobSpecificScore = baseScore;
+      
+      if (jobRequiredSkills.length > 0) {
+        // Proportional reduction: each missing skill reduces score proportionally
+        const skillPenalty = (actuallyMissingSkills.length / jobRequiredSkills.length) * 30; // Max 30 point reduction
+        jobSpecificScore = Math.max(0, Math.min(100, baseScore - skillPenalty));
+      }
+      
+      // Determine job-specific readiness status - reuses existing thresholds
+      let jobStatus = '';
+      if (jobSpecificScore >= 80) {
+        jobStatus = 'Ready';
+      } else if (jobSpecificScore >= 60) {
+        jobStatus = 'Partially Ready';
+      } else {
+        jobStatus = 'Not Ready';
+      }
+      
+      // Get job title from the job card - extracts from existing DOM structure
+      const jobCard = document.getElementById(`skills-${jobId}`).closest('.col-md-6');
+      const jobTitle = jobCard.querySelector('h5').textContent;
+      
+      // Display job-specific evaluation - uses existing UI elements
+      document.getElementById('jobSpecificScore').innerText = Math.round(jobSpecificScore);
+      document.getElementById('jobSpecificStatus').innerText = jobStatus;
+      document.getElementById('jobTitle').innerHTML = `For: <strong>${jobTitle}</strong>`;
+      
+      // Update job-specific missing skills list
+      const jobMissingSkillsList = document.getElementById('jobMissingSkillsList');
+      if (actuallyMissingSkills.length > 0) {
+        jobMissingSkillsList.innerHTML = actuallyMissingSkills.map(skill => `<li>${skill}</li>`).join('');
+      } else {
+        jobMissingSkillsList.innerHTML = '<li class="text-success">All required skills present</li>';
+      }
+      
+      // Show job-specific evaluation section
+      document.getElementById('job-specific-evaluation').style.display = 'block';
+      
+      // Scroll to job-specific evaluation - maintains existing scroll behavior
+      setTimeout(() => {
+        document.getElementById('job-specific-evaluation').scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
 
     function lockResumeFields() {
       document.querySelectorAll("#resumeForm input, #resumeForm textarea")

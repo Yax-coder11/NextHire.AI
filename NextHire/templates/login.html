@@ -158,6 +158,18 @@
         return;
       }
 
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const passwordRegex = /^[0-9]{4,6}$/; // 4–6 digits only
+      if (!emailRegex.test(email)) {
+        showMessage('Please enter a valid email address', 'error');
+        return;
+      }
+
+      if (!passwordRegex.test(password)) {
+        showMessage('Password must be 4 to 6 digits only', 'error');
+        return;
+      }
+
       fetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -184,6 +196,12 @@
     function adminLogin() {
       const email = document.getElementById('adminEmail').value;
       const password = document.getElementById('adminPassword').value;
+
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(email)) {
+        showMessage('Please enter a valid admin email address', 'error');
+        return;
+      }
 
       fetch('/admin_login', {
         method: 'POST',

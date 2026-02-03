@@ -175,7 +175,7 @@
             <img src="{{ url_for('static', filename='images/yucks.png') }}" 
                  alt="Sample Resume 1" 
                  class="sample-resume-thumbnail active"
-                 onclick="changeResumePreview({{ url_for('static', filename='images/yucks.png') }}', this)">
+                 onclick="changeResumePreview('{{ url_for('static', filename='images/yucks.png') }}', this)">
             <img src="{{ url_for('static', filename='images/heheheen.jpg') }}" 
                  alt="Sample Resume 2" 
                  class="sample-resume-thumbnail"
@@ -862,14 +862,6 @@
       }
     }
 
-    // function startResume(){
-    //   if(!loggedIn){
-    //     new bootstrap.Modal(document.getElementById("signupModal")).show();
-    //   } else {
-    //     hideAll();
-    //     document.getElementById("resume").style.display="block";
-    //   }
-    // }
   </script>
 </body>
 </html>

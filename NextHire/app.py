@@ -695,6 +695,139 @@ def my_resumes():
     return render_template("my_resumes.html", resumes=resumes)
 
 
+# ---------------- JOB SEARCH API (Mock Implementation) ----------------
+@app.route("/api/jobs/search")
+def search_jobs():
+    """Mock job search API endpoint - maps interest fields to job listings"""
+    query = request.args.get('q', '').lower()
+    limit = int(request.args.get('limit', 10))
+    location = request.args.get('location', '').lower()
+    
+    # Mock job database with India-based locations - simulates external API response
+    mock_jobs = [
+        {
+            "id": "job_001",
+            "title": "Software Developer",
+            "company": "TechCorp Solutions",
+            "location": "Bangalore, India",
+            "type": "Full-time",
+            "description": "Join our team to build cutting-edge software solutions using modern technologies.",
+            "missing_skills": ["Python", "React", "Node.js"]
+        },
+        {
+            "id": "job_002", 
+            "title": "Frontend Developer",
+            "company": "WebFlow Inc",
+            "location": "Mumbai, India",
+            "type": "Full-time",
+            "description": "Create amazing user experiences with React, Vue.js, and modern frontend frameworks.",
+            "missing_skills": ["Vue.js", "TypeScript", "SASS"]
+        },
+        {
+            "id": "job_003",
+            "title": "Data Scientist",
+            "company": "DataVision Analytics",
+            "location": "Hyderabad, India", 
+            "type": "Full-time",
+            "description": "Analyze complex datasets and build machine learning models to drive business insights.",
+            "missing_skills": ["R", "TensorFlow", "Statistics"]
+        },
+        {
+            "id": "job_004",
+            "title": "Machine Learning Engineer",
+            "company": "AI Innovations",
+            "location": "Pune, India",
+            "type": "Full-time", 
+            "description": "Develop and deploy ML models at scale using Python, TensorFlow, and cloud platforms.",
+            "missing_skills": ["PyTorch", "Kubernetes", "MLOps"]
+        },
+        {
+            "id": "job_005",
+            "title": "Cloud Engineer",
+            "company": "CloudTech Systems",
+            "location": "Chennai, India",
+            "type": "Full-time",
+            "description": "Design and manage cloud infrastructure using AWS, Azure, and containerization technologies.",
+            "missing_skills": ["AWS", "Docker", "Terraform"]
+        },
+        {
+            "id": "job_006",
+            "title": "Cybersecurity Analyst",
+            "company": "SecureNet Solutions",
+            "location": "Delhi, India",
+            "type": "Full-time",
+            "description": "Protect organizational assets by implementing security measures and monitoring threats.",
+            "missing_skills": ["Penetration Testing", "SIEM", "Incident Response"]
+        },
+        {
+            "id": "job_007",
+            "title": "DevOps Engineer", 
+            "company": "DeployFast Inc",
+            "location": "Gurgaon, India",
+            "type": "Full-time",
+            "description": "Streamline development workflows with CI/CD pipelines and infrastructure automation.",
+            "missing_skills": ["Jenkins", "Ansible", "Monitoring"]
+        },
+        {
+            "id": "job_008",
+            "title": "Mobile App Developer",
+            "company": "MobileFirst Studios",
+            "location": "Noida, India",
+            "type": "Full-time",
+            "description": "Build native and cross-platform mobile applications for iOS and Android.",
+            "missing_skills": ["Swift", "Kotlin", "React Native"]
+        },
+        {
+            "id": "job_009",
+            "title": "Product Manager",
+            "company": "InnovatePro",
+            "location": "Kolkata, India",
+            "type": "Full-time",
+            "description": "Drive product strategy and work with cross-functional teams to deliver user-centric solutions.",
+            "missing_skills": []
+        },
+        {
+            "id": "job_010",
+            "title": "UX/UI Designer",
+            "company": "DesignHub Creative",
+            "location": "Ahmedabad, India",
+            "type": "Full-time",
+            "description": "Create intuitive and beautiful user interfaces that enhance user experience.",
+            "missing_skills": ["Figma", "Prototyping", "User Research"]
+        }
+    ]
+    
+    # Filter jobs based on search query - maps field labels to relevant jobs
+    filtered_jobs = []
+    for job in mock_jobs:
+        job_text = f"{job['title']} {job['company']} {job['description']}".lower()
+        query_terms = query.split()
+        
+        # Check if any query term matches job content
+        if any(term in job_text for term in query_terms if term):
+            filtered_jobs.append(job)
+    
+    # If no matches found, return some default India jobs - fallback logic
+    if not filtered_jobs and query:
+        filtered_jobs = mock_jobs[:3]  # Return first 3 as fallback
+    
+    # Filter by location if specified - ensures India-only constraint
+    if location and 'india' in location:
+        # All mock jobs are already India-based, but this handles real API integration
+        filtered_jobs = [job for job in filtered_jobs if 'india' in job['location'].lower()]
+    
+    # Limit results - respects API rate limits
+    filtered_jobs = filtered_jobs[:limit]
+    
+    return jsonify({
+        "success": True,
+        "jobs": filtered_jobs,
+        "total": len(filtered_jobs),
+        "query": query,
+        "location": location
+    })
+
+
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(debug=True)
