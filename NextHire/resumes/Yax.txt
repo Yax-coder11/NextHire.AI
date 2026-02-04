@@ -4,8 +4,8 @@ CE | CGPA: 10
 
 CONTACT
 Phone: 6958741230
-Email: tailoryax@gmail.com
-City: surat
+Email: yt@gmail.com
+City: Ahmedabad
 GitHub: yax-11
 
 SKILLS
@@ -13,7 +13,7 @@ SKILLS
 - Python
 - Java
 - DS
-- FSD
+- DBMS
 
 
 PROJECTS

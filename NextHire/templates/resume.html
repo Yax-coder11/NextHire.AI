@@ -1387,7 +1387,7 @@
                           </div>
                         </div>
                         <div class="mt-auto">
-                          <button class="comic-button" onclick="toggleJobSkills('${job.id}')">
+                          <button class="comic-button skills-needed-btn" data-job-id="${job.id}" data-job-skills='${JSON.stringify(job.missing_skills || [])}'>
                             <i class="bi bi-list-check"></i> Skills Needed
                           </button>
                         </div>
@@ -1413,10 +1413,29 @@
       }, 100);
     }
 
+    // Event delegation for dynamically created Skills Needed buttons - fixes missing event binding
+    document.addEventListener('click', function(event) {
+      if (event.target.closest('.skills-needed-btn')) {
+        const button = event.target.closest('.skills-needed-btn');
+        const jobId = button.dataset.jobId; // Get job ID from data attribute
+        const jobSkills = JSON.parse(button.dataset.jobSkills || '[]'); // Parse job skills from data attribute
+        toggleJobSkills(jobId, jobSkills); // Call existing function with correct parameters
+      }
+    });
+
     // Toggle job skills display - shows/hides missing skills for specific job
     function toggleJobSkills(jobId, jobRequiredSkills) {
       const skillsDiv = document.getElementById(`skills-${jobId}`);
+      
+      // Prevent duplicate execution on same button click - adds minimal guard
+      if (skillsDiv.dataset.processing === 'true') {
+        return;
+      }
+      
       if (skillsDiv.style.display === 'none') {
+        // Mark as processing to prevent duplicate execution
+        skillsDiv.dataset.processing = 'true';
+        
         // Get user skills from resume form - reuses existing skill extraction logic
         const userSkillsInput = document.getElementById('skills').value || '';
         const userSkills = userSkillsInput.split(',').map(s => s.trim().toLowerCase());
@@ -1441,10 +1460,14 @@
         calculateJobSpecificScore(jobId, jobRequiredSkills, actuallyMissingSkills);
         
         skillsDiv.style.display = 'block'; // Show missing skills for this job
+        
+        // Clear processing flag after display
+        skillsDiv.dataset.processing = 'false';
       } else {
         skillsDiv.style.display = 'none'; // Hide missing skills for this job
         // Hide job-specific evaluation when skills are hidden
         document.getElementById('job-specific-evaluation').style.display = 'none';
+        skillsDiv.dataset.processing = 'false';
       }
     }
 
@@ -1453,23 +1476,30 @@
       // Get base resume score from existing evaluation - preserves global score
       const baseScore = parseInt(document.getElementById('resumeScore').innerText) || 0;
       
-      // Calculate job-specific score reduction based on missing skills
-      let jobSpecificScore = baseScore;
+      // Calculate job-specific readiness based on skill matching - uses required formula
+      let jobSpecificScore = 0;
+      let jobStatus = 'Not Ready';
       
       if (jobRequiredSkills.length > 0) {
-        // Proportional reduction: each missing skill reduces score proportionally
-        const skillPenalty = (actuallyMissingSkills.length / jobRequiredSkills.length) * 30; // Max 30 point reduction
-        jobSpecificScore = Math.max(0, Math.min(100, baseScore - skillPenalty));
-      }
-      
-      // Determine job-specific readiness status - reuses existing thresholds
-      let jobStatus = '';
-      if (jobSpecificScore >= 80) {
-        jobStatus = 'Ready';
-      } else if (jobSpecificScore >= 60) {
-        jobStatus = 'Partially Ready';
+        // Calculate matched skills vs total job skills - implements required formula
+        const matchedSkills = jobRequiredSkills.length - actuallyMissingSkills.length;
+        const readinessPercentage = (matchedSkills / jobRequiredSkills.length) * 100;
+        
+        // Use readiness percentage as job-specific score - ensures score reflects job fit
+        jobSpecificScore = Math.round(readinessPercentage);
+        
+        // Determine status based on readiness percentage - uses required thresholds
+        if (readinessPercentage >= 80) {
+          jobStatus = 'Ready';
+        } else if (readinessPercentage >= 60) {
+          jobStatus = 'Partially Ready';
+        } else {
+          jobStatus = 'Not Ready';
+        }
       } else {
-        jobStatus = 'Not Ready';
+        // Handle edge case: no detectable skills - shows appropriate message
+        jobSpecificScore = 0;
+        jobStatus = 'Skills data unavailable';
       }
       
       // Get job title from the job card - extracts from existing DOM structure
@@ -1477,16 +1507,18 @@
       const jobTitle = jobCard.querySelector('h5').textContent;
       
       // Display job-specific evaluation - uses existing UI elements
-      document.getElementById('jobSpecificScore').innerText = Math.round(jobSpecificScore);
+      document.getElementById('jobSpecificScore').innerText = jobSpecificScore;
       document.getElementById('jobSpecificStatus').innerText = jobStatus;
       document.getElementById('jobTitle').innerHTML = `For: <strong>${jobTitle}</strong>`;
       
-      // Update job-specific missing skills list
+      // Update job-specific missing skills list - handles edge cases
       const jobMissingSkillsList = document.getElementById('jobMissingSkillsList');
-      if (actuallyMissingSkills.length > 0) {
+      if (jobRequiredSkills.length === 0) {
+        jobMissingSkillsList.innerHTML = '<li class="text-muted">Skills data unavailable</li>';
+      } else if (actuallyMissingSkills.length > 0) {
         jobMissingSkillsList.innerHTML = actuallyMissingSkills.map(skill => `<li>${skill}</li>`).join('');
       } else {
-        jobMissingSkillsList.innerHTML = '<li class="text-success">All required skills present</li>';
+        jobMissingSkillsList.innerHTML = '<li class="text-success">You are job-ready</li>';
       }
       
       // Show job-specific evaluation section

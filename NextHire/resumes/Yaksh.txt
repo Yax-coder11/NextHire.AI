@@ -1,40 +1,29 @@
 YAKSH
 ----------------------------------------
-CE | CGPA: 9.17
+CE | CGPA: 10
 
 CONTACT
-Phone: 9876543210
+Phone: 6958741230
 Email: tailoryax@gmail.com
-City: Ahemdabad
-GitHub: YaxCoder-11
-
-ABOUT
-----------------------------------------
-Computer Engineering student with a basic understanding of programming, data structures, and database
-systems. Have worked on academic projects using Java, Python, and MySQL. Looking for an opportunity to
-learn, improve my skills, and apply my knowledge in a practical environment.
+City: Surat
+GitHub: yax-11
 
 SKILLS
 ----------------------------------------
-- Java
 - Python
-- SQL
+- Java
 - DS
-- DBMS
+- SQL
 - Git
+- HTML
+- JavaScript
+- CSS
+- React
+- Node.js
 
 
 PROJECTS
 ----------------------------------------
-ATM Management System — Java
-• Developed a basic Java application to simulate ATM operations
-• Implemented features like balance check, withdraw, and deposit
-• Focused on understanding core Java logic and control structures
-BrainCrate — Java, Data Structures, DBMS, Swing
-• Built a learning and productivity platform using Java Swing
-• Implemented custom data structures without using built-in collections
-• Integrated MySQL database for user login and data management
-NextHire.ai — Python, Full Stack Development
-• Worked on a Python-based full-stack application
-• Contributed to backend logic and basic frontend integration
-• Gained exposure to full-stack development workflow
+ATM
+BrainCrate
+NextHire
