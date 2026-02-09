@@ -33,6 +33,11 @@ header.border-bottom {
   border-bottom: 1px solid var(--border) !important;
 }
 
+/* Brand accent - orange color for "AI" in NextHire.AI */
+.brand-accent {
+  color: var(--primary) !important;
+}
+
 /* Fixed navbar - stays at top while scrolling */
 header {
   position: fixed;
@@ -418,21 +423,13 @@ h6 {
 }
 
 .btn-primary::before {
-  content: '';
-  width: 0;
-  height: 3em;
-  border-radius: 30em;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-image: linear-gradient(to right, #000000 0%, #374151 100%);
-  transition: .5s ease;
-  display: block;
-  z-index: -1;
+  /* Disabled black gradient overlay on hover */
+  display: none;
 }
 
 .btn-primary:hover::before {
-  width: 9em;
+  /* Disabled black gradient overlay on hover */
+  display: none;
 }
 
 .panel {
@@ -1319,21 +1316,13 @@ html {
 }
 
 .btn-success::before, .btn-danger::before {
-  content: '';
-  width: 0;
-  height: 3em;
-  border-radius: 30em;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-image: linear-gradient(to right, #000000 0%, #374151 100%);
-  transition: .5s ease;
-  display: block;
-  z-index: -1;
+  /* Disabled black gradient overlay on hover */
+  display: none;
 }
 
 .btn-success:hover::before, .btn-danger:hover::before {
-  width: 9em;
+  /* Disabled black gradient overlay on hover */
+  display: none;
 }
 
 /* Full width buttons in modals */
@@ -3061,5 +3050,2129 @@ video {
   .education-entry .comic-button:focus {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
+  }
+}
+
+
+/* ========== EVALUATION SUMMARY SECTION - THEME INTEGRATION & NUMBER CONTAINMENT ========== */
+
+/* Main Summary Container - Premium card style matching website theme */
+#summary-verdict-section {
+  background: linear-gradient(135deg, var(--card) 0%, var(--background) 100%) !important;
+  border: 2px solid var(--primary) !important;
+  border-radius: calc(var(--radius) * 2) !important;
+  padding: 2rem !important;
+  margin-top: 2rem !important;
+  box-shadow: 0 8px 24px rgba(255, 107, 61, 0.15) !important;
+  overflow: hidden;
+}
+
+/* Summary heading - matching website typography */
+#summary-verdict-section h5 {
+  color: var(--foreground) !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 2rem !important;
+  margin-bottom: 1.5rem !important;
+  letter-spacing: 0.02em;
+}
+
+/* Summary metric columns - proper containment */
+#summary-verdict-section .col-md-3 {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 140px;
+}
+
+/* Metric labels - matching website font style */
+#summary-verdict-section .col-md-3 strong {
+  color: var(--foreground) !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 1.1rem !important;
+  display: block;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+/* Score display containers - proper number containment */
+#summary-verdict-section .resume-score-display {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0.5rem 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  line-height: 1.2;
+  min-height: 50px;
+}
+
+/* Number styling - contained and responsive */
+#summary-resume-score,
+#summary-job-fit-score,
+#summary-missing-skills-count {
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-weight: 700 !important;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* Resume Score - primary orange */
+#summary-verdict-section .col-md-3:nth-child(1) .resume-score-display {
+  color: var(--primary) !important;
+  font-size: clamp(1.5rem, 4vw, 2rem) !important;
+}
+
+#summary-resume-score {
+  color: var(--primary) !important;
+  font-size: inherit !important;
+}
+
+/* Job Fit Score - orange variant */
+#summary-verdict-section .col-md-3:nth-child(2) .resume-score-display {
+  color: #E67E22 !important;
+  font-size: clamp(1.5rem, 4vw, 2rem) !important;
+}
+
+#summary-job-fit-score {
+  color: #E67E22 !important;
+  font-size: inherit !important;
+}
+
+/* Missing Skills Count - red */
+#summary-verdict-section .col-md-3:nth-child(4) > div:nth-child(2) {
+  color: #E74C3C !important;
+  font-size: clamp(1.5rem, 4vw, 2rem) !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-weight: 700 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  line-height: 1.2;
+  min-height: 50px;
+  padding: 0.5rem 0;
+}
+
+#summary-missing-skills-count {
+  color: #E74C3C !important;
+  font-size: inherit !important;
+}
+
+/* Status badge container - proper containment */
+#summary-verdict-section .col-md-3:nth-child(3) > div:nth-child(2) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-height: 50px;
+  padding: 0.5rem 0;
+}
+
+/* Summary status badge - matching dashboard badge style */
+#summary-resume-status {
+  background-color: var(--primary) !important;
+  color: white !important;
+  border-radius: var(--radius) !important;
+  font-weight: 600 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  padding: 0.5rem 1rem !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  font-size: clamp(0.85rem, 2vw, 1rem) !important;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Metric descriptions - matching website text style */
+#summary-verdict-section .text-muted.small {
+  color: rgba(0,0,0,0.6) !important;
+  font-size: clamp(0.75rem, 1.5vw, 0.85rem) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  margin-top: 0.5rem;
+  text-align: center;
+  display: block;
+  line-height: 1.4;
+}
+
+/* Eligibility Badge Container */
+#eligibility-badge-container {
+  background-color: rgba(255, 107, 61, 0.05);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  border: 1px solid rgba(255, 107, 61, 0.2);
+}
+
+#eligibility-badge-container strong {
+  color: var(--foreground) !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 1.2rem !important;
+}
+
+#eligibility-badge {
+  background-color: var(--primary) !important;
+  color: white !important;
+  border-radius: var(--radius) !important;
+  font-weight: 600 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Confidence Level Badge */
+#confidence-level-badge {
+  background-color: var(--primary) !important;
+  color: white !important;
+  border-radius: var(--radius) !important;
+  font-weight: 600 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Improvement Tips Section - matching website warning style */
+#improvement-tips-section {
+  background-color: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+  border-radius: var(--radius) !important;
+  padding: 1.5rem !important;
+  margin-top: 1.5rem !important;
+}
+
+#improvement-tips-section h6 {
+  color: #856404 !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 1.3rem !important;
+  margin-bottom: 1rem !important;
+}
+
+#improvement-tips-section ul {
+  color: #856404 !important;
+  line-height: 1.8 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  padding-left: 1.5rem;
+}
+
+#improvement-tips-section li {
+  margin-bottom: 0.5rem;
+}
+
+/* Start New Evaluation Button */
+#summary-verdict-section .comic-button {
+  background-color: #6c757d !important;
+  color: white !important;
+  border: 2px solid #000 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: bold !important;
+  transition: all 0.3s ease !important;
+}
+
+#summary-verdict-section .comic-button:hover {
+  background-color: #fff !important;
+  color: #6c757d !important;
+  border: 2px solid #6c757d !important;
+  box-shadow: 5px 5px 0px #6c757d !important;
+}
+
+/* Responsive Design - Tablet */
+@media (max-width: 991px) {
+  #summary-verdict-section {
+    padding: 1.75rem !important;
+  }
+  
+  #summary-verdict-section h5 {
+    font-size: 1.8rem !important;
+  }
+  
+  #summary-verdict-section .col-md-3 {
+    padding: 0.875rem;
+    min-height: 130px;
+  }
+  
+  #summary-verdict-section .col-md-3 strong {
+    font-size: 1rem !important;
+  }
+  
+  #summary-verdict-section .resume-score-display {
+    font-size: clamp(1.4rem, 3.5vw, 1.8rem) !important;
+    min-height: 45px;
+  }
+  
+  #summary-verdict-section .col-md-3:nth-child(4) > div:nth-child(2) {
+    font-size: clamp(1.4rem, 3.5vw, 1.8rem) !important;
+    min-height: 45px;
+  }
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 768px) {
+  #summary-verdict-section {
+    padding: 1.5rem !important;
+  }
+  
+  #summary-verdict-section h5 {
+    font-size: 1.6rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+  
+  #summary-verdict-section .row.text-center {
+    margin-bottom: 1rem !important;
+  }
+  
+  #summary-verdict-section .col-md-3 {
+    padding: 1rem 0.5rem;
+    margin-bottom: 1.5rem;
+    min-height: auto;
+  }
+  
+  #summary-verdict-section .col-md-3:last-child {
+    margin-bottom: 0;
+  }
+  
+  #summary-verdict-section .col-md-3 strong {
+    font-size: 1rem !important;
+    margin-bottom: 0.75rem;
+  }
+  
+  #summary-verdict-section .resume-score-display {
+    font-size: clamp(1.5rem, 5vw, 2rem) !important;
+    min-height: 50px;
+    padding: 0.75rem 0 !important;
+  }
+  
+  #summary-verdict-section .col-md-3:nth-child(4) > div:nth-child(2) {
+    font-size: clamp(1.5rem, 5vw, 2rem) !important;
+    min-height: 50px;
+    padding: 0.75rem 0;
+  }
+  
+  #summary-resume-status {
+    padding: 0.6rem 1rem !important;
+    font-size: clamp(0.9rem, 2.5vw, 1rem) !important;
+  }
+  
+  #summary-verdict-section .text-muted.small {
+    font-size: clamp(0.8rem, 2vw, 0.9rem) !important;
+    margin-top: 0.75rem;
+  }
+  
+  #eligibility-badge-container {
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+  }
+  
+  #improvement-tips-section {
+    padding: 1.25rem !important;
+    margin-top: 1.25rem !important;
+  }
+  
+  #improvement-tips-section h6 {
+    font-size: 1.2rem !important;
+  }
+}
+
+/* Responsive Design - Small Mobile */
+@media (max-width: 576px) {
+  #summary-verdict-section {
+    padding: 1.25rem !important;
+    margin-top: 1.5rem !important;
+  }
+  
+  #summary-verdict-section h5 {
+    font-size: 1.4rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  #summary-verdict-section .col-md-3 {
+    padding: 0.875rem 0.25rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  #summary-verdict-section .col-md-3 strong {
+    font-size: 0.95rem !important;
+    margin-bottom: 0.5rem;
+  }
+  
+  #summary-verdict-section .resume-score-display {
+    font-size: clamp(1.3rem, 6vw, 1.8rem) !important;
+    min-height: 45px;
+    padding: 0.5rem 0 !important;
+  }
+  
+  #summary-verdict-section .col-md-3:nth-child(4) > div:nth-child(2) {
+    font-size: clamp(1.3rem, 6vw, 1.8rem) !important;
+    min-height: 45px;
+    padding: 0.5rem 0;
+  }
+  
+  #summary-resume-status {
+    padding: 0.5rem 0.875rem !important;
+    font-size: clamp(0.85rem, 3vw, 0.95rem) !important;
+  }
+  
+  #eligibility-badge {
+    font-size: clamp(0.95rem, 3vw, 1.1rem) !important;
+    padding: 0.5rem 1rem !important;
+  }
+  
+  #confidence-level-badge {
+    font-size: clamp(0.9rem, 3vw, 1rem) !important;
+    padding: 0.4rem 0.875rem !important;
+  }
+  
+  #summary-verdict-section .text-muted.small {
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem) !important;
+    margin-top: 0.5rem;
+    line-height: 1.3;
+  }
+  
+  #eligibility-badge-container {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  #eligibility-badge-container strong {
+    font-size: 1.1rem !important;
+  }
+  
+  #improvement-tips-section {
+    padding: 1rem !important;
+    margin-top: 1rem !important;
+  }
+  
+  #improvement-tips-section h6 {
+    font-size: 1.1rem !important;
+    margin-bottom: 0.875rem !important;
+  }
+  
+  #improvement-tips-section ul {
+    font-size: 0.875rem !important;
+    line-height: 1.6 !important;
+    padding-left: 1.25rem;
+  }
+  
+  #summary-verdict-section .comic-button {
+    width: 100%;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.95rem !important;
+  }
+}
+
+/* Extra Small Screens - Maximum Containment */
+@media (max-width: 400px) {
+  #summary-verdict-section {
+    padding: 1rem !important;
+  }
+  
+  #summary-verdict-section h5 {
+    font-size: 1.3rem !important;
+  }
+  
+  #summary-verdict-section .col-md-3 {
+    padding: 0.75rem 0.125rem;
+    margin-bottom: 1rem;
+  }
+  
+  #summary-verdict-section .col-md-3 strong {
+    font-size: 0.9rem !important;
+  }
+  
+  #summary-verdict-section .resume-score-display {
+    font-size: clamp(1.2rem, 7vw, 1.6rem) !important;
+    min-height: 40px;
+  }
+  
+  #summary-verdict-section .col-md-3:nth-child(4) > div:nth-child(2) {
+    font-size: clamp(1.2rem, 7vw, 1.6rem) !important;
+    min-height: 40px;
+  }
+  
+  #summary-resume-status {
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.85rem !important;
+  }
+  
+  #summary-verdict-section .text-muted.small {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Prevent text overflow in all scenarios */
+#summary-verdict-section * {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Ensure numbers never break layout */
+#summary-resume-score,
+#summary-job-fit-score,
+#summary-missing-skills-count {
+  max-width: 100%;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Handle very large numbers gracefully */
+@media (max-width: 768px) {
+  #summary-resume-score,
+  #summary-job-fit-score,
+  #summary-missing-skills-count {
+    font-size: clamp(1.2rem, 5vw, 2rem) !important;
+  }
+}
+
+/* Smooth animations for summary section */
+@keyframes summaryFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#summary-verdict-section {
+  animation: summaryFadeIn 0.5s ease-out;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  #summary-verdict-section {
+    animation: none;
+  }
+  
+  #summary-verdict-section .comic-button:hover {
+    transform: none;
+  }
+}
+
+/* Print styles for summary section */
+@media print {
+  #summary-verdict-section {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+  }
+  
+  #summary-verdict-section .comic-button {
+    display: none;
+  }
+}
+
+
+/* ========== REMOVE SCROLLBAR FROM NAVBAR ========== */
+
+/* Hide scrollbar on header/navbar */
+header {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+/* Hide scrollbar on navbar elements */
+header nav,
+header .container,
+header .d-flex {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+/* Hide scrollbar on desktop navigation */
+header .d-none.d-md-flex {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+/* Hide scrollbar on mobile navigation */
+header .navbar-collapse {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+/* Remove any scrollbar styling from header */
+header::-webkit-scrollbar,
+header nav::-webkit-scrollbar,
+header .container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Firefox scrollbar hiding */
+header,
+header nav,
+header .container {
+  scrollbar-width: none !important;
+}
+
+/* IE/Edge scrollbar hiding */
+header,
+header nav,
+header .container {
+  -ms-overflow-style: none !important;
+}
+
+/* Ensure navbar content doesn't cause overflow */
+header .nav-link {
+  flex-shrink: 0;
+}
+
+/* Prevent any pseudo-elements from creating scroll indicators */
+header::before,
+header::after,
+header nav::before,
+header nav::after {
+  display: none !important;
+}
+
+
+/* ========== SKILL GAP LEARNING ROADMAP - REDESIGNED ========== */
+
+/* Main Roadmap Container - Enhanced green theme */
+#enhanced-roadmap {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.05) 0%, var(--card) 100%) !important;
+  border: 2px solid #28a745 !important;
+  border-radius: calc(var(--radius) * 2) !important;
+  padding: 2rem !important;
+  margin-top: 2rem !important;
+  box-shadow: 0 8px 24px rgba(40, 167, 69, 0.15) !important;
+}
+
+/* Roadmap heading - matching website typography */
+#enhanced-roadmap h5 {
+  color: var(--foreground) !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 2rem !important;
+  margin-bottom: 1rem !important;
+  letter-spacing: 0.02em;
+}
+
+#enhanced-roadmap h5 i {
+  color: #28a745 !important;
+  margin-right: 0.75rem;
+  font-size: 1.8rem;
+}
+
+/* Roadmap description */
+#enhanced-roadmap .text-muted.small {
+  color: rgba(0,0,0,0.6) !important;
+  font-size: 1rem !important;
+  font-family: 'DM Sans', sans-serif !important;
+  margin-bottom: 1.5rem !important;
+  line-height: 1.6;
+}
+
+/* Generate button - matching website button style */
+#enhanced-roadmap .btn-success {
+  /* Removed color overrides to use standardized cyan button styling */
+  font-weight: 600 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  border-radius: var(--radius) !important;
+  padding: 0.75rem 1.5rem !important;
+  font-size: 1rem !important;
+  transition: all 0.3s ease !important;
+}
+
+#enhanced-roadmap .btn-success:hover {
+  /* Removed color overrides to use standardized cyan button styling */
+  transform: translateY(-2px) !important;
+}
+
+#enhanced-roadmap .btn-success i {
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+}
+
+/* Roadmap Results Container */
+#roadmapResultsEnhanced {
+  margin-top: 2rem;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Learning Timeline Alert - Enhanced info box */
+#roadmapResultsEnhanced .alert-info {
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.1) 0%, rgba(23, 162, 184, 0.05) 100%) !important;
+  border: 1px solid #17a2b8 !important;
+  border-left: 4px solid #17a2b8 !important;
+  border-radius: var(--radius) !important;
+  padding: 1.5rem !important;
+  margin-bottom: 2rem !important;
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.1) !important;
+}
+
+#roadmapResultsEnhanced .alert-info h6 {
+  color: #0c5460 !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 1.4rem !important;
+  margin-bottom: 0.75rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#roadmapResultsEnhanced .alert-info h6 i {
+  color: #17a2b8 !important;
+  font-size: 1.5rem;
+}
+
+#roadmapResultsEnhanced .alert-info p {
+  color: #0c5460 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  margin-bottom: 0 !important;
+  line-height: 1.6;
+}
+
+/* Roadmap Timeline Cards - Enhanced design */
+#roadmapResultsEnhanced .row {
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+}
+
+#roadmapResultsEnhanced .col-md-4 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+#roadmapResultsEnhanced .card {
+  background-color: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+  transition: all 0.3s ease !important;
+  height: 100%;
+  overflow: hidden;
+}
+
+#roadmapResultsEnhanced .card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+}
+
+/* Card Headers - Color-coded timeline */
+#roadmapResultsEnhanced .card-header {
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 1.2rem !important;
+  padding: 1rem 1.25rem !important;
+  border-bottom: 2px solid rgba(0,0,0,0.1) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Short-term card - Orange background */
+#roadmapResultsEnhanced .col-md-4:nth-child(1) .card {
+  border-top: 4px solid var(--primary) !important;
+}
+
+#roadmapResultsEnhanced .col-md-4:nth-child(1) .card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #ff8c42 100%) !important;
+  color: white !important;
+}
+
+/* Mid-term card - Orange background */
+#roadmapResultsEnhanced .col-md-4:nth-child(2) .card {
+  border-top: 4px solid var(--primary) !important;
+}
+
+#roadmapResultsEnhanced .col-md-4:nth-child(2) .card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #ff8c42 100%) !important;
+  color: white !important;
+}
+
+/* Long-term card - Orange background */
+#roadmapResultsEnhanced .col-md-4:nth-child(3) .card {
+  border-top: 4px solid var(--primary) !important;
+}
+
+#roadmapResultsEnhanced .col-md-4:nth-child(3) .card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #ff8c42 100%) !important;
+  color: white !important;
+}
+
+#roadmapResultsEnhanced .card-header i {
+  font-size: 1.3rem;
+  margin-right: 0.25rem;
+}
+
+/* Card Body - Skills list */
+#roadmapResultsEnhanced .card-body {
+  padding: 1.5rem 1.25rem !important;
+  background-color: var(--background) !important;
+  min-height: 200px;
+}
+
+/* Individual Skill Items - Enhanced design */
+#roadmapResultsEnhanced .card-body > div {
+  padding-left: 0 !important;
+}
+
+#roadmapResultsEnhanced .card-body > div > div {
+  background-color: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-left: 3px solid var(--primary) !important;
+  border-radius: var(--radius) !important;
+  padding: 1rem !important;
+  margin-bottom: 1rem !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
+}
+
+#roadmapResultsEnhanced .card-body > div > div:hover {
+  transform: translateX(4px) !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08) !important;
+  border-left-color: #28a745 !important;
+}
+
+#roadmapResultsEnhanced .card-body > div > div:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Skill name styling */
+#roadmapResultsEnhanced .card-body strong {
+  color: var(--foreground) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  display: block;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+/* Skill metadata (weeks, priority) */
+#roadmapResultsEnhanced .card-body small {
+  color: rgba(0,0,0,0.6) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 0.875rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+#roadmapResultsEnhanced .card-body small::before {
+  content: '⏱';
+  font-size: 1rem;
+  margin-right: 0.25rem;
+}
+
+/* Empty state message */
+#roadmapResultsEnhanced .card-body .text-muted.small {
+  color: rgba(0,0,0,0.5) !important;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.95rem !important;
+}
+
+/* Next Skill Alert - Highlighted call-to-action */
+#roadmapResultsEnhanced .alert-primary {
+  background: linear-gradient(135deg, rgba(255, 107, 61, 0.1) 0%, rgba(255, 107, 61, 0.05) 100%) !important;
+  border: 1px solid var(--primary) !important;
+  border-left: 4px solid var(--primary) !important;
+  border-radius: var(--radius) !important;
+  padding: 1.5rem !important;
+  margin-top: 2rem !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 61, 0.15) !important;
+}
+
+#roadmapResultsEnhanced .alert-primary h6 {
+  color: var(--foreground) !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 1.4rem !important;
+  margin-bottom: 0.75rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#roadmapResultsEnhanced .alert-primary h6 i {
+  color: var(--primary) !important;
+  font-size: 1.5rem;
+}
+
+#roadmapResultsEnhanced .alert-primary p {
+  color: var(--foreground) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 1.05rem !important;
+  margin-bottom: 0 !important;
+  line-height: 1.6;
+}
+
+#roadmapResultsEnhanced .alert-primary strong {
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+}
+
+/* Responsive Design - Tablet */
+@media (max-width: 991px) {
+  #enhanced-roadmap {
+    padding: 1.75rem !important;
+  }
+  
+  #enhanced-roadmap h5 {
+    font-size: 1.8rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-header {
+    font-size: 1.1rem !important;
+    padding: 0.875rem 1rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-body {
+    padding: 1.25rem 1rem !important;
+    min-height: 180px;
+  }
+  
+  #roadmapResultsEnhanced .alert-info h6,
+  #roadmapResultsEnhanced .alert-primary h6 {
+    font-size: 1.3rem !important;
+  }
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 768px) {
+  #enhanced-roadmap {
+    padding: 1.5rem !important;
+  }
+  
+  #enhanced-roadmap h5 {
+    font-size: 1.6rem !important;
+    margin-bottom: 0.875rem !important;
+  }
+  
+  #enhanced-roadmap h5 i {
+    font-size: 1.6rem;
+  }
+  
+  #enhanced-roadmap .text-muted.small {
+    font-size: 0.95rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+  
+  #enhanced-roadmap .btn-success {
+    width: 100%;
+    padding: 0.875rem 1.25rem !important;
+    font-size: 1rem !important;
+  }
+  
+  #roadmapResultsEnhanced {
+    margin-top: 1.5rem;
+  }
+  
+  #roadmapResultsEnhanced .alert-info,
+  #roadmapResultsEnhanced .alert-primary {
+    padding: 1.25rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  #roadmapResultsEnhanced .alert-info h6,
+  #roadmapResultsEnhanced .alert-primary h6 {
+    font-size: 1.2rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  #roadmapResultsEnhanced .alert-info p,
+  #roadmapResultsEnhanced .alert-primary p {
+    font-size: 0.95rem !important;
+  }
+  
+  #roadmapResultsEnhanced .col-md-4 {
+    margin-bottom: 1.25rem;
+  }
+  
+  #roadmapResultsEnhanced .card-header {
+    font-size: 1.1rem !important;
+    padding: 0.875rem 1rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-header i {
+    font-size: 1.2rem;
+  }
+  
+  #roadmapResultsEnhanced .card-body {
+    padding: 1.25rem 1rem !important;
+    min-height: auto;
+  }
+  
+  #roadmapResultsEnhanced .card-body > div > div {
+    padding: 0.875rem !important;
+    margin-bottom: 0.875rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-body strong {
+    font-size: 0.95rem !important;
+    margin-bottom: 0.4rem;
+  }
+  
+  #roadmapResultsEnhanced .card-body small {
+    font-size: 0.85rem !important;
+    gap: 0.5rem;
+  }
+}
+
+/* Responsive Design - Small Mobile */
+@media (max-width: 576px) {
+  #enhanced-roadmap {
+    padding: 1.25rem !important;
+    margin-top: 1.5rem !important;
+  }
+  
+  #enhanced-roadmap h5 {
+    font-size: 1.4rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  #enhanced-roadmap h5 i {
+    font-size: 1.4rem;
+    margin-right: 0.5rem;
+  }
+  
+  #enhanced-roadmap .text-muted.small {
+    font-size: 0.9rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  #enhanced-roadmap .btn-success {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.95rem !important;
+  }
+  
+  #roadmapResultsEnhanced {
+    margin-top: 1.25rem;
+  }
+  
+  #roadmapResultsEnhanced .alert-info,
+  #roadmapResultsEnhanced .alert-primary {
+    padding: 1rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+  
+  #roadmapResultsEnhanced .alert-info h6,
+  #roadmapResultsEnhanced .alert-primary h6 {
+    font-size: 1.1rem !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  #roadmapResultsEnhanced .alert-info p,
+  #roadmapResultsEnhanced .alert-primary p {
+    font-size: 0.9rem !important;
+    line-height: 1.5;
+  }
+  
+  #roadmapResultsEnhanced .col-md-4 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  #roadmapResultsEnhanced .card-header {
+    font-size: 1rem !important;
+    padding: 0.75rem 0.875rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-header i {
+    font-size: 1.1rem;
+  }
+  
+  #roadmapResultsEnhanced .card-body {
+    padding: 1rem 0.875rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-body > div > div {
+    padding: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-body strong {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.35rem;
+  }
+  
+  #roadmapResultsEnhanced .card-body small {
+    font-size: 0.8rem !important;
+    gap: 0.4rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  #roadmapResultsEnhanced .card-body small::before {
+    display: none;
+  }
+  
+  #roadmapResultsEnhanced .alert-primary strong {
+    font-size: 1rem !important;
+  }
+}
+
+/* Extra Small Screens */
+@media (max-width: 400px) {
+  #enhanced-roadmap {
+    padding: 1rem !important;
+  }
+  
+  #enhanced-roadmap h5 {
+    font-size: 1.3rem !important;
+  }
+  
+  #enhanced-roadmap .btn-success {
+    padding: 0.625rem 0.875rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-header {
+    font-size: 0.95rem !important;
+    padding: 0.625rem 0.75rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-body {
+    padding: 0.875rem 0.75rem !important;
+  }
+  
+  #roadmapResultsEnhanced .card-body > div > div {
+    padding: 0.625rem !important;
+  }
+}
+
+/* Loading state animation */
+@keyframes roadmapPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+#roadmapResultsEnhanced.loading {
+  animation: roadmapPulse 1.5s ease-in-out infinite;
+}
+
+/* Smooth scroll to roadmap results */
+#roadmapResultsEnhanced {
+  scroll-margin-top: 5rem;
+}
+
+/* Print styles for roadmap */
+@media print {
+  #enhanced-roadmap {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+  }
+  
+  #enhanced-roadmap .btn-success {
+    display: none;
+  }
+  
+  #roadmapResultsEnhanced .card {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  #roadmapResultsEnhanced {
+    animation: none;
+  }
+  
+  #roadmapResultsEnhanced .card:hover,
+  #roadmapResultsEnhanced .card-body > div > div:hover {
+    transform: none;
+  }
+  
+  #enhanced-roadmap .btn-success:hover {
+    transform: none;
+  }
+}
+
+/* Accessibility improvements */
+#roadmapResultsEnhanced .card-body > div > div:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+#enhanced-roadmap .btn-success:focus {
+  outline: 2px solid #28a745;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  #roadmapResultsEnhanced .card {
+    border: 2px solid #000 !important;
+  }
+  
+  #roadmapResultsEnhanced .card-body > div > div {
+    border: 2px solid #000 !important;
+  }
+}
+
+
+/* ========== RESUME.HTML BUTTON STANDARDIZATION ========== */
+/* Ensuring all buttons match the website's comic-button design system */
+
+/* Override Bootstrap button styles to match comic-button theme */
+.btn-primary,
+.btn-success,
+.btn-info,
+.btn-danger {
+  /* Comic button base styling */
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  border: 2px solid #000;
+  border-radius: 10px;
+  box-shadow: 5px 5px 0px #000;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+  min-height: 3em;
+  position: relative;
+  overflow: visible;
+}
+
+/* Color-specific backgrounds - matching their border colors */
+.btn-primary {
+  background-color: #007bff; /* Darker blue for Evaluate Role Fit */
+}
+
+.btn-success {
+  background-color: #28a745; /* Green for Generate My Learning Roadmap */
+}
+
+.btn-info {
+  background-color: #17a2b8; /* Cyan for Compare All Roles */
+}
+
+.btn-danger {
+  background-color: #dc3545; /* Red for Analyze My Resume */
+}
+
+/* Hover states - matching their respective colors */
+.btn-primary:hover {
+  background-color: #fff;
+  color: #007bff;
+  border: 2px solid #007bff;
+  box-shadow: 5px 5px 0px #007bff;
+  text-decoration: none;
+}
+
+.btn-success:hover {
+  background-color: #fff;
+  color: #28a745;
+  border: 2px solid #28a745;
+  box-shadow: 5px 5px 0px #28a745;
+  text-decoration: none;
+}
+
+.btn-info:hover {
+  background-color: #fff;
+  color: #17a2b8;
+  border: 2px solid #17a2b8;
+  box-shadow: 5px 5px 0px #17a2b8;
+  text-decoration: none;
+}
+
+.btn-danger:hover {
+  background-color: #fff;
+  color: #dc3545;
+  border: 2px solid #dc3545;
+  box-shadow: 5px 5px 0px #dc3545;
+  text-decoration: none;
+}
+
+/* Active states - matching comic-button */
+.btn-primary:active,
+.btn-success:active,
+.btn-info:active,
+.btn-danger:active {
+  background-color: #fcf414;
+  box-shadow: none;
+  transform: translateY(4px);
+}
+
+/* Focus states - matching comic-button */
+.btn-primary:focus,
+.btn-success:focus,
+.btn-info:focus,
+.btn-danger:focus {
+  outline: none;
+  box-shadow: 5px 5px 0px #000, 0 0 0 3px hsla(16, 100%, 55%, 0.3);
+}
+
+/* Icon spacing in buttons */
+.btn-primary i,
+.btn-success i,
+.btn-info i,
+.btn-danger i,
+.comic-button i {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
+/* Remove Bootstrap's default button styles */
+.btn-primary:not(:disabled):not(.disabled),
+.btn-success:not(:disabled):not(.disabled),
+.btn-info:not(:disabled):not(.disabled),
+.btn-danger:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+
+/* Disabled state */
+.btn-primary:disabled,
+.btn-success:disabled,
+.btn-info:disabled,
+.btn-danger:disabled,
+.comic-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Button spacing in resume.html */
+#generateBtn,
+#downloadPdfBtn,
+#evaluateBtn,
+#toggleViewBtn {
+  margin-right: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+#generateBtn:last-child,
+#downloadPdfBtn:last-child,
+#evaluateBtn:last-child,
+#toggleViewBtn:last-child {
+  margin-right: 0;
+}
+
+/* Add Education button - compact style */
+#addEducationBtn {
+  font-size: 0.875rem !important;
+  padding: 0.375rem 0.75rem !important;
+  min-height: auto;
+  box-shadow: 3px 3px 0px #000;
+}
+
+#addEducationBtn:hover {
+  box-shadow: 3px 3px 0px var(--primary);
+}
+
+/* Education entry remove buttons - compact style */
+.education-entry .comic-button {
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0.5rem !important;
+  min-height: auto;
+  box-shadow: 3px 3px 0px #000;
+}
+
+.education-entry .comic-button:hover {
+  box-shadow: 3px 3px 0px #dc3545;
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+/* Skills Needed buttons in job cards */
+.skills-needed-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+}
+
+/* Modal buttons */
+.modal-footer .comic-button {
+  min-width: 120px;
+  margin: 0 0.5rem;
+}
+
+/* Proceed button in modal */
+#proceedBtn {
+  background-color: var(--primary);
+}
+
+#proceedBtn:hover {
+  background-color: #fff;
+  color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 5px 5px 0px var(--primary);
+}
+
+/* Enhanced features buttons - all using cyan to match Compare All Roles */
+/* Removed individual color overrides - all buttons now use standardized cyan styling */
+
+/* Start New Evaluation button - gray variant */
+#summary-verdict-section .comic-button {
+  background-color: #6c757d !important;
+  color: white !important;
+  border: 2px solid #000 !important;
+  box-shadow: 5px 5px 0px #000 !important;
+}
+
+#summary-verdict-section .comic-button:hover {
+  background-color: #fff !important;
+  color: #6c757d !important;
+  border: 2px solid #6c757d !important;
+  box-shadow: 5px 5px 0px #6c757d !important;
+}
+
+/* Button groups - proper spacing */
+.text-center .comic-button,
+.text-center .btn-primary,
+.text-center .btn-success,
+.text-center .btn-info,
+.text-center .btn-danger {
+  margin: 0.5rem 0.5rem;
+}
+
+/* Responsive Design - Tablet */
+@media (max-width: 991px) {
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .comic-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+  
+  #addEducationBtn {
+    font-size: 0.8rem !important;
+    padding: 0.3rem 0.6rem !important;
+  }
+  
+  .education-entry .comic-button {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .comic-button {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.75rem;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+  }
+  
+  /* Exception for inline buttons */
+  .d-flex .comic-button,
+  .d-flex .btn-primary,
+  .d-flex .btn-success,
+  .d-flex .btn-info,
+  .d-flex .btn-danger {
+    width: auto;
+    flex: 1;
+    margin: 0 0.25rem;
+  }
+  
+  /* Education buttons remain compact */
+  #addEducationBtn {
+    width: auto;
+    font-size: 0.85rem !important;
+    padding: 0.5rem 1rem !important;
+  }
+  
+  .education-entry .comic-button {
+    width: auto;
+    font-size: 0.75rem !important;
+    padding: 0.375rem 0.75rem !important;
+  }
+  
+  /* Skills needed buttons */
+  .skills-needed-btn {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 0.625rem 1rem;
+  }
+  
+  /* Modal buttons */
+  .modal-footer .comic-button {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+}
+
+/* Responsive Design - Small Mobile */
+@media (max-width: 576px) {
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .comic-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    box-shadow: 3px 3px 0px #000;
+  }
+  
+  .btn-primary:hover,
+  .btn-success:hover,
+  .btn-info:hover,
+  .btn-danger:hover,
+  .comic-button:hover {
+    box-shadow: 3px 3px 0px currentColor;
+  }
+  
+  #addEducationBtn {
+    font-size: 0.8rem !important;
+    padding: 0.4rem 0.8rem !important;
+  }
+  
+  .education-entry .comic-button {
+    font-size: 0.7rem !important;
+    padding: 0.3rem 0.6rem !important;
+  }
+  
+  .skills-needed-btn {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.875rem;
+  }
+}
+
+/* Extra Small Screens */
+@media (max-width: 400px) {
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .comic-button {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9rem;
+  }
+  
+  #addEducationBtn {
+    font-size: 0.75rem !important;
+    padding: 0.35rem 0.7rem !important;
+  }
+  
+  .education-entry .comic-button {
+    font-size: 0.65rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+}
+
+/* Loading state for all buttons */
+.btn-primary.loading,
+.btn-success.loading,
+.btn-info.loading,
+.btn-danger.loading,
+.comic-button.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.btn-primary.loading::after,
+.btn-success.loading::after,
+.btn-info.loading::after,
+.btn-danger.loading::after,
+.comic-button.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Button focus visible for accessibility */
+.btn-primary:focus-visible,
+.btn-success:focus-visible,
+.btn-info:focus-visible,
+.btn-danger:focus-visible,
+.comic-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Ensure buttons don't break layout */
+.btn-primary,
+.btn-success,
+.btn-info,
+.btn-danger,
+.comic-button {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Button text should not wrap on desktop */
+@media (min-width: 769px) {
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .comic-button {
+    white-space: nowrap;
+  }
+}
+
+/* Allow wrapping on mobile if needed */
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .comic-button {
+    white-space: normal;
+    word-wrap: break-word;
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .comic-button {
+    transition: none;
+  }
+  
+  .btn-primary:active,
+  .btn-success:active,
+  .btn-info:active,
+  .btn-danger:active,
+  .comic-button:active {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .comic-button {
+    border: 3px solid #000;
+  }
+}
+
+/* Print styles - hide interactive buttons */
+@media print {
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .comic-button {
+    display: none;
+  }
+}
+
+/* Ensure consistent button height */
+.btn-primary,
+.btn-success,
+.btn-info,
+.btn-danger {
+  min-height: 3em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove Bootstrap's default focus shadow */
+.btn-primary:focus,
+.btn-success:focus,
+.btn-info:focus,
+.btn-danger:focus {
+  box-shadow: 5px 5px 0px #000, 0 0 0 3px hsla(16, 100%, 55%, 0.3) !important;
+}
+
+/* Remove Bootstrap's default active state */
+.btn-primary:active:focus,
+.btn-success:active:focus,
+.btn-info:active:focus,
+.btn-danger:active:focus {
+  box-shadow: none !important;
+}
+
+/* Ensure proper spacing between button groups */
+.btn-group .btn-primary,
+.btn-group .btn-success,
+.btn-group .btn-info,
+.btn-group .btn-danger {
+  margin: 0 0.25rem;
+}
+
+/* Full width variant */
+.btn-primary.w-100,
+.btn-success.w-100,
+.btn-info.w-100,
+.btn-danger.w-100 {
+  width: 100% !important;
+  display: flex !important;
+}
+
+
+/* ========== SKILL-BASED ROADMAP - ORANGE GOAL LABELS ========== */
+
+/* Make Short-term, Mid-term, and Long-term labels black for readability on orange background */
+#roadmapResultsEnhanced .card-header strong {
+  color: #000 !important;
+}
+
+/* Ensure icons remain visible with proper contrast */
+#roadmapResultsEnhanced .col-md-4:nth-child(1) .card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #ff8c42 100%) !important;
+}
+
+#roadmapResultsEnhanced .col-md-4:nth-child(1) .card-header strong {
+  color: #000 !important;
+  text-shadow: none;
+}
+
+#roadmapResultsEnhanced .col-md-4:nth-child(2) .card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #ff8c42 100%) !important;
+}
+
+#roadmapResultsEnhanced .col-md-4:nth-child(2) .card-header strong {
+  color: #000 !important;
+  text-shadow: none;
+}
+
+#roadmapResultsEnhanced .col-md-4:nth-child(3) .card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #ff8c42 100%) !important;
+}
+
+#roadmapResultsEnhanced .col-md-4:nth-child(3) .card-header strong {
+  color: #000 !important;
+  text-shadow: none;
+}
+
+/* Ensure icons maintain good contrast */
+#roadmapResultsEnhanced .card-header i {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Responsive adjustments for roadmap labels */
+@media (max-width: 768px) {
+  #roadmapResultsEnhanced .card-header strong {
+    font-size: 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  #roadmapResultsEnhanced .card-header strong {
+    font-size: 0.95rem !important;
+  }
+}
+
+
+/* ========== CONFIDENCE INDEX STYLING ========== */
+/* Enhanced font styling for the center text inside the Confidence Index circle */
+
+#confidenceBadgeEnhanced {
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-weight: 400 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Responsive adjustments for Confidence Index */
+@media (max-width: 768px) {
+  #confidenceBadgeEnhanced {
+    font-size: 1.8rem !important;
+    width: 90px !important;
+    height: 90px !important;
+    padding: 18px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  #confidenceBadgeEnhanced {
+    font-size: 1.6rem !important;
+    width: 80px !important;
+    height: 80px !important;
+    padding: 16px !important;
+  }
+}
+
+
+/* ========== ENHANCED FEATURES BUTTONS - STANDARDIZATION ========== */
+/* Making all action buttons match the "Compare All Roles" button style */
+
+/* Base styling for all enhanced feature buttons - matching btn-info (Compare All Roles) */
+#enhanced-role-evaluation .btn-primary,
+#enhanced-roadmap .btn-success,
+#enhanced-comparison .btn-info,
+#enhanced-breakdown .btn-danger {
+  /* Comic button styling matching Compare All Roles */
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  border: 2px solid #000;
+  border-radius: 10px;
+  box-shadow: 5px 5px 0px #000;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+  min-height: 3em;
+  position: relative;
+  overflow: visible;
+}
+
+/* Specific background colors for each button */
+/* Specific background colors for each button - matching their border colors */
+#enhanced-role-evaluation .btn-primary {
+  background-color: #007bff; /* Darker blue */
+}
+
+#enhanced-roadmap .btn-success {
+  background-color: #28a745; /* Green */
+}
+
+#enhanced-comparison .btn-info {
+  background-color: #17a2b8; /* Cyan */
+}
+
+#enhanced-breakdown .btn-danger {
+  background-color: #dc3545; /* Red */
+}
+
+/* Individual hover states - matching their respective colors */
+#enhanced-role-evaluation .btn-primary:hover {
+  background-color: #fff !important;
+  color: #007bff !important;
+  border: 2px solid #007bff !important;
+  box-shadow: 5px 5px 0px #007bff !important;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+#enhanced-roadmap .btn-success:hover {
+  background-color: #fff !important;
+  color: #28a745 !important;
+  border: 2px solid #28a745 !important;
+  box-shadow: 5px 5px 0px #28a745 !important;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+#enhanced-comparison .btn-info:hover {
+  background-color: #fff !important;
+  color: #17a2b8 !important;
+  border: 2px solid #17a2b8 !important;
+  box-shadow: 5px 5px 0px #17a2b8 !important;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+#enhanced-breakdown .btn-danger:hover {
+  background-color: #fff !important;
+  color: #dc3545 !important;
+  border: 2px solid #dc3545 !important;
+  box-shadow: 5px 5px 0px #dc3545 !important;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+/* Unified active state */
+#enhanced-role-evaluation .btn-primary:active,
+#enhanced-roadmap .btn-success:active,
+#enhanced-comparison .btn-info:active,
+#enhanced-breakdown .btn-danger:active {
+  background-color: #fcf414 !important;
+  box-shadow: none !important;
+  transform: translateY(4px);
+}
+
+/* Individual focus states - matching their respective colors */
+#enhanced-role-evaluation .btn-primary:focus {
+  outline: none;
+  box-shadow: 5px 5px 0px #000, 0 0 0 3px rgba(0, 123, 255, 0.3) !important;
+}
+
+#enhanced-roadmap .btn-success:focus {
+  outline: none;
+  box-shadow: 5px 5px 0px #000, 0 0 0 3px rgba(40, 167, 69, 0.3) !important;
+}
+
+#enhanced-comparison .btn-info:focus {
+  outline: none;
+  box-shadow: 5px 5px 0px #000, 0 0 0 3px rgba(23, 162, 184, 0.3) !important;
+}
+
+#enhanced-breakdown .btn-danger:focus {
+  outline: none;
+  box-shadow: 5px 5px 0px #000, 0 0 0 3px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* Icon spacing - consistent across all buttons */
+#enhanced-role-evaluation .btn-primary i,
+#enhanced-roadmap .btn-success i,
+#enhanced-comparison .btn-info i,
+#enhanced-breakdown .btn-danger i {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
+/* Ensure consistent button alignment */
+#enhanced-role-evaluation .btn-primary,
+#enhanced-roadmap .btn-success,
+#enhanced-comparison .btn-info,
+#enhanced-breakdown .btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+}
+
+/* Responsive Design - Tablet */
+@media (max-width: 991px) {
+  #enhanced-role-evaluation .btn-primary,
+  #enhanced-roadmap .btn-success,
+  #enhanced-comparison .btn-info,
+  #enhanced-breakdown .btn-danger {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 768px) {
+  #enhanced-role-evaluation .btn-primary,
+  #enhanced-roadmap .btn-success,
+  #enhanced-comparison .btn-info,
+  #enhanced-breakdown .btn-danger {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+  }
+}
+
+/* Responsive Design - Small Mobile */
+@media (max-width: 576px) {
+  #enhanced-role-evaluation .btn-primary,
+  #enhanced-roadmap .btn-success,
+  #enhanced-comparison .btn-info,
+  #enhanced-breakdown .btn-danger {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    box-shadow: 3px 3px 0px #000;
+  }
+  
+  #enhanced-role-evaluation .btn-primary:hover {
+    box-shadow: 3px 3px 0px #007bff !important;
+  }
+  
+  #enhanced-roadmap .btn-success:hover {
+    box-shadow: 3px 3px 0px #28a745 !important;
+  }
+  
+  #enhanced-comparison .btn-info:hover {
+    box-shadow: 3px 3px 0px #17a2b8 !important;
+  }
+  
+  #enhanced-breakdown .btn-danger:hover {
+    box-shadow: 3px 3px 0px #dc3545 !important;
+  }
+}
+
+/* Extra Small Screens */
+@media (max-width: 400px) {
+  #enhanced-role-evaluation .btn-primary,
+  #enhanced-roadmap .btn-success,
+  #enhanced-comparison .btn-info,
+  #enhanced-breakdown .btn-danger {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Loading state for enhanced feature buttons */
+#enhanced-role-evaluation .btn-primary.loading,
+#enhanced-roadmap .btn-success.loading,
+#enhanced-comparison .btn-info.loading,
+#enhanced-breakdown .btn-danger.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+#enhanced-role-evaluation .btn-primary.loading::after,
+#enhanced-roadmap .btn-success.loading::after,
+#enhanced-comparison .btn-info.loading::after,
+#enhanced-breakdown .btn-danger.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Disabled state */
+#enhanced-role-evaluation .btn-primary:disabled,
+#enhanced-roadmap .btn-success:disabled,
+#enhanced-comparison .btn-info:disabled,
+#enhanced-breakdown .btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Ensure buttons don't break layout */
+#enhanced-role-evaluation .btn-primary,
+#enhanced-roadmap .btn-success,
+#enhanced-comparison .btn-info,
+#enhanced-breakdown .btn-danger {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Allow wrapping on mobile if needed */
+@media (max-width: 768px) {
+  #enhanced-role-evaluation .btn-primary,
+  #enhanced-roadmap .btn-success,
+  #enhanced-comparison .btn-info,
+  #enhanced-breakdown .btn-danger {
+    white-space: normal;
+    word-wrap: break-word;
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  #enhanced-role-evaluation .btn-primary,
+  #enhanced-roadmap .btn-success,
+  #enhanced-comparison .btn-info,
+  #enhanced-breakdown .btn-danger {
+    transition: none;
+  }
+  
+  #enhanced-role-evaluation .btn-primary:hover,
+  #enhanced-roadmap .btn-success:hover,
+  #enhanced-comparison .btn-info:hover,
+  #enhanced-breakdown .btn-danger:hover {
+    transform: none;
+  }
+  
+  #enhanced-role-evaluation .btn-primary:active,
+  #enhanced-roadmap .btn-success:active,
+  #enhanced-comparison .btn-info:active,
+  #enhanced-breakdown .btn-danger:active {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  #enhanced-role-evaluation .btn-primary,
+  #enhanced-roadmap .btn-success,
+  #enhanced-comparison .btn-info,
+  #enhanced-breakdown .btn-danger {
+    border: 3px solid #000;
+  }
+}
+
+/* Focus visible for accessibility - matching their respective colors */
+#enhanced-role-evaluation .btn-primary:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+#enhanced-roadmap .btn-success:focus-visible {
+  outline: 2px solid #28a745;
+  outline-offset: 2px;
+}
+
+#enhanced-comparison .btn-info:focus-visible {
+  outline: 2px solid #17a2b8;
+  outline-offset: 2px;
+}
+
+#enhanced-breakdown .btn-danger:focus-visible {
+  outline: 2px solid #dc3545;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  #enhanced-role-evaluation .btn-primary,
+  #enhanced-roadmap .btn-success,
+  #enhanced-comparison .btn-info,
+  #enhanced-breakdown .btn-danger {
+    display: none;
   }
 }

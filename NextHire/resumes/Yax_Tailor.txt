@@ -1,27 +1,26 @@
 YAX TAILOR
 ----------------------------------------
-CE | CGPA: 9.17
+CE | CGPA: 8.9
 
 CONTACT
-Phone: 9874563215
+Phone:  9313336852
 Email: tailoryax@gmail.com
-City: Surat
-GitHub: yax-11
+City: Ahmedabad
+GitHub: Yaxcoder-11
+
+ABOUT
+----------------------------------------
+I AM YAX
 
 SKILLS
 ----------------------------------------
-- Python
-- Data Structures
-- Java
-- JavaScript
+- DBMS
+- JAVA
 - HTML
-- CSS
-- GIT
-- SQL
 
 
 PROJECTS
 ----------------------------------------
-ATM
-BrainCrate
-NextHire
+P1
+P2
+P3
