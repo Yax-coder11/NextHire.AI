@@ -1,0 +1,30 @@
+FARHEEN 
+----------------------------------------
+CE | CGPA: 8.7
+
+CONTACT
+Phone: 9875088740
+Email: farheen@gmail.com
+City: Ahmedabad
+GitHub: farheen-git
+
+ABOUT
+----------------------------------------
+I am a quick learner, eager to try out new things
+
+SKILLS
+----------------------------------------
+- Python
+- Java
+- DBMS
+- SQL
+- HTML
+- CSS
+
+
+PROJECTS
+----------------------------------------
+ATM
+BusinessBytes
+BrainCrate
+

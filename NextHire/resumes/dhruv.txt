@@ -1,0 +1,30 @@
+DHRUV
+----------------------------------------
+AIDS | CGPA: 8.7
+
+CONTACT
+Phone: 9878767654
+Email: dhruvsom@gmail.com
+City: Surat
+GitHub: dhruvsom
+
+ABOUT
+----------------------------------------
+I'm the best !
+
+SKILLS
+----------------------------------------
+- HTML
+- CSS
+- JAVA
+- JAVASCRIPT
+- DS
+- PYTHON
+- SQL
+
+
+PROJECTS
+----------------------------------------
+ATM
+BrainCrate
+NextHire

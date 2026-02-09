@@ -273,6 +273,214 @@
                 <ul id="jobMissingSkillsList" class="missing-skills-list"></ul>
               </div>
             </div>
+            
+            <!-- Chart Visualization Section (Hidden by default) -->
+            <div id="chart-visualization-section" class="missing-skills-section" style="display: none; margin-top: 2rem;">
+              <h5 class="mb-3"><i class="bi bi-bar-chart text-success me-2"></i>Visual Analytics</h5>
+              <div class="text-center mb-3">
+                <p class="text-muted small mb-1" id="chartCompanyName">Company: <strong>--</strong></p>
+                <p class="text-muted small mb-2" style="font-style: italic;">
+                  <i class="bi bi-info-circle me-1"></i>Charts generated dynamically based on the selected job
+                </p>
+                <p class="text-muted small mb-3" style="font-style: italic; color: #27AE60;">
+                  <i class="bi bi-graph-up me-1"></i>All analytics are generated based on your resume evaluation.
+                </p>
+              </div>
+              
+              <!-- Bar Chart -->
+              <div class="mb-4">
+                <h6 class="text-center mb-3">Job Availability Across Fields</h6>
+                <div class="text-center">
+                  <img id="barChartImage" src="" alt="Job Field Bar Chart" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                </div>
+              </div>
+              
+              <!-- Pie Chart -->
+              <div class="mb-4">
+                <h6 class="text-center mb-3">Skill Gap Impact Distribution</h6>
+                <p class="text-center text-muted small mb-3" style="font-style: italic;">
+                  Larger slices indicate skills with higher importance for this role
+                </p>
+                <div class="text-center">
+                  <img id="pieChartImage" src="" alt="Skill Gap Pie Chart" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                </div>
+              </div>
+              
+              <!-- Line Chart -->
+              <div class="mb-4">
+                <h6 class="text-center mb-3">Current Skill Readiness Progress</h6>
+                <p class="text-center text-muted small mb-3" style="font-style: italic;">
+                  This chart shows your current readiness level based on your resume evaluation.
+                </p>
+                <div class="text-center">
+                  <img id="lineChartImage" src="" alt="Skill Readiness Line Chart" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                </div>
+              </div>
+              
+              <!-- Download Report Button -->
+              <div class="text-center mt-4">
+                <a href="/download_report" target="_blank" class="comic-button">
+                  <i class="bi bi-download"></i> Download Evaluation Report
+                </a>
+                <p class="text-muted small mt-2" style="font-style: italic;">
+                  Opens in new tab. Use browser's Print/Save as PDF to download.
+                </p>
+              </div>
+            </div>
+            
+            <!-- FEATURE 1: Final Summary/Verdict Box -->
+            <div id="summary-verdict-section" class="missing-skills-section" style="display: none; margin-top: 2rem; border: 2px solid var(--primary); border-radius: 8px; padding: 1.5rem; background-color: #f8f9fa;">
+              <h5 class="mb-3 text-center"><i class="bi bi-clipboard-check text-primary me-2"></i>Evaluation Summary</h5>
+              
+              <div class="row text-center mb-3">
+                <div class="col-md-3">
+                  <div class="mb-2">
+                    <strong>Resume Score</strong>
+                  </div>
+                  <div class="resume-score-display" style="font-size: 2rem; color: var(--primary);">
+                    <span id="summary-resume-score">--</span>/100
+                  </div>
+                  <div class="text-muted small">Overall Resume Quality</div>
+                </div>
+                <div class="col-md-3">
+                  <div class="mb-2">
+                    <strong>Job Fit Score</strong>
+                  </div>
+                  <div class="resume-score-display" style="font-size: 2rem; color: #E67E22;">
+                    <span id="summary-job-fit-score">--</span>/100
+                  </div>
+                  <div class="text-muted small">Job-Specific Match</div>
+                </div>
+                <div class="col-md-3">
+                  <div class="mb-2">
+                    <strong>Resume Status</strong>
+                  </div>
+                  <div>
+                    <span class="dashboard-badge" id="summary-resume-status">--</span>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="mb-2">
+                    <strong>Missing Skills</strong>
+                  </div>
+                  <div style="font-size: 2rem; color: #E74C3C;">
+                    <span id="summary-missing-skills-count">--</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- FEATURE 2: Eligibility Badge (shown when job is selected) -->
+              <div id="eligibility-badge-container" style="display: none;">
+                <div class="text-center mb-3">
+                  <div class="mb-2">
+                    <strong>Job Eligibility</strong>
+                  </div>
+                  <div>
+                    <span class="dashboard-badge" style="font-size: 1.1rem; padding: 0.6rem 1.2rem;" id="eligibility-badge">--</span>
+                  </div>
+                  <div class="text-muted small mt-1">Based on Job Fit Score</div>
+                </div>
+              </div>
+              
+              <!-- FEATURE 5: Confidence Level -->
+              <div class="text-center mb-3">
+                <div class="mb-2">
+                  <strong>Confidence Level</strong>
+                </div>
+                <div>
+                  <span class="dashboard-badge" style="font-size: 1rem; padding: 0.5rem 1rem;" id="confidence-level-badge">--</span>
+                </div>
+              </div>
+              
+              <!-- FEATURE 3: Skill Improvement Tips -->
+              <div id="improvement-tips-section" style="display: none; margin-top: 1.5rem; padding: 1rem; background-color: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107;">
+                <h6 class="mb-3"><i class="bi bi-lightbulb text-warning me-2"></i>Skill Improvement Tips</h6>
+                <ul class="small mb-0" style="line-height: 1.8;">
+                  <li>Focus on learning the missing skills listed above to improve your job readiness</li>
+                  <li>Consider taking online courses or certifications in your weak areas</li>
+                  <li>Build small projects to practice and demonstrate your new skills</li>
+                  <li>Update your resume regularly as you acquire new skills</li>
+                  <li>Network with professionals in your target field to learn industry requirements</li>
+                </ul>
+              </div>
+              
+              <!-- FEATURE 4: Start New Evaluation Button -->
+              <div class="text-center mt-4">
+                <a href="/reset-evaluation" class="comic-button" style="background-color: #6c757d;">
+                  <i class="bi bi-arrow-clockwise"></i> Start New Evaluation
+                </a>
+                <p class="text-muted small mt-2" style="font-style: italic;">
+                  This will clear your current evaluation and return to home page
+                </p>
+              </div>
+            </div>
+            
+            <!-- ========== ENHANCED FEATURES SECTION ========== -->
+            <!-- These features appear after resume evaluation is complete -->
+            
+            <!-- ENHANCED FEATURE 1: Role-Based Evaluation -->
+            <div id="enhanced-role-evaluation" class="missing-skills-section" style="display: none; margin-top: 2rem; border: 2px solid #007bff; border-radius: 8px; padding: 1.5rem; background-color: #f8f9fa;">
+              <h5 class="mb-3"><i class="bi bi-person-badge text-primary me-2"></i>Role-Based Evaluation System</h5>
+              <p class="text-muted small mb-3">Evaluate your resume against specific job roles to see how well you match</p>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Select Target Role:</label>
+                  <select class="form-select" id="roleSelectEnhanced">
+                    <option value="">-- Select a Role --</option>
+                  </select>
+                  <button class="btn btn-primary mt-3" onclick="evaluateRoleEnhanced()">
+                    <i class="bi bi-search"></i> Evaluate Role Fit
+                  </button>
+                </div>
+                <div class="col-md-6" id="confidenceSectionEnhanced" style="display: none;">
+                  <h6 class="text-center">Confidence Index</h6>
+                  <div style="text-align: center;">
+                    <div style="display: inline-block; font-size: 2rem; padding: 20px; border-radius: 50%; width: 100px; height: 100px; align-items: center; justify-content: center; margin: 0 auto;" id="confidenceBadgeEnhanced">--</div>
+                  </div>
+                  <p class="text-center mt-2 small" id="confidenceTextEnhanced"></p>
+                </div>
+              </div>
+              
+              <div id="roleEvalResultsEnhanced" class="mt-4" style="display: none;"></div>
+            </div>
+            
+            <!-- ENHANCED FEATURE 2: Learning Roadmap -->
+            <div id="enhanced-roadmap" class="missing-skills-section" style="display: none; margin-top: 2rem; border: 2px solid #28a745; border-radius: 8px; padding: 1.5rem; background-color: #f8f9fa;">
+              <h5 class="mb-3"><i class="bi bi-map text-success me-2"></i>Skill Gap Learning Roadmap</h5>
+              <p class="text-muted small mb-3">Get a personalized learning plan to acquire missing skills</p>
+              
+              <button class="btn btn-success" onclick="generateRoadmapEnhanced()">
+                <i class="bi bi-arrow-right-circle"></i> Generate My Learning Roadmap
+              </button>
+              
+              <div id="roadmapResultsEnhanced" class="mt-4" style="display: none;"></div>
+            </div>
+            
+            <!-- ENHANCED FEATURE 5: Role Comparison -->
+            <div id="enhanced-comparison" class="missing-skills-section" style="display: none; margin-top: 2rem; border: 2px solid #17a2b8; border-radius: 8px; padding: 1.5rem; background-color: #f8f9fa;">
+              <h5 class="mb-3"><i class="bi bi-bar-chart text-info me-2"></i>Role Switch Impact Analysis</h5>
+              <p class="text-muted small mb-3">Compare your resume across multiple job roles to find your best fit</p>
+              
+              <button class="btn btn-info" onclick="compareRolesEnhanced()">
+                <i class="bi bi-arrow-left-right"></i> Compare All Roles
+              </button>
+              
+              <div id="comparisonResultsEnhanced" class="mt-4" style="display: none;"></div>
+            </div>
+            
+            <!-- ENHANCED FEATURE 6: Resume Breakdown -->
+            <div id="enhanced-breakdown" class="missing-skills-section" style="display: none; margin-top: 2rem; border: 2px solid #dc3545; border-radius: 8px; padding: 1.5rem; background-color: #f8f9fa;">
+              <h5 class="mb-3"><i class="bi bi-pie-chart text-danger me-2"></i>Resume Strength Breakdown</h5>
+              <p class="text-muted small mb-3">See detailed section-wise scoring of your resume</p>
+              
+              <button class="btn btn-danger" onclick="getResumeBreakdownEnhanced()">
+                <i class="bi bi-graph-up"></i> Analyze My Resume
+              </button>
+              
+              <div id="breakdownResultsEnhanced" class="mt-4" style="display: none;"></div>
+            </div>
+            
           </div>
         </div>
       </div>
@@ -930,8 +1138,12 @@
           }, 100);
 
         } else {
-          // Handle server-side validation errors
-          if (data.message && (data.message.includes('phone') || data.message.includes('email'))) {
+          // Handle validation errors from backend
+          if (data.validation_error) {
+            // Show professional validation message
+            showValidationModal(data.validation_error);
+          } else if (data.message && (data.message.includes('phone') || data.message.includes('email'))) {
+            // Handle phone/email validation errors
             if (data.message.includes('phone')) {
               showFieldError('phone', 'phoneError', data.message);
             }
@@ -975,11 +1187,20 @@
           const ul = document.getElementById("missingSkillsList");
           ul.innerHTML = "";
 
-          data.missing_skills.forEach(skill => {
+          // Handle missing skills display
+          if (data.missing_skills && data.missing_skills.length > 0) {
+            data.missing_skills.forEach(skill => {
+              const li = document.createElement("li");
+              li.innerText = skill;
+              ul.appendChild(li);
+            });
+          } else {
+            // No missing skills - show success message
             const li = document.createElement("li");
-            li.innerText = skill;
+            li.className = "text-success";
+            li.innerHTML = '<i class="bi bi-check-circle me-2"></i>No missing skills detected. You are fully eligible for this role.';
             ul.appendChild(li);
-          });
+          }
 
           // Show evaluation section and divider
           document.getElementById("evaluation-section").style.display = "block";
@@ -990,6 +1211,9 @@
 
           evaluateBtn.innerHTML = '<i class="bi bi-check-circle"></i> Resume Evaluated';
           
+          // Load and display evaluation summary (5 features)
+          loadEvaluationSummary();
+          
           // Smooth scroll to evaluation
           setTimeout(() => {
             document.getElementById("evaluation-section").scrollIntoView({
@@ -997,10 +1221,16 @@
               block: 'start'
             });
             
-            // Show interest field modal after scroll completes - extends existing flow
+            // CONDITIONAL LOGIC: Show interest field modal ONLY if resume is ready
             setTimeout(() => {
-              const interestModal = new bootstrap.Modal(document.getElementById('interestFieldModal'));
-              interestModal.show();
+              if (data.status === "Ready" || data.status === "Partially Ready") {
+                // Resume is ready - show interest field modal
+                const interestModal = new bootstrap.Modal(document.getElementById('interestFieldModal'));
+                interestModal.show();
+              } else {
+                // Resume is NOT ready - show "Not Ready" message
+                showNotReadyMessage();
+              }
             }, 500);
           }, 100);
 
@@ -1013,6 +1243,177 @@
           evaluateBtn.disabled = false;
         });
     });
+    
+    // Function to load and display evaluation summary (5 simple features)
+    async function loadEvaluationSummary() {
+      try {
+        // Call backend to get summary data (simple fetch)
+        const response = await fetch('/api/get-summary');
+        const data = await response.json();
+        
+        if (!data.success) {
+          console.error('Failed to load summary');
+          return;
+        }
+        
+        // FEATURE 1: Update Final Summary/Verdict Box
+        document.getElementById('summary-resume-score').innerText = data.resume_score;
+        document.getElementById('summary-resume-status').innerText = data.resume_status;
+        document.getElementById('summary-missing-skills-count').innerText = data.missing_skills_count;
+        
+        // Update Job Fit Score display
+        const jobFitScoreElement = document.getElementById('summary-job-fit-score');
+        if (data.job_fit_score > 0) {
+          jobFitScoreElement.innerText = data.job_fit_score;
+        } else {
+          jobFitScoreElement.innerText = '--';
+        }
+        
+        // FEATURE 2: Update Eligibility Badge (only show if job is selected)
+        const eligibilityContainer = document.getElementById('eligibility-badge-container');
+        const eligibilityBadge = document.getElementById('eligibility-badge');
+        
+        if (data.job_fit_score > 0) {
+          // Job has been selected - show eligibility based on job fit score
+          eligibilityBadge.innerText = data.eligibility;
+          
+          // Color code eligibility badge based on job fit score
+          if (data.eligibility === 'Eligible') {
+            eligibilityBadge.style.backgroundColor = '#27AE60';
+            eligibilityBadge.style.color = 'white';
+          } else if (data.eligibility === 'Partially Eligible') {
+            eligibilityBadge.style.backgroundColor = '#F39C12';
+            eligibilityBadge.style.color = 'white';
+          } else {
+            eligibilityBadge.style.backgroundColor = '#E74C3C';
+            eligibilityBadge.style.color = 'white';
+          }
+          
+          eligibilityContainer.style.display = 'block';
+        } else {
+          // No job selected yet - hide eligibility
+          eligibilityContainer.style.display = 'none';
+        }
+        
+        // FEATURE 3: Show Skill Improvement Tips (only if missing skills exist)
+        const improvementTipsSection = document.getElementById('improvement-tips-section');
+        if (data.has_missing_skills) {
+          improvementTipsSection.style.display = 'block';
+        } else {
+          improvementTipsSection.style.display = 'none';
+        }
+        
+        // FEATURE 5: Update Confidence Level
+        const confidenceBadge = document.getElementById('confidence-level-badge');
+        confidenceBadge.innerText = data.confidence_level;
+        
+        // Color code confidence level
+        if (data.confidence_level === 'High') {
+          confidenceBadge.style.backgroundColor = '#27AE60';
+          confidenceBadge.style.color = 'white';
+        } else if (data.confidence_level === 'Medium') {
+          confidenceBadge.style.backgroundColor = '#F39C12';
+          confidenceBadge.style.color = 'white';
+        } else {
+          confidenceBadge.style.backgroundColor = '#E74C3C';
+          confidenceBadge.style.color = 'white';
+        }
+        
+        // Show summary section
+        document.getElementById('summary-verdict-section').style.display = 'block';
+        
+        // Load enhanced features after evaluation is complete
+        loadRolesEnhanced();
+        
+      } catch (error) {
+        console.error('Error loading summary:', error);
+      }
+    }
+    
+    // Function to show "Not Ready" message when resume is not ready for job analysis
+    function showNotReadyMessage() {
+      // Create or update not ready section
+      let notReadySection = document.getElementById('not-ready-section');
+      
+      if (!notReadySection) {
+        // Create new section if it doesn't exist
+        notReadySection = document.createElement('div');
+        notReadySection.id = 'not-ready-section';
+        notReadySection.className = 'py-5';
+        
+        const evaluationSection = document.getElementById('evaluation-section');
+        evaluationSection.parentNode.insertBefore(notReadySection, evaluationSection.nextSibling);
+      }
+      
+      notReadySection.innerHTML = `
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="panel text-center">
+                <div class="mb-4">
+                  <i class="bi bi-exclamation-triangle" style="font-size: 4rem; color: #E74C3C;"></i>
+                </div>
+                <h4 class="mb-3">Your resume is not ready for job analysis yet.</h4>
+                <p class="text-muted mb-4">
+                  Please improve your resume by adding more relevant skills, projects, or experience to unlock job-specific evaluation and visual analytics.
+                </p>
+                <a href="/" class="comic-button">
+                  <i class="bi bi-house"></i> Go to Home
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      notReadySection.style.display = 'block';
+      
+      // Scroll to not ready message
+      setTimeout(() => {
+        notReadySection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+    
+    // Function to show validation error modal
+    function showValidationModal(message) {
+      // Create modal if it doesn't exist
+      let validationModal = document.getElementById('validationModal');
+      
+      if (!validationModal) {
+        const modalHTML = `
+          <div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header border-0">
+                  <h5 class="modal-title" id="validationModalLabel">
+                    <i class="bi bi-exclamation-circle text-warning me-2"></i>Validation Error
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                  <p id="validationMessage" class="mb-0"></p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                  <button type="button" class="comic-button" data-bs-dismiss="modal">
+                    <i class="bi bi-check-circle"></i> Understood
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        validationModal = document.getElementById('validationModal');
+      }
+      
+      // Update message and show modal
+      document.getElementById('validationMessage').textContent = message;
+      const modal = new bootstrap.Modal(validationModal);
+      modal.show();
+    }
 
     // Function to collect selected interest fields - handles multi-select functionality
     function getSelectedInterestFields() {
@@ -1419,12 +1820,18 @@
         const button = event.target.closest('.skills-needed-btn');
         const jobId = button.dataset.jobId; // Get job ID from data attribute
         const jobSkills = JSON.parse(button.dataset.jobSkills || '[]'); // Parse job skills from data attribute
-        toggleJobSkills(jobId, jobSkills); // Call existing function with correct parameters
+        
+        // Get job details for chart display
+        const jobCard = button.closest('.col-md-6');
+        const jobTitle = jobCard.querySelector('h5').textContent;
+        const jobCompany = jobCard.querySelector('.bi-building').parentElement.textContent.trim();
+        
+        toggleJobSkills(jobId, jobSkills, jobTitle, jobCompany); // Call with additional parameters
       }
     });
 
     // Toggle job skills display - shows/hides missing skills for specific job
-    function toggleJobSkills(jobId, jobRequiredSkills) {
+    function toggleJobSkills(jobId, jobRequiredSkills, jobTitle, jobCompany) {
       const skillsDiv = document.getElementById(`skills-${jobId}`);
       
       // Prevent duplicate execution on same button click - adds minimal guard
@@ -1459,6 +1866,9 @@
         // Calculate job-specific score based on missing skills - derives from existing evaluation
         calculateJobSpecificScore(jobId, jobRequiredSkills, actuallyMissingSkills);
         
+        // Display charts with company information
+        displayJobCharts(jobId, jobCompany);
+        
         skillsDiv.style.display = 'block'; // Show missing skills for this job
         
         // Clear processing flag after display
@@ -1467,8 +1877,154 @@
         skillsDiv.style.display = 'none'; // Hide missing skills for this job
         // Hide job-specific evaluation when skills are hidden
         document.getElementById('job-specific-evaluation').style.display = 'none';
+        // Hide charts when skills are hidden
+        document.getElementById('chart-visualization-section').style.display = 'none';
         skillsDiv.dataset.processing = 'false';
       }
+    }
+    
+    // Display job charts - shows bar and pie charts for the selected job
+    async function displayJobCharts(jobId, jobCompany) {
+      const chartSection = document.getElementById('chart-visualization-section');
+      const barChartImage = document.getElementById('barChartImage');
+      const pieChartImage = document.getElementById('pieChartImage');
+      const lineChartImage = document.getElementById('lineChartImage');
+      const lineChartContainer = lineChartImage.closest('.mb-4');
+      const pieChartContainer = pieChartImage.closest('.mb-4');
+      const companyNameElement = document.getElementById('chartCompanyName');
+      
+      try {
+        // Call backend to generate charts for this specific job
+        const response = await fetch(`/api/generate-job-charts/${jobId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+          console.error('Chart generation failed:', data.error);
+          alert('Failed to generate charts for this job');
+          return;
+        }
+        
+        // Store job data in session for report (simple fetch call)
+        fetch('/api/store-job-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            job_title: data.job_title,
+            job_company: data.job_company,
+            job_fit_score: data.job_fit_score  // Use job fit score instead of resume score
+          })
+        });
+        
+        // CRITICAL: Check resume status - hide charts if "Not Ready"
+        if (data.resume_status === "Not Ready") {
+          // Hide chart section completely
+          chartSection.style.display = 'none';
+          
+          // Show "Not Ready" message instead
+          showNotReadyForChartsMessage();
+          return;
+        }
+        
+        // Update company and job title
+        companyNameElement.innerHTML = `<strong>${data.job_title}</strong> at ${data.job_company}`;
+        
+        // Set chart image sources with cache-busting timestamp
+        const timestamp = new Date().getTime();
+        barChartImage.src = `{{ url_for('static', filename='images/job_field_chart.png') }}?t=${timestamp}`;
+        
+        // CONDITIONAL: Show pie chart ONLY if missing skills exist
+        if (data.missing_skills_count && data.missing_skills_count > 0) {
+          pieChartImage.src = `{{ url_for('static', filename='images/skill_gap_chart.png') }}?t=${timestamp}`;
+          pieChartContainer.style.display = 'block';
+        } else {
+          // No missing skills - hide pie chart and show success message
+          pieChartContainer.style.display = 'none';
+          
+          // Add success message after bar chart
+          const successMsg = document.createElement('div');
+          successMsg.className = 'text-center mb-4';
+          successMsg.innerHTML = `
+            <div class="alert alert-success" role="alert">
+              <i class="bi bi-check-circle me-2"></i>
+              <strong>No skill gaps identified for this role.</strong>
+              <p class="mb-0 small">You possess all the required skills for this position.</p>
+            </div>
+          `;
+          barChartImage.closest('.mb-4').after(successMsg);
+        }
+        
+        // CONDITIONAL: Show line chart ONLY if missing skills exist
+        if (data.missing_skills_count && data.missing_skills_count > 0) {
+          lineChartImage.src = `{{ url_for('static', filename='images/skill_readiness_chart.png') }}?t=${timestamp}`;
+          lineChartContainer.style.display = 'block';
+        } else {
+          // No missing skills - hide line chart
+          lineChartContainer.style.display = 'none';
+        }
+        
+        // Show chart section
+        chartSection.style.display = 'block';
+        
+        // Scroll to charts
+        setTimeout(() => {
+          chartSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }, 100);
+        
+      } catch (error) {
+        console.error('Error generating charts:', error);
+        alert('Failed to generate charts. Please try again.');
+      }
+    }
+    
+    // Function to show message when resume is "Not Ready" for charts
+    function showNotReadyForChartsMessage() {
+      // Create or update not ready for charts section
+      let notReadyChartsSection = document.getElementById('not-ready-charts-section');
+      
+      if (!notReadyChartsSection) {
+        // Create new section if it doesn't exist
+        notReadyChartsSection = document.createElement('div');
+        notReadyChartsSection.id = 'not-ready-charts-section';
+        notReadyChartsSection.className = 'py-4';
+        
+        const evaluationSection = document.getElementById('evaluation-section');
+        evaluationSection.parentNode.insertBefore(notReadyChartsSection, evaluationSection.nextSibling);
+      }
+      
+      notReadyChartsSection.innerHTML = `
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="panel text-center">
+                <div class="mb-3">
+                  <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: #E74C3C;"></i>
+                </div>
+                <h5 class="mb-3">Your resume does not meet the minimum requirements for job analysis.</h5>
+                <p class="text-muted mb-4">
+                  Visual analytics are only available for resumes with "Ready" or "Partially Ready" status.
+                  Please improve your resume to unlock these features.
+                </p>
+                <a href="/" class="comic-button">
+                  <i class="bi bi-house"></i> Go to Home
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      notReadyChartsSection.style.display = 'block';
+      
+      // Scroll to message
+      setTimeout(() => {
+        notReadyChartsSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
     }
 
     // Calculate job-specific score based on missing skills - adjusts score using existing logic
@@ -1523,6 +2079,9 @@
       
       // Show job-specific evaluation section
       document.getElementById('job-specific-evaluation').style.display = 'block';
+      
+      // Refresh evaluation summary to update eligibility badge
+      loadEvaluationSummary();
       
       // Scroll to job-specific evaluation - maintains existing scroll behavior
       setTimeout(() => {
@@ -1750,6 +2309,471 @@
         previewText.style.display = 'block';
         toggleBtn.innerHTML = '<i class="bi bi-eye"></i> Formatted View';
       }
+    }
+    
+    // ========== ENHANCED FEATURES JAVASCRIPT ==========
+    
+    let currentRoleEnhanced = '';
+    let allRolesEnhanced = [];
+    
+    // Load roles when evaluation is complete
+    async function loadRolesEnhanced() {
+      try {
+        const response = await fetch('/api/roles/list');
+        const data = await response.json();
+        
+        if (data.success) {
+          allRolesEnhanced = data.roles;
+          const select = document.getElementById('roleSelectEnhanced');
+          
+          // Clear existing options except first
+          select.innerHTML = '<option value="">-- Select a Role --</option>';
+          
+          data.roles.forEach(role => {
+            const option = document.createElement('option');
+            option.value = role.name;
+            option.textContent = `${role.name} - ${role.description}`;
+            select.appendChild(option);
+          });
+          
+          // Show enhanced features sections
+          document.getElementById('enhanced-role-evaluation').style.display = 'block';
+          document.getElementById('enhanced-roadmap').style.display = 'block';
+          document.getElementById('enhanced-comparison').style.display = 'block';
+          document.getElementById('enhanced-breakdown').style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error loading roles:', error);
+      }
+    }
+    
+    // ENHANCED FEATURE 1: Evaluate Role Fit
+    async function evaluateRoleEnhanced() {
+      const roleName = document.getElementById('roleSelectEnhanced').value;
+      
+      if (!roleName) {
+        alert('Please select a role first');
+        return;
+      }
+      
+      currentRoleEnhanced = roleName;
+      
+      try {
+        const response = await fetch('/api/roles/evaluate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role_name: roleName })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          displayRoleEvaluationEnhanced(data);
+        } else {
+          alert('Error: ' + (data.error || 'Evaluation failed'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error evaluating role. Please try again.');
+      }
+    }
+    
+    function displayRoleEvaluationEnhanced(data) {
+      const resultsDiv = document.getElementById('roleEvalResultsEnhanced');
+      
+      let html = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6>Role Fit Score</h6>
+            <div style="font-size: 3rem; color: var(--primary); font-weight: bold;">${data.role_fit_score}/100</div>
+            <div class="progress mt-2" style="height: 30px;">
+              <div class="progress-bar ${getScoreColorEnhanced(data.role_fit_score)}" 
+                   style="width: ${data.role_fit_score}%">
+                ${data.role_fit_score}%
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6>Score Breakdown</h6>
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between">
+                Core Skills <span class="badge bg-primary">${data.breakdown.core_score}/50</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                Secondary Skills <span class="badge bg-info">${data.breakdown.secondary_score}/30</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                Bonus Skills <span class="badge bg-success">${data.breakdown.bonus_score}/10</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                CGPA <span class="badge bg-warning">${data.breakdown.cgpa_score}/5</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                Projects <span class="badge bg-danger">${data.breakdown.projects_score}/5</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-md-12">
+            <h6>Missing Skills</h6>
+            ${displayMissingSkillsEnhanced(data.missing_skills)}
+          </div>
+        </div>
+      `;
+      
+      resultsDiv.innerHTML = html;
+      resultsDiv.style.display = 'block';
+      
+      // Display confidence
+      displayConfidenceEnhanced(data.confidence);
+    }
+    
+    function displayMissingSkillsEnhanced(missing) {
+      let html = '';
+      
+      if (missing.critical && missing.critical.length > 0) {
+        html += `<div class="mb-3">
+          <strong class="text-danger"><i class="bi bi-exclamation-triangle"></i> Critical Skills</strong>
+          <div class="mt-2">`;
+        missing.critical.forEach(skill => {
+          html += `<span class="badge bg-danger text-white me-2 mb-2">${skill}</span>`;
+        });
+        html += `</div></div>`;
+      }
+      
+      if (missing.important && missing.important.length > 0) {
+        html += `<div class="mb-3">
+          <strong class="text-warning"><i class="bi bi-exclamation-circle"></i> Important Skills</strong>
+          <div class="mt-2">`;
+        missing.important.forEach(skill => {
+          html += `<span class="badge bg-warning text-dark me-2 mb-2">${skill}</span>`;
+        });
+        html += `</div></div>`;
+      }
+      
+      if (missing.nice_to_have && missing.nice_to_have.length > 0) {
+        html += `<div class="mb-3">
+          <strong class="text-info"><i class="bi bi-info-circle"></i> Nice-to-Have Skills</strong>
+          <div class="mt-2">`;
+        missing.nice_to_have.forEach(skill => {
+          html += `<span class="badge bg-info text-white me-2 mb-2">${skill}</span>`;
+        });
+        html += `</div></div>`;
+      }
+      
+      if (!html) {
+        html = '<p class="text-success"><i class="bi bi-check-circle"></i> No missing skills! You meet all requirements.</p>';
+      }
+      
+      return html;
+    }
+    
+    function displayConfidenceEnhanced(confidence) {
+      const section = document.getElementById('confidenceSectionEnhanced');
+      const badge = document.getElementById('confidenceBadgeEnhanced');
+      const text = document.getElementById('confidenceTextEnhanced');
+      
+      const colors = {
+        'High': '#28a745',
+        'Medium': '#ffc107',
+        'Low': '#dc3545'
+      };
+      
+      badge.style.backgroundColor = colors[confidence.confidence_level];
+      badge.style.color = 'white';
+      badge.textContent = confidence.confidence_level;
+      
+      text.innerHTML = `
+        <strong>Score: ${confidence.confidence_score}/100</strong><br>
+        ${confidence.recommendations.join('<br>')}
+      `;
+      
+      section.style.display = 'block';
+    }
+    
+    function getScoreColorEnhanced(score) {
+      if (score >= 70) return 'bg-success';
+      if (score >= 40) return 'bg-warning';
+      return 'bg-danger';
+    }
+    
+    // ENHANCED FEATURE 2: Generate Learning Roadmap
+    async function generateRoadmapEnhanced() {
+      if (!currentRoleEnhanced) {
+        alert('Please evaluate a role first');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/roadmap/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role_name: currentRoleEnhanced })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          displayRoadmapEnhanced(data);
+        } else {
+          alert('Error generating roadmap');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error generating roadmap. Please try again.');
+      }
+    }
+    
+    function displayRoadmapEnhanced(data) {
+      const resultsDiv = document.getElementById('roadmapResultsEnhanced');
+      const roadmap = data.roadmap;
+      const summary = data.summary;
+      
+      let html = `
+        <div class="alert alert-info">
+          <h6><i class="bi bi-clock"></i> Learning Timeline</h6>
+          <p class="mb-0">
+            Total Skills: ${summary.total_skills} | 
+            Estimated Time: ${summary.estimated_months} months (${roadmap.total_weeks} weeks)
+          </p>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header bg-success text-white">
+                <strong><i class="bi bi-calendar-check"></i> Short-term (0-3 months)</strong>
+              </div>
+              <div class="card-body">
+                ${displayRoadmapSkillsEnhanced(roadmap.short_term)}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header bg-warning text-dark">
+                <strong><i class="bi bi-calendar"></i> Mid-term (3-6 months)</strong>
+              </div>
+              <div class="card-body">
+                ${displayRoadmapSkillsEnhanced(roadmap.mid_term)}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header bg-danger text-white">
+                <strong><i class="bi bi-calendar-event"></i> Long-term (6+ months)</strong>
+              </div>
+              <div class="card-body">
+                ${displayRoadmapSkillsEnhanced(roadmap.long_term)}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      if (data.next_skill) {
+        html += `
+          <div class="alert alert-primary mt-3">
+            <h6><i class="bi bi-arrow-right-circle"></i> Next Skill to Learn</h6>
+            <p class="mb-0">
+              <strong>${data.next_skill.skill}</strong> - 
+              ${data.next_skill.weeks} weeks (${data.next_skill.priority} priority)
+            </p>
+          </div>
+        `;
+      }
+      
+      resultsDiv.innerHTML = html;
+      resultsDiv.style.display = 'block';
+    }
+    
+    function displayRoadmapSkillsEnhanced(skills) {
+      if (!skills || skills.length === 0) {
+        return '<p class="text-muted small">No skills in this timeframe</p>';
+      }
+      
+      let html = '<div style="padding-left: 10px;">';
+      skills.forEach(skill => {
+        html += `
+          <div style="margin-bottom: 15px; padding-left: 10px; border-left: 2px solid #007bff;">
+            <strong>${skill.skill}</strong><br>
+            <small class="text-muted">${skill.weeks} weeks | ${skill.priority}</small>
+          </div>
+        `;
+      });
+      html += '</div>';
+      
+      return html;
+    }
+    
+    // ENHANCED FEATURE 5: Compare Roles
+    async function compareRolesEnhanced() {
+      try {
+        const roleNames = allRolesEnhanced.map(r => r.name);
+        
+        const response = await fetch('/api/roles/compare', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role_names: roleNames })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          displayComparisonEnhanced(data);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error comparing roles. Please try again.');
+      }
+    }
+    
+    function displayComparisonEnhanced(data) {
+      const resultsDiv = document.getElementById('comparisonResultsEnhanced');
+      const comparison = data.comparison;
+      
+      let html = `
+        <div class="alert alert-success">
+          <h6><i class="bi bi-trophy"></i> Best Fit: ${comparison.best_fit_role}</h6>
+          <p class="mb-0">Score: ${comparison.best_fit_score}/100</p>
+        </div>
+        
+        <p class="lead">${data.recommendation}</p>
+        
+        <div class="row">
+      `;
+      
+      comparison.comparisons.forEach(role => {
+        html += `
+          <div class="col-md-6 mb-3">
+            <div class="card" style="border-left: 4px solid #007bff;">
+              <div class="card-body">
+                <h6>${role.role_name}</h6>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Score:</span>
+                  <strong class="text-primary">${role.role_fit_score}/100</strong>
+                </div>
+                <div class="progress mb-2" style="height: 20px;">
+                  <div class="progress-bar ${getScoreColorEnhanced(role.role_fit_score)}" 
+                       style="width: ${role.role_fit_score}%">
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Status:</span>
+                  <span class="badge ${getReadinessBadgeEnhanced(role.readiness)}">${role.readiness}</span>
+                </div>
+                <div class="d-flex justify-content-between mt-1">
+                  <span>Missing Skills:</span>
+                  <span class="badge bg-secondary">${role.missing_skills_count}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      
+      resultsDiv.innerHTML = html;
+      resultsDiv.style.display = 'block';
+    }
+    
+    function getReadinessBadgeEnhanced(status) {
+      if (status === 'Ready') return 'bg-success';
+      if (status === 'Partially Ready') return 'bg-warning text-dark';
+      return 'bg-danger';
+    }
+    
+    // ENHANCED FEATURE 6: Resume Breakdown
+    async function getResumeBreakdownEnhanced() {
+      try {
+        const response = await fetch('/api/resume/breakdown');
+        const data = await response.json();
+        
+        if (data.success) {
+          displayBreakdownEnhanced(data);
+        } else {
+          alert('Error: ' + (data.error || 'Please create a resume first'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error getting resume breakdown. Please try again.');
+      }
+    }
+    
+    function displayBreakdownEnhanced(data) {
+      const resultsDiv = document.getElementById('breakdownResultsEnhanced');
+      const breakdown = data.breakdown;
+      
+      let html = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6>Total Resume Score</h6>
+            <div style="font-size: 3rem; color: var(--primary); font-weight: bold;">${breakdown.total_score}/100</div>
+          </div>
+          <div class="col-md-6">
+            <h6>Section Scores</h6>
+            ${displaySectionScoresEnhanced(breakdown.sections)}
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header bg-success text-white">
+                <strong><i class="bi bi-check-circle"></i> Strengths</strong>
+              </div>
+              <div class="card-body">
+                <ul class="list-unstyled">
+                  ${breakdown.strengths.map(s => `<li><i class="bi bi-check"></i> ${s}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header bg-warning text-dark">
+                <strong><i class="bi bi-exclamation-triangle"></i> Recommendations</strong>
+              </div>
+              <div class="card-body">
+                <ul class="list-unstyled">
+                  ${breakdown.recommendations.map(r => `<li><i class="bi bi-arrow-right"></i> ${r}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      resultsDiv.innerHTML = html;
+      resultsDiv.style.display = 'block';
+    }
+    
+    function displaySectionScoresEnhanced(sections) {
+      let html = '';
+      
+      for (const [name, data] of Object.entries(sections)) {
+        const percentage = data.percentage;
+        const color = percentage >= 80 ? 'success' : percentage >= 60 ? 'warning' : 'danger';
+        
+        html += `
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-capitalize">${name}</span>
+              <strong>${data.score}/${data.max_score}</strong>
+            </div>
+            <div style="height: 20px; border-radius: 10px; background: #e9ecef; overflow: hidden;">
+              <div style="height: 100%; width: ${percentage}%; background-color: var(--bs-${color}); transition: width 0.5s;"></div>
+            </div>
+            <small class="text-muted">${data.details}</small>
+          </div>
+        `;
+      }
+      
+      return html;
     }
   </script>
 

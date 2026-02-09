@@ -6,6 +6,10 @@ import os
 import sqlite3
 import io
 import re
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for server-side rendering
+import matplotlib.pyplot as plt
 from flask import Flask, render_template, request, jsonify, session, send_file, redirect, url_for
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -13,7 +17,14 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.units import inch
 from python_modules.resume_history_ds import ResumeLinkedList
+from python_modules import role_evaluator, skill_roadmap, confidence_calculator, skill_simulator, role_comparator, resume_breakdown
 from datetime import datetime
+
+
+# RapidAPI JSearch configuration
+RAPIDAPI_KEY = "dd39669e4fmsh5e0b28764b36855p10b159jsnad9ed342f1a2"
+RAPIDAPI_HOST = "jsearch.p.rapidapi.com"
+
 
 
 app = Flask(__name__)
@@ -85,6 +96,14 @@ def login_page():
 @app.route("/dashboard")
 def resume():
     return render_template("resume.html")
+
+# ---------------- ENHANCED DASHBOARD ----------------
+@app.route("/enhanced_dashboard")
+def enhanced_dashboard():
+    """Enhanced features dashboard"""
+    if "user_email" not in session:
+        return redirect("/login_page")
+    return render_template("enhanced_dashboard.html")
 
 # ---------------- RESUME PREVIEW ----------------
 @app.route("/resumePreview")
@@ -181,15 +200,24 @@ def save_resume():
         projects = data["projects"]
         education_data = data.get("education", [])
 
-        score, missing_skills = calculate_resume_score(
+        # Calculate score with validation
+        score, missing_skills, validation_error = calculate_resume_score(
             cgpa=cgpa,
             skills=skills,
             projects=projects,
             fields_present=True
         )
+        
+        # If validation failed, return error message
+        if validation_error:
+            return jsonify({
+                "success": False,
+                "validation_error": validation_error
+            })
 
         session["last_score"] = score
         session["last_missing_skills"] = missing_skills
+        session["user_skills"] = skills  # Store user skills for job fit calculation
 
         # -------- Resume Text --------
         resume_text = f"""{name.upper()}
@@ -370,6 +398,40 @@ PROJECTS
 
 # ---------------- RESUME SCORE ----------------
 def calculate_resume_score(cgpa, skills, projects, fields_present=True):
+    """
+    Calculate resume score with proper validation.
+    Returns: (score, missing_skills, validation_error)
+    """
+    
+    # ----- VALIDATION: SKILLS -----
+    # Check if skills is empty or invalid
+    if not skills or not skills.strip():
+        return 0, [], "Please enter valid skills to proceed."
+    
+    # Check for invalid skill inputs
+    skills_lower = skills.strip().lower()
+    if skills_lower in ["none", "null", "n/a", "na"]:
+        return 0, [], "Please enter valid skills to proceed."
+    
+    # ----- VALIDATION: PROJECTS -----
+    # Extract project count from projects text
+    project_count = 0
+    projects_valid = False
+    
+    if projects and projects.strip():
+        # Check for invalid project inputs
+        projects_lower = projects.strip().lower()
+        if projects_lower not in ["none", "null", "n/a", "na"]:
+            # Count number of lines or bullet points as projects
+            project_lines = [line.strip() for line in projects.split('\n') if line.strip()]
+            project_count = len(project_lines)
+            projects_valid = True
+    
+    # Minimum 3 projects required for job readiness
+    if project_count < 3:
+        return 0, [], "Minimum 3 projects are required for job readiness."
+    
+    # ----- START SCORING -----
     score = 0
 
     # ----- CGPA SCORE (40) -----
@@ -384,19 +446,29 @@ def calculate_resume_score(cgpa, skills, projects, fields_present=True):
     # ----- SKILL SCORE (30) -----
     expected_skills = ["python", "java", "sql", "html", "css", "javascript"]
 
-    user_skills = [s.strip().lower() for s in skills.split(",")]
+    user_skills = [s.strip().lower() for s in skills.split(",") if s.strip()]
     matched_skills = set(user_skills) & set(expected_skills)
 
     skill_score = (len(matched_skills) / len(expected_skills)) * 30
     score += skill_score
 
-    # ----- PROJECT SCORE (20) -----
-    if not projects.strip():
+    # ----- PROJECT SCORE (20) - CORRECTED LOGIC -----
+    # Apply exact scoring rules:
+    # 0 projects or invalid → 0 points
+    # 1 project → 5 points
+    # 2 projects → 10 points
+    # 3+ projects → 20 points (FULL SCORE)
+    
+    if not projects_valid or project_count == 0:
         project_score = 0
-    elif len(projects.strip()) < 50:
+    elif project_count == 1:
+        project_score = 5
+    elif project_count == 2:
         project_score = 10
+    elif project_count >= 3:
+        project_score = 20  # Full score for 3 or more projects
     else:
-        project_score = 20
+        project_score = 0
 
     score += project_score
 
@@ -404,7 +476,464 @@ def calculate_resume_score(cgpa, skills, projects, fields_present=True):
     completeness_score = 10 if fields_present else 0
     score += completeness_score
 
-    return round(score), list(set(expected_skills) - set(user_skills))
+    return round(score), list(set(expected_skills) - set(user_skills)), None
+
+
+# ---------------- PREPARE JOB GRAPH DATA (NumPy-based) ----------------
+def prepare_job_graph_data(mock_jobs, selected_job_id=None):
+    """
+    Prepare numerical data for graph visualization using NumPy.
+    
+    Args:
+        mock_jobs (list): List of job dictionaries from the mock database
+        selected_job_id (str, optional): ID of a specific job to analyze skills for
+    
+    Returns:
+        dict: Contains two datasets ready for plotting:
+            - 'jobs_per_field': {'fields': array, 'counts': array}
+            - 'skill_frequency': {'skills': array, 'frequencies': array}
+    """
+    
+    # ===== PART 1: Count jobs per field =====
+    # Extract job titles and categorize them into fields
+    field_mapping = {
+        'Software Development': ['software developer', 'frontend developer', 'backend developer', 
+                                'full stack developer', 'mobile app developer'],
+        'Data Science & AI': ['data scientist', 'machine learning engineer', 'ai research', 
+                             'data analyst', 'data research analyst'],
+        'Cloud & DevOps': ['cloud engineer', 'devops engineer', 'cloud solutions architect'],
+        'Security': ['cybersecurity analyst', 'penetration tester'],
+        'Design': ['ux/ui designer', 'product designer', 'graphic designer', 
+                  'motion graphics designer'],
+        'Content & Marketing': ['content writer', 'content creator', 'copywriter', 
+                               'social media manager', 'digital marketing specialist', 
+                               'technical writer'],
+        'Management': ['product manager', 'operations manager', 'business analyst', 
+                      'growth marketing manager'],
+        'Engineering': ['electronics engineer', 'embedded systems developer', 'iot engineer', 
+                       'robotics engineer', 'automation engineer', 'renewable energy engineer'],
+        'Emerging Tech': ['blockchain developer', 'fintech product manager', 'healthtech developer', 
+                         'edtech content developer']
+    }
+    
+    # Initialize field counts using NumPy
+    field_names = list(field_mapping.keys())
+    field_counts = np.zeros(len(field_names), dtype=int)
+    
+    # Count jobs for each field
+    for job in mock_jobs:
+        job_title_lower = job['title'].lower()
+        for idx, (field, keywords) in enumerate(field_mapping.items()):
+            if any(keyword in job_title_lower for keyword in keywords):
+                field_counts[idx] += 1
+                break  # Each job belongs to only one field
+    
+    # Convert to NumPy arrays for graph-ready output
+    fields_array = np.array(field_names)
+    counts_array = field_counts
+    
+    # ===== PART 2: Skill frequency analysis =====
+    skills_array = np.array([])
+    frequencies_array = np.array([])
+    
+    if selected_job_id:
+        # Find the selected job
+        selected_job = None
+        for job in mock_jobs:
+            if job['id'] == selected_job_id:
+                selected_job = job
+                break
+        
+        if selected_job and 'missing_skills' in selected_job:
+            # Extract all missing skills from the selected job
+            missing_skills = selected_job['missing_skills']
+            
+            # Count frequency of each skill across ALL jobs
+            skill_frequency_dict = {}
+            
+            for job in mock_jobs:
+                if 'missing_skills' in job:
+                    for skill in job['missing_skills']:
+                        skill_frequency_dict[skill] = skill_frequency_dict.get(skill, 0) + 1
+            
+            # Filter to only include skills from the selected job
+            selected_skill_frequencies = {
+                skill: skill_frequency_dict.get(skill, 0) 
+                for skill in missing_skills
+            }
+            
+            # Convert to NumPy arrays sorted by frequency (descending)
+            sorted_skills = sorted(selected_skill_frequencies.items(), 
+                                 key=lambda x: x[1], reverse=True)
+            
+            if sorted_skills:
+                skills_array = np.array([skill for skill, _ in sorted_skills])
+                frequencies_array = np.array([freq for _, freq in sorted_skills], dtype=int)
+    
+    return {
+        'jobs_per_field': {
+            'fields': fields_array,
+            'counts': counts_array
+        },
+        'skill_frequency': {
+            'skills': skills_array,
+            'frequencies': frequencies_array
+        }
+    }
+
+
+# ---------------- GENERATE JOB FIELD CHART (Matplotlib) ----------------
+def generate_job_field_chart(fields_array, counts_array, output_path=None):
+    """
+    Generate a bar chart showing job availability across fields using Matplotlib.
+    
+    Args:
+        fields_array (numpy.ndarray): Array of field names
+        counts_array (numpy.ndarray): Array of job counts per field
+        output_path (str): Path where the PNG image will be saved
+    
+    Returns:
+        str: Path to the saved chart image
+    """
+    
+    # Use absolute path based on Flask app root
+    if output_path is None:
+        images_dir = os.path.join(app.root_path, 'static', 'images')
+        os.makedirs(images_dir, exist_ok=True)
+        output_path = os.path.join(images_dir, 'job_field_chart.png')
+    
+    # Create figure and axis
+    fig, ax = plt.subplots(figsize=(12, 6))
+    
+    # Create bar chart
+    bars = ax.bar(range(len(fields_array)), counts_array, color='#4A90E2', alpha=0.8, edgecolor='black')
+    
+    # Customize the chart
+    ax.set_xlabel('Job Fields', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Number of Jobs', fontsize=12, fontweight='bold')
+    ax.set_title('Job Availability Across Fields', fontsize=14, fontweight='bold', pad=20)
+    
+    # Set x-axis labels with rotation for readability
+    ax.set_xticks(range(len(fields_array)))
+    ax.set_xticklabels(fields_array, rotation=45, ha='right', fontsize=10)
+    
+    # Add value labels on top of each bar
+    for i, (bar, count) in enumerate(zip(bars, counts_array)):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height,
+                f'{int(count)}',
+                ha='center', va='bottom', fontsize=9, fontweight='bold')
+    
+    # Add grid for better readability
+    ax.grid(axis='y', alpha=0.3, linestyle='--')
+    ax.set_axisbelow(True)
+    
+    # Adjust layout to prevent label cutoff
+    plt.tight_layout()
+    
+    # Save the chart as PNG with absolute path
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close(fig)  # Close the figure to free memory
+    
+    return output_path
+
+
+# ---------------- GENERATE SKILL GAP CHART (Matplotlib) ----------------
+def generate_skill_gap_chart(skills_array, frequencies_array, output_path=None):
+    """
+    Generate a pie chart showing skill gap IMPACT distribution using Matplotlib.
+    Skills are weighted by importance/frequency.
+    
+    Args:
+        skills_array (numpy.ndarray): Array of skill names
+        frequencies_array (numpy.ndarray): Array of skill frequencies (used as weights)
+        output_path (str): Path where the PNG image will be saved
+    
+    Returns:
+        str: Path to the saved chart image
+    """
+    
+    # Handle empty data
+    if len(skills_array) == 0 or len(frequencies_array) == 0:
+        return None
+    
+    # Use absolute path based on Flask app root
+    if output_path is None:
+        images_dir = os.path.join(app.root_path, 'static', 'images')
+        os.makedirs(images_dir, exist_ok=True)
+        output_path = os.path.join(images_dir, 'skill_gap_chart.png')
+    
+    # Weight skills by frequency (higher frequency = more important)
+    # Normalize frequencies to create impact weights
+    total_frequency = np.sum(frequencies_array)
+    impact_weights = (frequencies_array / total_frequency) * 100
+    
+    # Sort by impact (descending) for better visualization
+    sorted_indices = np.argsort(impact_weights)[::-1]
+    skills_sorted = skills_array[sorted_indices]
+    impact_sorted = impact_weights[sorted_indices]
+    
+    # Create figure and axis
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    # Define color palette (gradient from high to low impact)
+    colors = ['#E74C3C', '#E67E22', '#F39C12', '#F1C40F', '#2ECC71', 
+              '#3498DB', '#9B59B6', '#1ABC9C', '#34495E', '#95A5A6']
+    
+    # Create pie chart with weighted impact
+    wedges, texts, autotexts = ax.pie(
+        impact_sorted,
+        labels=skills_sorted,
+        autopct='%1.1f%%',
+        startangle=90,
+        colors=colors[:len(skills_sorted)],
+        explode=[0.1 if i == 0 else 0.03 for i in range(len(skills_sorted))],  # Emphasize most critical
+        shadow=True,
+        textprops={'fontsize': 10, 'weight': 'bold'}
+    )
+    
+    # Customize percentage text
+    for autotext in autotexts:
+        autotext.set_color('white')
+        autotext.set_fontsize(9)
+        autotext.set_weight('bold')
+    
+    # Customize label text
+    for text in texts:
+        text.set_fontsize(11)
+        text.set_weight('bold')
+    
+    # Set title
+    ax.set_title('Skill Gap Impact Distribution', fontsize=14, fontweight='bold', pad=20)
+    
+    # Add subtitle explaining the weighting
+    fig.text(0.5, 0.02, 
+             'Larger slices indicate skills with higher importance for this role',
+             ha='center', fontsize=9, style='italic', color='#7F8C8D')
+    
+    # Equal aspect ratio ensures that pie is drawn as a circle
+    ax.axis('equal')
+    
+    # Adjust layout to prevent label cutoff
+    plt.tight_layout()
+    
+    # Save the chart as PNG with absolute path
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close(fig)  # Close the figure to free memory
+    
+    return output_path
+
+
+# ---------------- CALCULATE JOB FIT SCORE ----------------
+def calculate_job_fit_score(user_skills, job_required_skills):
+    """
+    Calculate job fit score based on skill matching.
+    
+    Args:
+        user_skills (list): List of user's skills
+        job_required_skills (list): List of skills required for the job
+    
+    Returns:
+        tuple: (job_fit_score, missing_skills_count, total_job_skills)
+    """
+    if not job_required_skills or len(job_required_skills) == 0:
+        return 100, 0, 0  # No requirements = perfect fit
+    
+    # Normalize skills for comparison
+    user_skills_lower = [skill.strip().lower() for skill in user_skills if skill.strip()]
+    job_skills_lower = [skill.strip().lower() for skill in job_required_skills if skill.strip()]
+    
+    # Count matching skills
+    matched_skills = 0
+    for job_skill in job_skills_lower:
+        for user_skill in user_skills_lower:
+            if user_skill in job_skill or job_skill in user_skill:
+                matched_skills += 1
+                break
+    
+    # Calculate score
+    total_job_skills = len(job_skills_lower)
+    missing_skills_count = total_job_skills - matched_skills
+    
+    # Job fit score: (matched_skills / total_job_skills) * 100
+    if total_job_skills > 0:
+        job_fit_score = int((matched_skills / total_job_skills) * 100)
+    else:
+        job_fit_score = 100
+    
+    return job_fit_score, missing_skills_count, total_job_skills
+
+
+# ---------------- GENERATE SKILL READINESS LINE CHART (Matplotlib) ----------------
+def generate_skill_readiness_chart(job_title, missing_skills_count, current_job_fit_score, total_job_skills, output_path=None):
+    """
+    Generate a line chart showing CURRENT job fit readiness progress using Matplotlib.
+    
+    This chart represents job-specific readiness levels:
+    - Stage 0: Baseline match (current resume vs job)
+    - Stage 1: After acquiring some missing job skills
+    - Stage 2: After acquiring most job-required skills
+    - Stage 3: Near-perfect job readiness
+    
+    Args:
+        job_title (str): Title of the selected job
+        missing_skills_count (int): Number of missing skills for the job
+        current_job_fit_score (int): Current job fit score (0-100) based on job requirements
+        total_job_skills (int): Total number of skills required for the job
+        output_path (str): Path where the PNG image will be saved
+    
+    Returns:
+        str: Path to the saved chart image
+    """
+    
+    # Use absolute path based on Flask app root
+    if output_path is None:
+        images_dir = os.path.join(app.root_path, 'static', 'images')
+        os.makedirs(images_dir, exist_ok=True)
+        output_path = os.path.join(images_dir, 'skill_readiness_chart.png')
+    
+    # Calculate current position based on missing skills
+    # Stage 0 = baseline (all skills missing)
+    # Stage 1 = current position (some skills acquired)
+    # Stage 2 = most skills acquired
+    # Stage 3 = near-perfect (all skills acquired)
+    
+    # Determine total stages based on missing skills
+    if missing_skills_count == 0:
+        # No missing skills - user is at final stage
+        total_steps = 4  # Still show 4 stages for consistency
+        current_step = 3  # At final stage
+    elif missing_skills_count >= total_job_skills:
+        # All skills missing - user is at baseline
+        total_steps = 4
+        current_step = 0  # At baseline
+    else:
+        # Some skills acquired - calculate position
+        total_steps = 4
+        # Current step based on skill acquisition progress
+        skills_acquired = total_job_skills - missing_skills_count
+        progress_ratio = skills_acquired / total_job_skills
+        
+        # Map progress to stages 0-3
+        if progress_ratio <= 0.25:
+            current_step = 0  # Baseline
+        elif progress_ratio <= 0.5:
+            current_step = 1  # Some skills
+        elif progress_ratio <= 0.75:
+            current_step = 2  # Most skills
+        else:
+            current_step = 3  # Near-perfect
+    
+    # Generate steps using NumPy - only up to current position
+    steps_current = np.arange(0, current_step + 1)
+    
+    # Calculate job fit percentages for current progress
+    # Start from baseline (30%) and progress to current job fit score
+    baseline_score = 30  # Baseline job fit when no skills match
+    
+    if current_step > 0:
+        readiness_current = np.linspace(baseline_score, current_job_fit_score, len(steps_current))
+    else:
+        readiness_current = np.array([current_job_fit_score])  # At baseline
+    
+    # Generate projected future steps (dotted line)
+    if current_step < total_steps - 1:
+        steps_future = np.arange(current_step, total_steps)
+        # Project to 100% if all skills are acquired
+        readiness_future = np.linspace(current_job_fit_score, 100, len(steps_future))
+    else:
+        steps_future = None
+        readiness_future = None
+    
+    # Create figure and axis
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Plot CURRENT progress (solid line)
+    ax.plot(steps_current, readiness_current, 
+            color='#2ECC71', 
+            linewidth=3, 
+            marker='o', 
+            markersize=8, 
+            markerfacecolor='#27AE60',
+            markeredgecolor='white',
+            markeredgewidth=2,
+            label='Current Progress',
+            zorder=3)
+    
+    # Fill area under current progress
+    ax.fill_between(steps_current, readiness_current, alpha=0.3, color='#2ECC71')
+    
+    # Plot PROJECTED future (dotted line) if not at 100%
+    if steps_future is not None and current_job_fit_score < 100:
+        ax.plot(steps_future, readiness_future, 
+                color='#95A5A6', 
+                linewidth=2, 
+                linestyle='--',
+                marker='o', 
+                markersize=6, 
+                markerfacecolor='#BDC3C7',
+                markeredgecolor='white',
+                markeredgewidth=1,
+                label='Projected (if skills acquired)',
+                alpha=0.6,
+                zorder=2)
+    
+    # Highlight "You are here" marker
+    ax.scatter([current_step], [current_job_fit_score], 
+               s=300, 
+               color='#E74C3C', 
+               marker='*', 
+               edgecolors='white',
+               linewidths=2,
+               label='You are here',
+               zorder=4)
+    
+    # Add "You are here" annotation
+    ax.annotate('You are here',
+               xy=(current_step, current_job_fit_score),
+               xytext=(15, 15),
+               textcoords='offset points',
+               ha='left',
+               fontsize=10,
+               fontweight='bold',
+               color='#E74C3C',
+               bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor='#E74C3C', linewidth=2),
+               arrowprops=dict(arrowstyle='->', color='#E74C3C', lw=2))
+    
+    # Customize the chart
+    ax.set_xlabel('Skill Acquisition Stages', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Readiness Percentage (%)', fontsize=12, fontweight='bold')
+    ax.set_title(f'Current Skill Readiness Progress for {job_title}', 
+                 fontsize=14, fontweight='bold', pad=20)
+    
+    # Set axis limits and ticks
+    ax.set_xlim(-0.5, total_steps - 0.5)
+    ax.set_ylim(0, 105)
+    ax.set_xticks(np.arange(0, total_steps))
+    
+    # Add grid for better readability
+    ax.grid(axis='both', alpha=0.3, linestyle='--')
+    ax.set_axisbelow(True)
+    
+    # Add current job fit score label
+    ax.text(current_step, current_job_fit_score - 8,
+            f'{current_job_fit_score}%',
+            ha='center',
+            fontsize=11,
+            fontweight='bold',
+            color='#E74C3C')
+    
+    # Add legend
+    ax.legend(loc='lower right', fontsize=9)
+    
+    # Adjust layout to prevent label cutoff
+    plt.tight_layout()
+    
+    # Save the chart as PNG with absolute path
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close(fig)  # Close the figure to free memory
+    
+    return output_path
 
 
 # ---------------- DOWNLOAD (FORMATTED HTML → PDF) ----------------
@@ -784,7 +1313,7 @@ def search_jobs():
             "location": "Kolkata, India",
             "type": "Full-time",
             "description": "Drive product strategy and work with cross-functional teams to deliver user-centric solutions.",
-            "missing_skills": []
+            "missing_skills": ["Roadmapping", "Agile", "Stakeholder Management"]
         },
         {
             "id": "job_010",
@@ -794,6 +1323,321 @@ def search_jobs():
             "type": "Full-time",
             "description": "Create intuitive and beautiful user interfaces that enhance user experience.",
             "missing_skills": ["Figma", "Prototyping", "User Research"]
+        },
+        {
+            "id": "job_011",
+            "title": "Backend Developer",
+            "company": "ServerStack Technologies",
+            "location": "Bangalore, India",
+            "type": "Full-time",
+            "description": "Build scalable backend systems and RESTful APIs using Java, Spring Boot, and microservices architecture.",
+            "missing_skills": ["Spring Boot", "Microservices", "PostgreSQL"]
+        },
+        {
+            "id": "job_012",
+            "title": "Full Stack Developer",
+            "company": "CodeCraft Solutions",
+            "location": "Pune, India",
+            "type": "Full-time",
+            "description": "Work on end-to-end web applications using MERN stack and modern development practices.",
+            "missing_skills": ["MongoDB", "Express.js", "Redux"]
+        },
+        {
+            "id": "job_013",
+            "title": "Data Analyst",
+            "company": "InsightMetrics",
+            "location": "Mumbai, India",
+            "type": "Full-time",
+            "description": "Transform raw data into actionable insights using SQL, Python, and visualization tools.",
+            "missing_skills": ["Power BI", "Tableau", "Advanced Excel"]
+        },
+        {
+            "id": "job_014",
+            "title": "AI Research Intern",
+            "company": "DeepMind Labs India",
+            "location": "Hyderabad, India",
+            "type": "Internship",
+            "description": "Contribute to cutting-edge AI research projects in natural language processing and computer vision.",
+            "missing_skills": ["Research Methodology", "PyTorch", "NLP"]
+        },
+        {
+            "id": "job_015",
+            "title": "Database Administrator",
+            "company": "DataGuard Systems",
+            "location": "Chennai, India",
+            "type": "Full-time",
+            "description": "Manage and optimize database systems ensuring high availability and performance.",
+            "missing_skills": ["Oracle", "MySQL", "Database Tuning", "Backup Strategies"]
+        },
+        {
+            "id": "job_016",
+            "title": "Digital Marketing Specialist",
+            "company": "GrowthHackers India",
+            "location": "Delhi, India",
+            "type": "Full-time",
+            "description": "Drive online marketing campaigns across SEO, SEM, social media, and content marketing channels.",
+            "missing_skills": ["Google Ads", "SEO", "Analytics"]
+        },
+        {
+            "id": "job_017",
+            "title": "Business Analyst",
+            "company": "StrategyFirst Consulting",
+            "location": "Bangalore, India",
+            "type": "Full-time",
+            "description": "Analyze business processes and requirements to deliver data-driven recommendations.",
+            "missing_skills": ["Business Intelligence", "SQL", "Requirements Gathering"]
+        },
+        {
+            "id": "job_018",
+            "title": "Growth Marketing Manager",
+            "company": "ScaleUp Ventures",
+            "location": "Gurgaon, India",
+            "type": "Full-time",
+            "description": "Lead growth initiatives through experimentation, analytics, and customer acquisition strategies.",
+            "missing_skills": ["A/B Testing", "Growth Hacking", "Marketing Automation"]
+        },
+        {
+            "id": "job_019",
+            "title": "Sales Engineer",
+            "company": "TechSales Pro",
+            "location": "Mumbai, India",
+            "type": "Full-time",
+            "description": "Bridge technical expertise with sales to demonstrate product value to enterprise clients.",
+            "missing_skills": ["Technical Presentations", "CRM", "Solution Architecture"]
+        },
+        {
+            "id": "job_020",
+            "title": "Operations Manager",
+            "company": "LogiFlow Systems",
+            "location": "Pune, India",
+            "type": "Full-time",
+            "description": "Optimize operational processes and manage cross-functional teams to improve efficiency.",
+            "missing_skills": ["Process Optimization", "Six Sigma", "Project Management"]
+        },
+        {
+            "id": "job_021",
+            "title": "Product Designer",
+            "company": "PixelPerfect Studios",
+            "location": "Bangalore, India",
+            "type": "Full-time",
+            "description": "Design end-to-end product experiences from concept to final implementation.",
+            "missing_skills": ["Sketch", "Design Systems", "Interaction Design"]
+        },
+        {
+            "id": "job_022",
+            "title": "Graphic Designer",
+            "company": "CreativeMinds Agency",
+            "location": "Ahmedabad, India",
+            "type": "Full-time",
+            "description": "Create compelling visual designs for branding, marketing materials, and digital campaigns.",
+            "missing_skills": ["Adobe Illustrator", "Photoshop", "Brand Identity"]
+        },
+        {
+            "id": "job_023",
+            "title": "Motion Graphics Designer",
+            "company": "AnimateNow Studios",
+            "location": "Mumbai, India",
+            "type": "Full-time",
+            "description": "Produce engaging motion graphics and animations for video content and digital media.",
+            "missing_skills": ["After Effects", "Cinema 4D", "Animation Principles"]
+        },
+        {
+            "id": "job_024",
+            "title": "Video Editor",
+            "company": "MediaCraft Productions",
+            "location": "Hyderabad, India",
+            "type": "Full-time",
+            "description": "Edit and produce high-quality video content for various platforms and audiences.",
+            "missing_skills": ["Premiere Pro", "Color Grading", "Sound Design"]
+        },
+        {
+            "id": "job_025",
+            "title": "Content Creator",
+            "company": "SocialBuzz Media",
+            "location": "Delhi, India",
+            "type": "Full-time",
+            "description": "Develop engaging content across multiple formats including video, blogs, and social media.",
+            "missing_skills": ["Content Strategy", "Video Production", "Social Media Trends"]
+        },
+        {
+            "id": "job_026",
+            "title": "Content Writer",
+            "company": "WordSmith Content Agency",
+            "location": "Bangalore, India",
+            "type": "Full-time",
+            "description": "Write compelling content for websites, blogs, and marketing materials across industries.",
+            "missing_skills": ["SEO Writing", "Copywriting", "Content Management Systems"]
+        },
+        {
+            "id": "job_027",
+            "title": "Technical Writer",
+            "company": "DocuTech Solutions",
+            "location": "Pune, India",
+            "type": "Full-time",
+            "description": "Create clear technical documentation, API guides, and user manuals for software products.",
+            "missing_skills": ["API Documentation", "Markdown", "Technical Communication"]
+        },
+        {
+            "id": "job_028",
+            "title": "Copywriter",
+            "company": "AdWords Creative",
+            "location": "Mumbai, India",
+            "type": "Full-time",
+            "description": "Craft persuasive copy for advertising campaigns, websites, and marketing collateral.",
+            "missing_skills": ["Creative Writing", "Brand Voice", "Campaign Strategy"]
+        },
+        {
+            "id": "job_029",
+            "title": "Social Media Manager",
+            "company": "ViralReach Digital",
+            "location": "Gurgaon, India",
+            "type": "Full-time",
+            "description": "Manage social media presence, create content calendars, and engage with online communities.",
+            "missing_skills": ["Social Media Analytics", "Community Management", "Content Planning"]
+        },
+        {
+            "id": "job_030",
+            "title": "Research Scientist",
+            "company": "Innovation Labs India",
+            "location": "Bangalore, India",
+            "type": "Full-time",
+            "description": "Conduct advanced research in computer science and publish findings in top-tier conferences.",
+            "missing_skills": ["Research Methodology", "Academic Writing", "Statistical Analysis"]
+        },
+        {
+            "id": "job_031",
+            "title": "Data Research Analyst",
+            "company": "ResearchHub Analytics",
+            "location": "Chennai, India",
+            "type": "Full-time",
+            "description": "Perform quantitative and qualitative research to support business decision-making.",
+            "missing_skills": ["SPSS", "Survey Design", "Data Mining"]
+        },
+        {
+            "id": "job_032",
+            "title": "Electronics Engineer",
+            "company": "CircuitTech Industries",
+            "location": "Hyderabad, India",
+            "type": "Full-time",
+            "description": "Design and develop electronic circuits and embedded systems for consumer products.",
+            "missing_skills": ["PCB Design", "Embedded C", "Circuit Simulation"]
+        },
+        {
+            "id": "job_033",
+            "title": "Embedded Systems Developer",
+            "company": "EmbedCore Solutions",
+            "location": "Pune, India",
+            "type": "Full-time",
+            "description": "Develop firmware and software for embedded systems in automotive and IoT applications.",
+            "missing_skills": ["ARM Architecture", "RTOS", "Hardware Debugging"]
+        },
+        {
+            "id": "job_034",
+            "title": "IoT Engineer",
+            "company": "SmartConnect Technologies",
+            "location": "Bangalore, India",
+            "type": "Full-time",
+            "description": "Build IoT solutions connecting devices, sensors, and cloud platforms for smart applications.",
+            "missing_skills": ["MQTT", "IoT Protocols", "Sensor Integration"]
+        },
+        {
+            "id": "job_035",
+            "title": "Robotics Engineer",
+            "company": "RoboTech Innovations",
+            "location": "Chennai, India",
+            "type": "Full-time",
+            "description": "Design and program robotic systems for industrial automation and autonomous applications.",
+            "missing_skills": ["ROS", "Computer Vision", "Control Systems"]
+        },
+        {
+            "id": "job_036",
+            "title": "Blockchain Developer",
+            "company": "CryptoChain Labs",
+            "location": "Mumbai, India",
+            "type": "Full-time",
+            "description": "Develop decentralized applications and smart contracts on blockchain platforms.",
+            "missing_skills": ["Solidity", "Web3.js", "Smart Contracts"]
+        },
+        {
+            "id": "job_037",
+            "title": "FinTech Product Manager",
+            "company": "PayNext Solutions",
+            "location": "Bangalore, India",
+            "type": "Full-time",
+            "description": "Lead product development for digital payment and financial technology solutions.",
+            "missing_skills": ["Payment Systems", "Regulatory Compliance", "UPI Integration"]
+        },
+        {
+            "id": "job_038",
+            "title": "HealthTech Developer",
+            "company": "MediCare Technologies",
+            "location": "Hyderabad, India",
+            "type": "Full-time",
+            "description": "Build healthcare applications and telemedicine platforms to improve patient care.",
+            "missing_skills": ["HIPAA Compliance", "Healthcare APIs", "Medical Informatics"]
+        },
+        {
+            "id": "job_039",
+            "title": "EdTech Content Developer",
+            "company": "LearnSphere India",
+            "location": "Delhi, India",
+            "type": "Full-time",
+            "description": "Create engaging educational content and interactive learning experiences for online platforms.",
+            "missing_skills": ["Instructional Design", "LMS", "Educational Technology"]
+        },
+        {
+            "id": "job_040",
+            "title": "Automation Engineer",
+            "company": "AutoFlow Systems",
+            "location": "Pune, India",
+            "type": "Full-time",
+            "description": "Design and implement automation solutions for manufacturing and industrial processes.",
+            "missing_skills": ["PLC Programming", "SCADA", "Industrial Automation"]
+        },
+        {
+            "id": "job_041",
+            "title": "Market Research Analyst",
+            "company": "InsightPro Research",
+            "location": "Mumbai, India",
+            "type": "Full-time",
+            "description": "Conduct market research studies and analyze consumer behavior to guide business strategy.",
+            "missing_skills": ["Market Analysis", "Consumer Insights", "Survey Tools"]
+        },
+        {
+            "id": "job_042",
+            "title": "Startup Operations Associate",
+            "company": "VentureHub Accelerator",
+            "location": "Bangalore, India",
+            "type": "Internship",
+            "description": "Support startup operations including fundraising, partnerships, and growth initiatives.",
+            "missing_skills": ["Startup Ecosystem", "Pitch Decks", "Investor Relations"]
+        },
+        {
+            "id": "job_043",
+            "title": "Renewable Energy Engineer",
+            "company": "GreenPower Solutions",
+            "location": "Ahmedabad, India",
+            "type": "Full-time",
+            "description": "Design and optimize solar and wind energy systems for sustainable power generation.",
+            "missing_skills": ["Solar PV Design", "Energy Modeling", "Grid Integration"]
+        },
+        {
+            "id": "job_044",
+            "title": "Cloud Solutions Architect",
+            "company": "CloudScale Technologies",
+            "location": "Gurgaon, India",
+            "type": "Full-time",
+            "description": "Architect enterprise cloud solutions and lead cloud migration projects for large organizations.",
+            "missing_skills": ["Azure", "Cloud Architecture", "Migration Strategies"]
+        },
+        {
+            "id": "job_045",
+            "title": "Penetration Tester",
+            "company": "SecureShield Cybersecurity",
+            "location": "Bangalore, India",
+            "type": "Full-time",
+            "description": "Conduct security assessments and penetration testing to identify vulnerabilities in systems.",
+            "missing_skills": ["Ethical Hacking", "Kali Linux", "Vulnerability Assessment"]
         }
     ]
     
@@ -819,6 +1663,31 @@ def search_jobs():
     # Limit results - respects API rate limits
     filtered_jobs = filtered_jobs[:limit]
     
+    # Generate charts for visualization
+    try:
+        # Prepare graph data from all mock jobs
+        graph_data = prepare_job_graph_data(mock_jobs)
+        
+        # Generate bar chart (job field distribution)
+        generate_job_field_chart(
+            graph_data['jobs_per_field']['fields'],
+            graph_data['jobs_per_field']['counts']
+        )
+        
+        # Generate pie chart (skill frequency) - use first job as example
+        if filtered_jobs and len(filtered_jobs) > 0:
+            selected_job_id = filtered_jobs[0]['id']
+            graph_data_with_skills = prepare_job_graph_data(mock_jobs, selected_job_id)
+            
+            if len(graph_data_with_skills['skill_frequency']['skills']) > 0:
+                generate_skill_gap_chart(
+                    graph_data_with_skills['skill_frequency']['skills'],
+                    graph_data_with_skills['skill_frequency']['frequencies']
+                )
+    except Exception as e:
+        print(f"Chart generation error: {e}")
+        # Continue even if chart generation fails
+    
     return jsonify({
         "success": True,
         "jobs": filtered_jobs,
@@ -826,6 +1695,809 @@ def search_jobs():
         "query": query,
         "location": location
     })
+
+
+# ---------------- GENERATE CHARTS FOR SPECIFIC JOB ----------------
+@app.route("/api/generate-job-charts/<job_id>")
+def generate_job_charts(job_id):
+    """Generate charts dynamically for a specific job"""
+    try:
+        # Mock job database (same as in search_jobs route)
+        mock_jobs = [
+            {"id": "job_001", "title": "Software Developer", "company": "TechCorp Solutions", "location": "Bangalore, India", "type": "Full-time", "description": "Join our team to build cutting-edge software solutions using modern technologies.", "missing_skills": ["Python", "React", "Node.js"]},
+            {"id": "job_002", "title": "Frontend Developer", "company": "WebFlow Inc", "location": "Mumbai, India", "type": "Full-time", "description": "Create amazing user experiences with React, Vue.js, and modern frontend frameworks.", "missing_skills": ["Vue.js", "TypeScript", "SASS"]},
+            {"id": "job_003", "title": "Data Scientist", "company": "DataVision Analytics", "location": "Hyderabad, India", "type": "Full-time", "description": "Analyze complex datasets and build machine learning models to drive business insights.", "missing_skills": ["R", "TensorFlow", "Statistics"]},
+            {"id": "job_004", "title": "Machine Learning Engineer", "company": "AI Innovations", "location": "Pune, India", "type": "Full-time", "description": "Develop and deploy ML models at scale using Python, TensorFlow, and cloud platforms.", "missing_skills": ["PyTorch", "Kubernetes", "MLOps"]},
+            {"id": "job_005", "title": "Cloud Engineer", "company": "CloudTech Systems", "location": "Chennai, India", "type": "Full-time", "description": "Design and manage cloud infrastructure using AWS, Azure, and containerization technologies.", "missing_skills": ["AWS", "Docker", "Terraform"]},
+            {"id": "job_006", "title": "Cybersecurity Analyst", "company": "SecureNet Solutions", "location": "Delhi, India", "type": "Full-time", "description": "Protect organizational assets by implementing security measures and monitoring threats.", "missing_skills": ["Penetration Testing", "SIEM", "Incident Response"]},
+            {"id": "job_007", "title": "DevOps Engineer", "company": "DeployFast Inc", "location": "Gurgaon, India", "type": "Full-time", "description": "Streamline development workflows with CI/CD pipelines and infrastructure automation.", "missing_skills": ["Jenkins", "Ansible", "Monitoring"]},
+            {"id": "job_008", "title": "Mobile App Developer", "company": "MobileFirst Studios", "location": "Noida, India", "type": "Full-time", "description": "Build native and cross-platform mobile applications for iOS and Android.", "missing_skills": ["Swift", "Kotlin", "React Native"]},
+            {"id": "job_009", "title": "Product Manager", "company": "InnovatePro", "location": "Kolkata, India", "type": "Full-time", "description": "Drive product strategy and work with cross-functional teams to deliver user-centric solutions.", "missing_skills": ["Roadmapping", "Agile", "Stakeholder Management"]},
+            {"id": "job_010", "title": "UX/UI Designer", "company": "DesignHub Creative", "location": "Ahmedabad, India", "type": "Full-time", "description": "Create intuitive and beautiful user interfaces that enhance user experience.", "missing_skills": ["Figma", "Prototyping", "User Research"]},
+            {"id": "job_011", "title": "Backend Developer", "company": "ServerStack Technologies", "location": "Bangalore, India", "type": "Full-time", "description": "Build scalable backend systems and RESTful APIs using Java, Spring Boot, and microservices architecture.", "missing_skills": ["Spring Boot", "Microservices", "PostgreSQL"]},
+            {"id": "job_012", "title": "Full Stack Developer", "company": "CodeCraft Solutions", "location": "Pune, India", "type": "Full-time", "description": "Work on end-to-end web applications using MERN stack and modern development practices.", "missing_skills": ["MongoDB", "Express.js", "Redux"]},
+            {"id": "job_013", "title": "Data Analyst", "company": "InsightMetrics", "location": "Mumbai, India", "type": "Full-time", "description": "Transform raw data into actionable insights using SQL, Python, and visualization tools.", "missing_skills": ["Power BI", "Tableau", "Advanced Excel"]},
+            {"id": "job_014", "title": "AI Research Intern", "company": "DeepMind Labs India", "location": "Hyderabad, India", "type": "Internship", "description": "Contribute to cutting-edge AI research projects in natural language processing and computer vision.", "missing_skills": ["Research Methodology", "PyTorch", "NLP"]},
+            {"id": "job_015", "title": "Database Administrator", "company": "DataGuard Systems", "location": "Chennai, India", "type": "Full-time", "description": "Manage and optimize database systems ensuring high availability and performance.", "missing_skills": ["Oracle", "MySQL", "Database Tuning", "Backup Strategies"]},
+            {"id": "job_016", "title": "Digital Marketing Specialist", "company": "GrowthHackers India", "location": "Delhi, India", "type": "Full-time", "description": "Drive online marketing campaigns across SEO, SEM, social media, and content marketing channels.", "missing_skills": ["Google Ads", "SEO", "Analytics"]},
+            {"id": "job_017", "title": "Business Analyst", "company": "StrategyFirst Consulting", "location": "Bangalore, India", "type": "Full-time", "description": "Analyze business processes and requirements to deliver data-driven recommendations.", "missing_skills": ["Business Intelligence", "SQL", "Requirements Gathering"]},
+            {"id": "job_018", "title": "Growth Marketing Manager", "company": "ScaleUp Ventures", "location": "Gurgaon, India", "type": "Full-time", "description": "Lead growth initiatives through experimentation, analytics, and customer acquisition strategies.", "missing_skills": ["A/B Testing", "Growth Hacking", "Marketing Automation"]},
+            {"id": "job_019", "title": "Sales Engineer", "company": "TechSales Pro", "location": "Mumbai, India", "type": "Full-time", "description": "Bridge technical expertise with sales to demonstrate product value to enterprise clients.", "missing_skills": ["Technical Presentations", "CRM", "Solution Architecture"]},
+            {"id": "job_020", "title": "Operations Manager", "company": "LogiFlow Systems", "location": "Pune, India", "type": "Full-time", "description": "Optimize operational processes and manage cross-functional teams to improve efficiency.", "missing_skills": ["Process Optimization", "Six Sigma", "Project Management"]},
+            {"id": "job_021", "title": "Product Designer", "company": "PixelPerfect Studios", "location": "Bangalore, India", "type": "Full-time", "description": "Design end-to-end product experiences from concept to final implementation.", "missing_skills": ["Sketch", "Design Systems", "Interaction Design"]},
+            {"id": "job_022", "title": "Graphic Designer", "company": "CreativeMinds Agency", "location": "Ahmedabad, India", "type": "Full-time", "description": "Create compelling visual designs for branding, marketing materials, and digital campaigns.", "missing_skills": ["Adobe Illustrator", "Photoshop", "Brand Identity"]},
+            {"id": "job_023", "title": "Motion Graphics Designer", "company": "AnimateNow Studios", "location": "Mumbai, India", "type": "Full-time", "description": "Produce engaging motion graphics and animations for video content and digital media.", "missing_skills": ["After Effects", "Cinema 4D", "Animation Principles"]},
+            {"id": "job_024", "title": "Video Editor", "company": "MediaCraft Productions", "location": "Hyderabad, India", "type": "Full-time", "description": "Edit and produce high-quality video content for various platforms and audiences.", "missing_skills": ["Premiere Pro", "Color Grading", "Sound Design"]},
+            {"id": "job_025", "title": "Content Creator", "company": "SocialBuzz Media", "location": "Delhi, India", "type": "Full-time", "description": "Develop engaging content across multiple formats including video, blogs, and social media.", "missing_skills": ["Content Strategy", "Video Production", "Social Media Trends"]},
+            {"id": "job_026", "title": "Content Writer", "company": "WordSmith Content Agency", "location": "Bangalore, India", "type": "Full-time", "description": "Write compelling content for websites, blogs, and marketing materials across industries.", "missing_skills": ["SEO Writing", "Copywriting", "Content Management Systems"]},
+            {"id": "job_027", "title": "Technical Writer", "company": "DocuTech Solutions", "location": "Pune, India", "type": "Full-time", "description": "Create clear technical documentation, API guides, and user manuals for software products.", "missing_skills": ["API Documentation", "Markdown", "Technical Communication"]},
+            {"id": "job_028", "title": "Copywriter", "company": "AdWords Creative", "location": "Mumbai, India", "type": "Full-time", "description": "Craft persuasive copy for advertising campaigns, websites, and marketing collateral.", "missing_skills": ["Creative Writing", "Brand Voice", "Campaign Strategy"]},
+            {"id": "job_029", "title": "Social Media Manager", "company": "ViralReach Digital", "location": "Gurgaon, India", "type": "Full-time", "description": "Manage social media presence, create content calendars, and engage with online communities.", "missing_skills": ["Social Media Analytics", "Community Management", "Content Planning"]},
+            {"id": "job_030", "title": "Research Scientist", "company": "Innovation Labs India", "location": "Bangalore, India", "type": "Full-time", "description": "Conduct advanced research in computer science and publish findings in top-tier conferences.", "missing_skills": ["Research Methodology", "Academic Writing", "Statistical Analysis"]},
+            {"id": "job_031", "title": "Data Research Analyst", "company": "ResearchHub Analytics", "location": "Chennai, India", "type": "Full-time", "description": "Perform quantitative and qualitative research to support business decision-making.", "missing_skills": ["SPSS", "Survey Design", "Data Mining"]},
+            {"id": "job_032", "title": "Electronics Engineer", "company": "CircuitTech Industries", "location": "Hyderabad, India", "type": "Full-time", "description": "Design and develop electronic circuits and embedded systems for consumer products.", "missing_skills": ["PCB Design", "Embedded C", "Circuit Simulation"]},
+            {"id": "job_033", "title": "Embedded Systems Developer", "company": "EmbedCore Solutions", "location": "Pune, India", "type": "Full-time", "description": "Develop firmware and software for embedded systems in automotive and IoT applications.", "missing_skills": ["ARM Architecture", "RTOS", "Hardware Debugging"]},
+            {"id": "job_034", "title": "IoT Engineer", "company": "SmartConnect Technologies", "location": "Bangalore, India", "type": "Full-time", "description": "Build IoT solutions connecting devices, sensors, and cloud platforms for smart applications.", "missing_skills": ["MQTT", "IoT Protocols", "Sensor Integration"]},
+            {"id": "job_035", "title": "Robotics Engineer", "company": "RoboTech Innovations", "location": "Chennai, India", "type": "Full-time", "description": "Design and program robotic systems for industrial automation and autonomous applications.", "missing_skills": ["ROS", "Computer Vision", "Control Systems"]},
+            {"id": "job_036", "title": "Blockchain Developer", "company": "CryptoChain Labs", "location": "Mumbai, India", "type": "Full-time", "description": "Develop decentralized applications and smart contracts on blockchain platforms.", "missing_skills": ["Solidity", "Web3.js", "Smart Contracts"]},
+            {"id": "job_037", "title": "FinTech Product Manager", "company": "PayNext Solutions", "location": "Bangalore, India", "type": "Full-time", "description": "Lead product development for digital payment and financial technology solutions.", "missing_skills": ["Payment Systems", "Regulatory Compliance", "UPI Integration"]},
+            {"id": "job_038", "title": "HealthTech Developer", "company": "MediCare Technologies", "location": "Hyderabad, India", "type": "Full-time", "description": "Build healthcare applications and telemedicine platforms to improve patient care.", "missing_skills": ["HIPAA Compliance", "Healthcare APIs", "Medical Informatics"]},
+            {"id": "job_039", "title": "EdTech Content Developer", "company": "LearnSphere India", "location": "Delhi, India", "type": "Full-time", "description": "Create engaging educational content and interactive learning experiences for online platforms.", "missing_skills": ["Instructional Design", "LMS", "Educational Technology"]},
+            {"id": "job_040", "title": "Automation Engineer", "company": "AutoFlow Systems", "location": "Pune, India", "type": "Full-time", "description": "Design and implement automation solutions for manufacturing and industrial processes.", "missing_skills": ["PLC Programming", "SCADA", "Industrial Automation"]},
+            {"id": "job_041", "title": "Market Research Analyst", "company": "InsightPro Research", "location": "Mumbai, India", "type": "Full-time", "description": "Conduct market research studies and analyze consumer behavior to guide business strategy.", "missing_skills": ["Market Analysis", "Consumer Insights", "Survey Tools"]},
+            {"id": "job_042", "title": "Startup Operations Associate", "company": "VentureHub Accelerator", "location": "Bangalore, India", "type": "Internship", "description": "Support startup operations including fundraising, partnerships, and growth initiatives.", "missing_skills": ["Startup Ecosystem", "Pitch Decks", "Investor Relations"]},
+            {"id": "job_043", "title": "Renewable Energy Engineer", "company": "GreenPower Solutions", "location": "Ahmedabad, India", "type": "Full-time", "description": "Design and optimize solar and wind energy systems for sustainable power generation.", "missing_skills": ["Solar PV Design", "Energy Modeling", "Grid Integration"]},
+            {"id": "job_044", "title": "Cloud Solutions Architect", "company": "CloudScale Technologies", "location": "Gurgaon, India", "type": "Full-time", "description": "Architect enterprise cloud solutions and lead cloud migration projects for large organizations.", "missing_skills": ["Azure", "Cloud Architecture", "Migration Strategies"]},
+            {"id": "job_045", "title": "Penetration Tester", "company": "SecureShield Cybersecurity", "location": "Bangalore, India", "type": "Full-time", "description": "Conduct security assessments and penetration testing to identify vulnerabilities in systems.", "missing_skills": ["Ethical Hacking", "Kali Linux", "Vulnerability Assessment"]}
+        ]
+        
+        # Find the selected job
+        selected_job = None
+        for job in mock_jobs:
+            if job['id'] == job_id:
+                selected_job = job
+                break
+        
+        if not selected_job:
+            return jsonify({"success": False, "error": "Job not found"}), 404
+        
+        # Generate bar chart (all jobs field distribution)
+        graph_data = prepare_job_graph_data(mock_jobs)
+        generate_job_field_chart(
+            graph_data['jobs_per_field']['fields'],
+            graph_data['jobs_per_field']['counts']
+        )
+        
+        # Generate pie chart for THIS specific job's missing skills
+        graph_data_with_skills = prepare_job_graph_data(mock_jobs, selected_job_id=job_id)
+        
+        if len(graph_data_with_skills['skill_frequency']['skills']) > 0:
+            generate_skill_gap_chart(
+                graph_data_with_skills['skill_frequency']['skills'],
+                graph_data_with_skills['skill_frequency']['frequencies']
+            )
+        else:
+            # No skills data available
+            return jsonify({
+                "success": False,
+                "error": "No skill data available for this job"
+            }), 400
+        
+        # Generate line chart for skill readiness progress
+        # Get user's skills from session to calculate job fit score
+        user_skills_str = session.get('user_skills', '')
+        user_skills = [s.strip() for s in user_skills_str.split(',') if s.strip()]
+        
+        # Get job required skills
+        job_required_skills = selected_job.get('missing_skills', [])
+        
+        # Calculate job fit score based on skill matching
+        job_fit_score, missing_skills_count, total_job_skills = calculate_job_fit_score(
+            user_skills, 
+            job_required_skills
+        )
+        
+        # Generate line chart with job fit score
+        generate_skill_readiness_chart(
+            job_title=selected_job['title'],
+            missing_skills_count=missing_skills_count,
+            current_job_fit_score=job_fit_score,
+            total_job_skills=total_job_skills
+        )
+        
+        # Get resume score and status for frontend
+        current_resume_score = session.get('last_score', 60)
+        if current_resume_score >= 80:
+            resume_status = "Ready"
+        elif current_resume_score >= 60:
+            resume_status = "Partially Ready"
+        else:
+            resume_status = "Not Ready"
+        
+        return jsonify({
+            "success": True,
+            "job_title": selected_job['title'],
+            "job_company": selected_job['company'],
+            "missing_skills_count": missing_skills_count,
+            "resume_score": current_resume_score,
+            "job_fit_score": job_fit_score,  # Add job fit score to response
+            "resume_status": resume_status,
+            "message": f"Charts generated for {selected_job['title']} at {selected_job['company']}"
+        })
+        
+    except Exception as e:
+        print(f"Chart generation error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ---------------- GET EVALUATION SUMMARY (SIMPLE) ----------------
+@app.route("/api/get-summary")
+def get_summary():
+    """
+    Simple route to get evaluation summary.
+    Uses only basic Python - if/else logic.
+    """
+    
+    # Get data from session (simple)
+    resume_score = session.get("last_score", 0)
+    missing_skills = session.get("last_missing_skills", [])
+    job_fit_score = session.get("job_fit_score", 0)
+    
+    # Calculate resume status (simple if/else)
+    if resume_score >= 80:
+        resume_status = "Ready"
+    elif resume_score >= 60:
+        resume_status = "Partially Ready"
+    else:
+        resume_status = "Not Ready"
+    
+    # Calculate eligibility based on job fit score (simple if/else)
+    if job_fit_score >= 70:
+        eligibility = "Eligible"
+    elif job_fit_score >= 40:
+        eligibility = "Partially Eligible"
+    else:
+        eligibility = "Not Eligible"
+    
+    # Calculate confidence level (simple if/else)
+    # Confidence should consider BOTH resume readiness AND job fit
+    if resume_status == "Ready" and job_fit_score >= 70:
+        confidence_level = "High"
+    elif resume_status == "Partially Ready" or (resume_status == "Ready" and job_fit_score >= 40):
+        confidence_level = "Medium"
+    else:
+        confidence_level = "Low"
+    
+    # Count missing skills (simple)
+    missing_skills_count = len(missing_skills)
+    
+    # Return simple dictionary
+    return jsonify({
+        "success": True,
+        "resume_score": resume_score,
+        "resume_status": resume_status,
+        "job_fit_score": job_fit_score,
+        "eligibility": eligibility,
+        "confidence_level": confidence_level,
+        "missing_skills_count": missing_skills_count,
+        "has_missing_skills": missing_skills_count > 0
+    })
+
+
+# ---------------- RESET EVALUATION (SIMPLE) ----------------
+@app.route("/reset-evaluation")
+def reset_evaluation():
+    """
+    Simple route to reset evaluation.
+    Clears session data and redirects to home.
+    """
+    
+    # Clear evaluation data from session (simple)
+    session.pop("last_score", None)
+    session.pop("last_missing_skills", None)
+    session.pop("selected_job_title", None)
+    session.pop("selected_job_company", None)
+    session.pop("job_fit_score", None)
+    
+    # Redirect to home (simple)
+    return redirect("/")
+
+
+# ---------------- STORE JOB DATA IN SESSION ----------------
+@app.route("/api/store-job-data", methods=["POST"])
+def store_job_data():
+    """
+    Simple route to store job data in session.
+    Uses only basic Python.
+    """
+    try:
+        # Get data from request (simple)
+        data = request.get_json()
+        
+        # Store in session (simple assignment)
+        session["selected_job_title"] = data.get("job_title", "Not Selected")
+        session["selected_job_company"] = data.get("job_company", "Not Selected")
+        session["job_fit_score"] = data.get("job_fit_score", 0)
+        
+        return jsonify({"success": True})
+    except:
+        return jsonify({"success": False})
+
+
+# ---------------- DOWNLOAD EVALUATION REPORT ----------------
+@app.route("/download_report")
+def download_report():
+    """
+    Enhanced route to display comprehensive evaluation report.
+    Includes all 6 rule-based features with only Line and Pie charts.
+    """
+    
+    # Get basic data from session
+    resume_score = session.get("last_score", 0)
+    missing_skills = session.get("last_missing_skills", [])
+    user_email = session.get("user_email", "Guest")
+    
+    # Calculate readiness status using simple if/else
+    if resume_score >= 80:
+        readiness_status = "Ready"
+    elif resume_score >= 60:
+        readiness_status = "Partially Ready"
+    else:
+        readiness_status = "Not Ready"
+    
+    # Get resume details from database
+    resume_data = None
+    if user_email != "Guest":
+        conn = get_db()
+        cur = conn.cursor()
+        
+        cur.execute("""
+            SELECT name, email, phone, degree, cgpa, skills, projects, city, github_username
+            FROM resumes
+            WHERE user_email = ?
+            ORDER BY id DESC
+            LIMIT 1
+        """, (user_email,))
+        
+        row = cur.fetchone()
+        conn.close()
+        
+        if row:
+            resume_data = {
+                "name": row[0],
+                "email": row[1],
+                "phone": row[2],
+                "degree": row[3],
+                "cgpa": row[4],
+                "skills": row[5],
+                "projects": row[6],
+                "city": row[7],
+                "github_username": row[8]
+            }
+    
+    # Get job-specific data from session
+    job_title = session.get("selected_job_title", "Not Selected")
+    job_company = session.get("selected_job_company", "Not Selected")
+    job_fit_score = session.get("job_fit_score", 0)
+    
+    # ========== ENHANCED FEATURES DATA ==========
+    
+    # FEATURE 1: Role-Based Evaluation (if available)
+    role_evaluation = None
+    if resume_data:
+        try:
+            # Get user skills from resume data
+            user_skills = [s.strip() for s in resume_data['skills'].split(',') if s.strip()]
+            cgpa = float(resume_data['cgpa'])
+            
+            # Count projects
+            projects_str = resume_data.get('projects', '')
+            if projects_str:
+                project_lines = [line.strip() for line in projects_str.split('\n') if line.strip()]
+                projects_count = len(project_lines)
+            else:
+                projects_count = 0
+            
+            # Get all roles and find best match
+            all_roles = role_evaluator.get_all_roles()
+            best_role = None
+            best_score = 0
+            
+            for role in all_roles:
+                result = role_evaluator.calculate_role_fit_score(
+                    user_skills, cgpa, projects_count, role['name']
+                )
+                if result and result['role_fit_score'] > best_score:
+                    best_score = result['role_fit_score']
+                    # Categorize missing skills
+                    missing_categorized = role_evaluator.categorize_missing_skills(result)
+                    best_role = {
+                        'role_name': role['name'],
+                        'role_fit_score': result['role_fit_score'],
+                        'breakdown': result['breakdown'],
+                        'missing_skills': missing_categorized
+                    }
+            
+            role_evaluation = best_role
+        except Exception as e:
+            print(f"Error in role evaluation: {e}")
+            import traceback
+            traceback.print_exc()
+            role_evaluation = None
+    
+    # FEATURE 2: Skill Gap Roadmap (if available)
+    skill_roadmap_data = None
+    if resume_data and role_evaluation:
+        try:
+            roadmap = skill_roadmap.generate_skill_roadmap(role_evaluation['missing_skills'])
+            roadmap_summary = skill_roadmap.get_roadmap_summary(roadmap)
+            next_skill = skill_roadmap.get_next_skill_to_learn(roadmap)
+            
+            skill_roadmap_data = {
+                'roadmap': roadmap,
+                'summary': roadmap_summary,
+                'next_skill': next_skill
+            }
+        except Exception as e:
+            print(f"Error in roadmap generation: {e}")
+            import traceback
+            traceback.print_exc()
+            skill_roadmap_data = None
+    
+    # FEATURE 3: Confidence Index
+    confidence_data = None
+    if resume_data and role_evaluation:
+        try:
+            role_req = role_evaluator.get_role_requirements(role_evaluation['role_name'])
+            all_missing = role_evaluator.get_all_missing_skills(role_evaluation)
+            
+            confidence = confidence_calculator.calculate_confidence_index(
+                resume_score,
+                role_evaluation['role_fit_score'],
+                len(all_missing),
+                role_req
+            )
+            confidence_data = confidence
+        except Exception as e:
+            print(f"Error in confidence calculation: {e}")
+            import traceback
+            traceback.print_exc()
+            confidence_data = None
+    
+    # FEATURE 4: What-If Skill Simulation (simulate adding top missing skills)
+    simulation_data = None
+    if resume_data and role_evaluation:
+        try:
+            # Get top 3 critical missing skills
+            critical_skills = role_evaluation['missing_skills'].get('critical', [])[:3]
+            if critical_skills:
+                user_skills = [s.strip() for s in resume_data['skills'].split(',') if s.strip()]
+                cgpa = float(resume_data['cgpa'])
+                projects_str = resume_data.get('projects', '')
+                if projects_str:
+                    project_lines = [line.strip() for line in projects_str.split('\n') if line.strip()]
+                    projects_count = len(project_lines)
+                else:
+                    projects_count = 0
+                
+                sim_result = skill_simulator.simulate_skill_acquisition(
+                    user_skills,
+                    cgpa,
+                    projects_count,
+                    role_evaluation['role_name'],
+                    critical_skills
+                )
+                simulation_data = sim_result
+        except Exception as e:
+            print(f"Error in simulation: {e}")
+            import traceback
+            traceback.print_exc()
+            simulation_data = None
+    
+    # FEATURE 5: Role Switch Impact Comparison
+    role_comparison = None
+    if resume_data:
+        try:
+            user_skills = [s.strip() for s in resume_data['skills'].split(',') if s.strip()]
+            cgpa = float(resume_data['cgpa'])
+            projects_str = resume_data.get('projects', '')
+            if projects_str:
+                project_lines = [line.strip() for line in projects_str.split('\n') if line.strip()]
+                projects_count = len(project_lines)
+            else:
+                projects_count = 0
+            
+            all_roles = role_evaluator.get_all_roles()
+            role_names = [r['name'] for r in all_roles]
+            
+            comparison_result = role_comparator.compare_roles(
+                user_skills, cgpa, projects_count, role_names
+            )
+            role_comparison = comparison_result
+        except Exception as e:
+            print(f"Error in role comparison: {e}")
+            import traceback
+            traceback.print_exc()
+            role_comparison = None
+    
+    # FEATURE 6: Resume Strength Breakdown
+    resume_breakdown_data = None
+    if resume_data:
+        try:
+            user_skills = [s.strip() for s in resume_data['skills'].split(',') if s.strip()]
+            cgpa = float(resume_data['cgpa'])
+            projects_str = resume_data.get('projects', '')
+            if projects_str:
+                project_lines = [line.strip() for line in projects_str.split('\n') if line.strip()]
+                projects_count = len(project_lines)
+            else:
+                projects_count = 0
+            
+            breakdown_result = resume_breakdown.analyze_resume_strength(
+                user_skills, cgpa, projects_count, resume_data.get('degree', '')
+            )
+            resume_breakdown_data = breakdown_result
+        except Exception as e:
+            print(f"Error in resume breakdown: {e}")
+            import traceback
+            traceback.print_exc()
+            resume_breakdown_data = None
+    
+    # Pass all data to template
+    return render_template(
+        "report.html",
+        resume_score=resume_score,
+        readiness_status=readiness_status,
+        missing_skills=missing_skills,
+        resume_data=resume_data,
+        job_title=job_title,
+        job_company=job_company,
+        job_fit_score=job_fit_score,
+        # Enhanced features data
+        role_evaluation=role_evaluation,
+        skill_roadmap=skill_roadmap_data,
+        confidence_data=confidence_data,
+        simulation_data=simulation_data,
+        role_comparison=role_comparison,
+        resume_breakdown=resume_breakdown_data
+    )
+
+
+
+
+# ============================================================================
+# ENHANCED FEATURES - RULE-BASED EVALUATION SYSTEM
+# ============================================================================
+
+# ---------------- GET ALL AVAILABLE ROLES ----------------
+@app.route("/api/roles/list")
+def get_roles_list():
+    """Get list of all available roles"""
+    try:
+        roles = role_evaluator.get_all_roles()
+        roles_with_desc = []
+        
+        for role in roles:
+            req = role_evaluator.get_role_requirements(role)
+            roles_with_desc.append({
+                'name': role,
+                'description': req['description'],
+                'min_cgpa': req['min_cgpa'],
+                'min_projects': req['min_projects']
+            })
+        
+        return jsonify({
+            "success": True,
+            "roles": roles_with_desc,
+            "total_roles": len(roles)
+        })
+    except Exception as e:
+        print(f"Error getting roles: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ---------------- EVALUATE ROLE FIT ----------------
+@app.route("/api/roles/evaluate", methods=["POST"])
+def evaluate_role_fit():
+    """Evaluate user's fit for a specific role"""
+    try:
+        data = request.get_json()
+        role_name = data.get('role_name')
+        
+        # Get user data from session
+        user_skills_str = session.get('user_skills', '')
+        user_skills = [s.strip() for s in user_skills_str.split(',') if s.strip()]
+        
+        # Get CGPA and projects from session or data
+        cgpa = float(data.get('cgpa', session.get('user_cgpa', 7.0)))
+        projects_str = data.get('projects', session.get('user_projects', ''))
+        
+        # Count projects
+        if projects_str:
+            project_lines = [line.strip() for line in projects_str.split('\n') if line.strip()]
+            projects_count = len(project_lines)
+        else:
+            projects_count = 0
+        
+        # Calculate role fit
+        result = role_evaluator.calculate_role_fit_score(
+            user_skills, cgpa, projects_count, role_name
+        )
+        
+        if not result:
+            return jsonify({"success": False, "error": "Role not found"}), 404
+        
+        # Get role requirements
+        role_req = role_evaluator.get_role_requirements(role_name)
+        
+        # Categorize missing skills
+        missing_categorized = role_evaluator.categorize_missing_skills(result)
+        
+        # Generate skill roadmap
+        roadmap = skill_roadmap.generate_skill_roadmap(missing_categorized)
+        roadmap_summary = skill_roadmap.get_roadmap_summary(roadmap)
+        
+        # Calculate confidence index
+        resume_score = session.get('last_score', 70)
+        confidence = confidence_calculator.calculate_confidence_index(
+            resume_score,
+            result['role_fit_score'],
+            len(role_evaluator.get_all_missing_skills(result)),
+            role_req
+        )
+        
+        # Store in session
+        session['selected_role'] = role_name
+        session['role_fit_score'] = result['role_fit_score']
+        session['user_cgpa'] = cgpa
+        session['user_projects'] = projects_str
+        
+        return jsonify({
+            "success": True,
+            "role_name": role_name,
+            "role_fit_score": result['role_fit_score'],
+            "breakdown": result['breakdown'],
+            "missing_skills": {
+                'critical': result['missing_core'],
+                'important': result['missing_secondary'],
+                'nice_to_have': result['missing_bonus']
+            },
+            "requirements_met": {
+                'cgpa': result['cgpa_met'],
+                'projects': result['projects_met']
+            },
+            "roadmap_summary": roadmap_summary,
+            "confidence": confidence
+        })
+        
+    except Exception as e:
+        print(f"Error evaluating role fit: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ---------------- GET SKILL ROADMAP ----------------
+@app.route("/api/roadmap/generate", methods=["POST"])
+def generate_roadmap():
+    """Generate detailed skill learning roadmap"""
+    try:
+        data = request.get_json()
+        role_name = data.get('role_name')
+        
+        # Get user data
+        user_skills_str = session.get('user_skills', '')
+        user_skills = [s.strip() for s in user_skills_str.split(',') if s.strip()]
+        cgpa = float(session.get('user_cgpa', 7.0))
+        projects_str = session.get('user_projects', '')
+        projects_count = len([line for line in projects_str.split('\n') if line.strip()])
+        
+        # Calculate role fit
+        result = role_evaluator.calculate_role_fit_score(
+            user_skills, cgpa, projects_count, role_name
+        )
+        
+        if not result:
+            return jsonify({"success": False, "error": "Role not found"}), 404
+        
+        # Categorize missing skills
+        missing_categorized = role_evaluator.categorize_missing_skills(result)
+        
+        # Generate roadmap
+        roadmap = skill_roadmap.generate_skill_roadmap(missing_categorized)
+        
+        return jsonify({
+            "success": True,
+            "roadmap": roadmap,
+            "summary": skill_roadmap.get_roadmap_summary(roadmap),
+            "next_skill": skill_roadmap.get_next_skill_to_learn(roadmap)
+        })
+        
+    except Exception as e:
+        print(f"Error generating roadmap: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ---------------- SIMULATE SKILL ACQUISITION ----------------
+@app.route("/api/simulator/simulate", methods=["POST"])
+def simulate_skills():
+    """Simulate adding skills and recalculate scores"""
+    try:
+        data = request.get_json()
+        role_name = data.get('role_name')
+        simulated_skills = data.get('simulated_skills', [])
+        
+        # Get user data
+        user_skills_str = session.get('user_skills', '')
+        current_skills = [s.strip() for s in user_skills_str.split(',') if s.strip()]
+        cgpa = float(session.get('user_cgpa', 7.0))
+        projects_str = session.get('user_projects', '')
+        projects_count = len([line for line in projects_str.split('\n') if line.strip()])
+        
+        # Run simulation
+        simulation_result = skill_simulator.simulate_skill_acquisition(
+            current_skills, simulated_skills, role_name, cgpa, projects_count, role_evaluator
+        )
+        
+        # Get recommendation
+        recommendation = skill_simulator.get_simulation_recommendation(simulation_result)
+        
+        return jsonify({
+            "success": True,
+            "simulation": simulation_result,
+            "recommendation": recommendation
+        })
+        
+    except Exception as e:
+        print(f"Error simulating skills: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ---------------- COMPARE MULTIPLE ROLES ----------------
+@app.route("/api/roles/compare", methods=["POST"])
+def compare_multiple_roles():
+    """Compare user's fit across multiple roles"""
+    try:
+        data = request.get_json()
+        role_names = data.get('role_names', [])
+        
+        # Get user data
+        user_skills_str = session.get('user_skills', '')
+        user_skills = [s.strip() for s in user_skills_str.split(',') if s.strip()]
+        cgpa = float(session.get('user_cgpa', 7.0))
+        projects_str = session.get('user_projects', '')
+        projects_count = len([line for line in projects_str.split('\n') if line.strip()])
+        
+        # Compare roles
+        comparison = role_comparator.compare_roles(
+            user_skills, cgpa, projects_count, role_names, role_evaluator
+        )
+        
+        # Get recommendation
+        recommendation = role_comparator.get_role_switch_recommendation(comparison)
+        
+        # Identify common missing skills
+        common_skills = role_comparator.identify_common_missing_skills(comparison)
+        
+        return jsonify({
+            "success": True,
+            "comparison": comparison,
+            "recommendation": recommendation,
+            "common_missing_skills": common_skills
+        })
+        
+    except Exception as e:
+        print(f"Error comparing roles: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ---------------- GET RESUME BREAKDOWN ----------------
+@app.route("/api/resume/breakdown")
+def get_resume_breakdown():
+    """Get detailed resume strength breakdown"""
+    try:
+        # Get user data from session
+        user_email = session.get('user_email')
+        
+        if not user_email:
+            return jsonify({"success": False, "error": "Not logged in"}), 401
+        
+        # Get latest resume from database
+        conn = get_db()
+        cur = conn.cursor()
+        
+        cur.execute("""
+            SELECT cgpa, skills, projects, github_username, about_yourself, city, id
+            FROM resumes
+            WHERE user_email = ?
+            ORDER BY id DESC
+            LIMIT 1
+        """, (user_email,))
+        
+        row = cur.fetchone()
+        
+        if not row:
+            conn.close()
+            return jsonify({"success": False, "error": "No resume found"}), 404
+        
+        cgpa, skills, projects, github, about, city, resume_id = row
+        
+        # Get education count
+        cur.execute("""
+            SELECT COUNT(*) FROM education WHERE resume_id = ?
+        """, (resume_id,))
+        
+        education_count = cur.fetchone()[0]
+        conn.close()
+        
+        # Calculate breakdown
+        extras = {
+            'github_username': github,
+            'about_yourself': about,
+            'city': city
+        }
+        
+        breakdown = resume_breakdown.calculate_resume_breakdown(
+            cgpa, skills, projects, education_count, extras
+        )
+        
+        # Get comparison with average
+        comparison = resume_breakdown.compare_with_average(breakdown)
+        
+        # Get improvement priority
+        priority = resume_breakdown.get_improvement_priority(breakdown['sections'])
+        
+        return jsonify({
+            "success": True,
+            "breakdown": breakdown,
+            "comparison_with_average": comparison,
+            "improvement_priority": priority
+        })
+        
+    except Exception as e:
+        print(f"Error getting resume breakdown: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ---------------- RANK SKILLS BY IMPACT ----------------
+@app.route("/api/simulator/rank-skills", methods=["POST"])
+def rank_skills_by_impact():
+    """Rank missing skills by their impact on role fit"""
+    try:
+        data = request.get_json()
+        role_name = data.get('role_name')
+        
+        # Get user data
+        user_skills_str = session.get('user_skills', '')
+        current_skills = [s.strip() for s in user_skills_str.split(',') if s.strip()]
+        cgpa = float(session.get('user_cgpa', 7.0))
+        projects_str = session.get('user_projects', '')
+        projects_count = len([line for line in projects_str.split('\n') if line.strip()])
+        
+        # Get missing skills
+        result = role_evaluator.calculate_role_fit_score(
+            current_skills, cgpa, projects_count, role_name
+        )
+        
+        if not result:
+            return jsonify({"success": False, "error": "Role not found"}), 404
+        
+        missing_skills = role_evaluator.get_all_missing_skills(result)
+        
+        # Rank skills by impact
+        ranked_skills = skill_simulator.rank_skills_by_impact(
+            missing_skills, current_skills, role_name, cgpa, projects_count, role_evaluator
+        )
+        
+        return jsonify({
+            "success": True,
+            "ranked_skills": [
+                {"skill": skill, "impact": impact}
+                for skill, impact in ranked_skills
+            ]
+        })
+        
+    except Exception as e:
+        print(f"Error ranking skills: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 # ---------------- RUN ----------------
