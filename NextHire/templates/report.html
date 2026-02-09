@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comprehensive Evaluation Report - NextHire.AI</title>
+    <title>Resume Evaluation Report - NextHire.AI</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -39,7 +39,6 @@
             padding: 20px;
             border: 1px solid #dee2e6;
             border-radius: 8px;
-            page-break-inside: avoid;
         }
         
         .section-title {
@@ -118,81 +117,6 @@
             font-weight: bold;
         }
         
-        .feature-box {
-            background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
-            padding: 15px;
-            margin: 15px 0;
-        }
-        
-        .roadmap-timeline {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .roadmap-column {
-            flex: 1;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        
-        .roadmap-short {
-            background-color: #d4edda;
-            border: 2px solid #28a745;
-        }
-        
-        .roadmap-mid {
-            background-color: #fff3cd;
-            border: 2px solid #ffc107;
-        }
-        
-        .roadmap-long {
-            background-color: #f8d7da;
-            border: 2px solid #dc3545;
-        }
-        
-        .comparison-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .comparison-card {
-            padding: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            border-left: 4px solid #007bff;
-        }
-        
-        .progress-bar-custom {
-            height: 20px;
-            background-color: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background-color: #007bff;
-            transition: width 0.3s;
-        }
-        
-        .progress-fill-success {
-            background-color: #28a745;
-        }
-        
-        .progress-fill-warning {
-            background-color: #ffc107;
-        }
-        
-        .progress-fill-danger {
-            background-color: #dc3545;
-        }
-        
         .no-print {
             text-align: center;
             margin-top: 30px;
@@ -213,18 +137,8 @@
                 display: none;
             }
             
-            .report-section {
-                page-break-inside: avoid;
-            }
-            
             .chart-image {
                 page-break-inside: avoid;
-            }
-        }
-        
-        @media print {
-            .comparison-grid {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -234,9 +148,8 @@
 <div class="report-container">
     <!-- Report Header -->
     <div class="report-header">
-        <h1>Comprehensive Evaluation Report</h1>
-        <p class="text-muted">NextHire.AI - Career Readiness Analysis</p>
-        <p class="text-muted small">Rule-Based Evaluation System</p>
+        <h1>Resume Evaluation Report</h1>
+        <p class="text-muted">NextHire.AI - Placement Readiness Analysis</p>
     </div>
     
     <!-- Resume Details Section -->
@@ -358,9 +271,10 @@
         
         <div class="info-row">
             <span class="info-label">Job Fit Score:</span>
-            <span class="info-value"><strong>{{ job_fit_score }} / 100</strong></span>
+            <span class="info-value">{{ job_fit_score }} / 100</span>
         </div>
         
+        <!-- FEATURE 2: ELIGIBILITY BADGE -->
         <div class="info-row">
             <span class="info-label">Eligibility Status:</span>
             <span class="info-value">
@@ -376,373 +290,155 @@
     </div>
     {% endif %}
     
-    <!-- ========== ENHANCED FEATURE 1: ROLE-BASED EVALUATION ========== -->
-    {% if role_evaluation %}
-    <div class="report-section" style="border-left: 4px solid #007bff;">
+    <!-- FEATURE 1: FINAL SUMMARY / VERDICT BOX -->
+    <div class="report-section" style="background-color: #f0f8ff; border: 2px solid #007bff;">
         <div class="section-title">
-            <i class="bi bi-person-badge"></i> 1. Role-Based Evaluation Summary
+            <i class="bi bi-clipboard-check"></i> Final Summary / Verdict
         </div>
         
-        <div class="info-row">
-            <span class="info-label">Target Role:</span>
-            <span class="info-value"><strong>{{ role_evaluation.role_name }}</strong></span>
-        </div>
-        
-        <div class="info-row">
-            <span class="info-label">Role Fit Score:</span>
-            <span class="info-value"><strong>{{ role_evaluation.role_fit_score }} / 100</strong></span>
-        </div>
-        
-        <div class="feature-box mt-3">
-            <h6><strong>Score Breakdown:</strong></h6>
-            <ul class="skills-list">
-                <li>Core Skills: {{ role_evaluation.breakdown.core_score }} / 50</li>
-                <li>Secondary Skills: {{ role_evaluation.breakdown.secondary_score }} / 30</li>
-                <li>Bonus Skills: {{ role_evaluation.breakdown.bonus_score }} / 10</li>
-                <li>CGPA: {{ role_evaluation.breakdown.cgpa_score }} / 5</li>
-                <li>Projects: {{ role_evaluation.breakdown.projects_score }} / 5</li>
-            </ul>
-        </div>
-        
-        {% if role_evaluation.missing_skills %}
-        <div class="feature-box mt-3" style="background-color: #fff3cd; border-left-color: #ffc107;">
-            <h6><strong>Missing Skills by Priority:</strong></h6>
-            
-            {% if role_evaluation.missing_skills.critical %}
-            <p class="mb-2"><strong class="text-danger">Critical:</strong> 
-                {{ role_evaluation.missing_skills.critical|join(', ') }}</p>
-            {% endif %}
-            
-            {% if role_evaluation.missing_skills.important %}
-            <p class="mb-2"><strong class="text-warning">Important:</strong> 
-                {{ role_evaluation.missing_skills.important|join(', ') }}</p>
-            {% endif %}
-            
-            {% if role_evaluation.missing_skills.nice_to_have %}
-            <p class="mb-0"><strong class="text-info">Nice-to-Have:</strong> 
-                {{ role_evaluation.missing_skills.nice_to_have|join(', ') }}</p>
-            {% endif %}
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-    
-    <!-- ========== ENHANCED FEATURE 2: SKILL GAP ROADMAP ========== -->
-    {% if skill_roadmap %}
-    <div class="report-section" style="border-left: 4px solid #28a745;">
-        <div class="section-title">
-            <i class="bi bi-map"></i> 2. Skill Gap Analysis & Learning Roadmap
-        </div>
-        
-        <div class="feature-box">
-            <p><strong>Total Skills to Learn:</strong> {{ skill_roadmap.summary.total_skills }}</p>
-            <p><strong>Estimated Time:</strong> {{ skill_roadmap.summary.estimated_months }} months 
-               ({{ skill_roadmap.roadmap.total_weeks }} weeks)</p>
-        </div>
-        
-        <div class="roadmap-timeline">
-            <div class="roadmap-column roadmap-short">
-                <h6 class="text-success"><strong>Short-term (0-3 months)</strong></h6>
-                {% if skill_roadmap.roadmap.short_term %}
-                <ul class="skills-list">
-                    {% for skill in skill_roadmap.roadmap.short_term %}
-                    <li>{{ skill.skill }} - {{ skill.weeks }} weeks</li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p class="text-muted small">No skills in this timeframe</p>
-                {% endif %}
-            </div>
-            
-            <div class="roadmap-column roadmap-mid">
-                <h6 class="text-warning"><strong>Mid-term (3-6 months)</strong></h6>
-                {% if skill_roadmap.roadmap.mid_term %}
-                <ul class="skills-list">
-                    {% for skill in skill_roadmap.roadmap.mid_term %}
-                    <li>{{ skill.skill }} - {{ skill.weeks }} weeks</li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p class="text-muted small">No skills in this timeframe</p>
-                {% endif %}
-            </div>
-            
-            <div class="roadmap-column roadmap-long">
-                <h6 class="text-danger"><strong>Long-term (6+ months)</strong></h6>
-                {% if skill_roadmap.roadmap.long_term %}
-                <ul class="skills-list">
-                    {% for skill in skill_roadmap.roadmap.long_term %}
-                    <li>{{ skill.skill }} - {{ skill.weeks }} weeks</li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p class="text-muted small">No skills in this timeframe</p>
-                {% endif %}
-            </div>
-        </div>
-        
-        {% if skill_roadmap.next_skill %}
-        <div class="feature-box" style="background-color: #d1ecf1; border-left-color: #17a2b8;">
-            <p class="mb-0"><strong>Next Skill to Learn:</strong> 
-                {{ skill_roadmap.next_skill.skill }} 
-                ({{ skill_roadmap.next_skill.weeks }} weeks, {{ skill_roadmap.next_skill.priority }} priority)</p>
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-    
-    <!-- ========== ENHANCED FEATURE 3: CONFIDENCE INDEX ========== -->
-    {% if confidence_data %}
-    <div class="report-section" style="border-left: 4px solid #6f42c1;">
-        <div class="section-title">
-            <i class="bi bi-speedometer2"></i> 3. Confidence Index
-        </div>
-        
-        <div class="text-center mb-3">
-            <div class="score-badge 
-                {% if confidence_data.confidence_level == 'High' %}badge-ready
-                {% elif confidence_data.confidence_level == 'Medium' %}badge-partial
-                {% else %}badge-not-ready{% endif %}">
-                {{ confidence_data.confidence_level }}
-            </div>
-            <p class="mt-2"><strong>Confidence Score:</strong> {{ confidence_data.confidence_score }} / 100</p>
-        </div>
-        
-        <div class="feature-box">
-            <h6><strong>Contributing Factors:</strong></h6>
-            <ul class="skills-list">
-                <li>Resume Quality: {{ confidence_data.factors.resume_factor }} / 30</li>
-                <li>Role Fit: {{ confidence_data.factors.role_fit_factor }} / 40</li>
-                <li>Skill Completeness: {{ confidence_data.factors.missing_skills_factor }} / 30</li>
-            </ul>
-        </div>
-        
-        {% if confidence_data.recommendations %}
-        <div class="feature-box mt-3" style="background-color: #d1ecf1; border-left-color: #17a2b8;">
-            <h6><strong>Recommendations:</strong></h6>
-            <ul class="skills-list">
-                {% for rec in confidence_data.recommendations %}
-                <li>{{ rec }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-    
-    <!-- ========== ENHANCED FEATURE 4: WHAT-IF SKILL SIMULATION ========== -->
-    {% if simulation_data %}
-    <div class="report-section" style="border-left: 4px solid #fd7e14;">
-        <div class="section-title">
-            <i class="bi bi-lightning"></i> 4. What-If Skill Simulation Results
-        </div>
-        
-        <p class="text-muted">Simulated impact of acquiring top missing skills</p>
-        
-        <div class="row text-center mb-3">
-            <div class="col-md-4">
-                <div class="feature-box">
-                    <h6>Current Score</h6>
-                    <p class="h3 text-primary">{{ simulation_data.simulation.current_state.role_fit_score }}</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-box" style="background-color: #d4edda;">
-                    <h6>Improvement</h6>
-                    <p class="h3 text-success">+{{ simulation_data.simulation.improvements.score_improvement }}</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-box">
-                    <h6>Projected Score</h6>
-                    <p class="h3 text-primary">{{ simulation_data.simulation.simulated_state.role_fit_score }}</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="feature-box">
-            <h6><strong>Skills Simulated:</strong></h6>
-            <p>{{ simulation_data.simulation.simulated_skills|join(', ') }}</p>
-        </div>
-        
-        <div class="feature-box mt-3" style="background-color: #d1ecf1; border-left-color: #17a2b8;">
-            <p class="mb-0"><strong>Recommendation:</strong> {{ simulation_data.recommendation }}</p>
-        </div>
-    </div>
-    {% endif %}
-    
-    <!-- ========== ENHANCED FEATURE 5: ROLE SWITCH IMPACT COMPARISON ========== -->
-    {% if role_comparison %}
-    <div class="report-section" style="border-left: 4px solid #17a2b8;">
-        <div class="section-title">
-            <i class="bi bi-bar-chart"></i> 5. Role Switch Impact Comparison
-        </div>
-        
-        <div class="feature-box" style="background-color: #d4edda; border-left-color: #28a745;">
-            <h6><strong>Best Fit Role:</strong> {{ role_comparison.comparison.best_fit_role }}</h6>
-            <p class="mb-0"><strong>Score:</strong> {{ role_comparison.comparison.best_fit_score }} / 100</p>
-        </div>
-        
-        <p class="mt-3"><strong>{{ role_comparison.recommendation }}</strong></p>
-        
-        <div class="comparison-grid">
-            {% for role in role_comparison.comparison.comparisons[:6] %}
-            <div class="comparison-card">
-                <h6><strong>{{ role.role_name }}</strong></h6>
-                <p class="mb-1"><strong>Score:</strong> {{ role.role_fit_score }} / 100</p>
-                <div class="progress-bar-custom">
-                    <div class="progress-fill 
-                        {% if role.role_fit_score >= 70 %}progress-fill-success
-                        {% elif role.role_fit_score >= 40 %}progress-fill-warning
-                        {% else %}progress-fill-danger{% endif %}" 
-                        style="width: {{ role.role_fit_score }}%;">
-                    </div>
-                </div>
-                <p class="mb-1 small"><strong>Status:</strong> 
-                    <span class="badge 
-                        {% if role.readiness == 'Ready' %}bg-success
-                        {% elif role.readiness == 'Partially Ready' %}bg-warning text-dark
-                        {% else %}bg-danger{% endif %}">
-                        {{ role.readiness }}
+        <div class="text-center">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <strong>Resume Status:</strong><br>
+                    <span class="
+                        {% if readiness_status == 'Ready' %}text-success
+                        {% elif readiness_status == 'Partially Ready' %}text-warning
+                        {% else %}text-danger{% endif %}" style="font-size: 1.2rem; font-weight: bold;">
+                        {{ readiness_status }}
                     </span>
-                </p>
-                <p class="mb-0 small"><strong>Missing Skills:</strong> {{ role.missing_skills_count }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>Resume Score:</strong><br>
+                    <span style="font-size: 1.2rem; font-weight: bold; color: #007bff;">
+                        {{ resume_score }} / 100
+                    </span>
+                </div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-    
-    <!-- ========== ENHANCED FEATURE 6: RESUME STRENGTH BREAKDOWN ========== -->
-    {% if resume_breakdown %}
-    <div class="report-section" style="border-left: 4px solid #dc3545;">
-        <div class="section-title">
-            <i class="bi bi-pie-chart"></i> 6. Resume Strength Breakdown
-        </div>
-        
-        <div class="text-center mb-3">
-            <div class="score-badge badge-ready">
-                {{ resume_breakdown.breakdown.total_score }} / 100
-            </div>
-            <p class="mt-2"><strong>Overall Resume Quality</strong></p>
-        </div>
-        
-        <div class="feature-box">
-            <h6><strong>Section-wise Scores:</strong></h6>
             
-            {% for section_name, section_data in resume_breakdown.breakdown.sections.items() %}
-            <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
-                    <span><strong>{{ section_name|capitalize }}:</strong></span>
-                    <span>{{ section_data.score }} / {{ section_data.max_score }} ({{ section_data.percentage }}%)</span>
+            {% if job_title != "Not Selected" %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <strong>Job Fit Score:</strong><br>
+                    <span style="font-size: 1.2rem; font-weight: bold; color: #007bff;">
+                        {{ job_fit_score }} / 100
+                    </span>
                 </div>
-                <div class="progress-bar-custom">
-                    <div class="progress-fill 
-                        {% if section_data.percentage >= 80 %}progress-fill-success
-                        {% elif section_data.percentage >= 60 %}progress-fill-warning
-                        {% else %}progress-fill-danger{% endif %}" 
-                        style="width: {{ section_data.percentage }}%;">
-                    </div>
-                </div>
-                <p class="text-muted small mb-0">{{ section_data.details }}</p>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <div class="feature-box" style="background-color: #d4edda; border-left-color: #28a745;">
-                    <h6><strong>Strengths:</strong></h6>
-                    <ul class="skills-list">
-                        {% for strength in resume_breakdown.breakdown.strengths %}
-                        <li>{{ strength }}</li>
-                        {% endfor %}
-                    </ul>
+                <div class="col-md-6 mb-3">
+                    <strong>Missing Skills:</strong><br>
+                    {% if missing_skills and missing_skills|length > 0 %}
+                        <span style="font-size: 1.2rem; font-weight: bold; color: #dc3545;">
+                            {{ missing_skills|length }} skill(s)
+                        </span>
+                    {% else %}
+                        <span style="font-size: 1.2rem; font-weight: bold; color: #28a745;">
+                            No missing skills
+                        </span>
+                    {% endif %}
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="feature-box" style="background-color: #fff3cd; border-left-color: #ffc107;">
-                    <h6><strong>Recommendations:</strong></h6>
-                    <ul class="skills-list">
-                        {% for rec in resume_breakdown.breakdown.recommendations %}
-                        <li>{{ rec }}</li>
-                        {% endfor %}
-                    </ul>
+            {% else %}
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <strong>Missing Skills:</strong><br>
+                    {% if missing_skills and missing_skills|length > 0 %}
+                        <span style="font-size: 1.2rem; font-weight: bold; color: #dc3545;">
+                            {{ missing_skills|length }} skill(s)
+                        </span>
+                    {% else %}
+                        <span style="font-size: 1.2rem; font-weight: bold; color: #28a745;">
+                            No missing skills
+                        </span>
+                    {% endif %}
                 </div>
+            </div>
+            {% endif %}
+            
+            <!-- FEATURE 5: CONFIDENCE LEVEL (TEXT ONLY) -->
+            <div class="mt-3 p-3" style="background-color: white; border-radius: 8px; border: 1px solid #dee2e6;">
+                <strong>Confidence Level:</strong><br>
+                {% if readiness_status == "Ready" and job_fit_score >= 70 %}
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #28a745;">
+                        <i class="bi bi-emoji-smile"></i> High
+                    </span>
+                {% elif readiness_status == "Partially Ready" %}
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #ffc107;">
+                        <i class="bi bi-emoji-neutral"></i> Medium
+                    </span>
+                {% else %}
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #dc3545;">
+                        <i class="bi bi-emoji-frown"></i> Low
+                    </span>
+                {% endif %}
             </div>
         </div>
     </div>
-    {% endif %}
     
-    <!-- ========== VISUAL ANALYTICS SECTION ========== -->
-    <!-- ONLY LINE CHART AND PIE CHART (NO BAR CHART) -->
-    <div class="report-section">
-        <div class="section-title">
-            <i class="bi bi-graph-up"></i> Visual Analytics
-        </div>
-        
-        <p class="text-muted small" style="font-style: italic;">
-            Charts generated based on job-specific evaluation and resume analysis.
-        </p>
-        
-        <!-- LINE CHART: Job-Specific Evaluation Progression -->
-        <div class="text-center mb-4">
-            <h6><strong>Job-Specific Evaluation Progression</strong></h6>
-            <p class="text-muted small">Skill Acquisition Stages vs Job Fit Score</p>
-            <img src="{{ url_for('static', filename='images/skill_readiness_chart.png') }}" 
-                 alt="Job-Specific Evaluation Line Chart" 
-                 class="chart-image">
-            <p class="text-muted small mt-2" style="font-style: italic;">
-                This line chart shows your current job fit score and projected improvement 
-                as you acquire missing skills across different stages.
-            </p>
-        </div>
-        
-        <!-- PIE CHART: Resume Strength Breakdown -->
-        {% if resume_breakdown %}
-        <div class="text-center mb-4">
-            <h6><strong>Resume Strength Distribution</strong></h6>
-            <p class="text-muted small">Section-wise Contribution (Skills, Projects, Education, Extras)</p>
-            <img src="{{ url_for('static', filename='images/skill_gap_chart.png') }}" 
-                 alt="Resume Strength Pie Chart" 
-                 class="chart-image">
-            <p class="text-muted small mt-2" style="font-style: italic;">
-                This pie chart represents the distribution of your resume strength across 
-                different sections: Skills ({{ resume_breakdown.breakdown.sections.skills.percentage }}%), 
-                Projects ({{ resume_breakdown.breakdown.sections.projects.percentage }}%), 
-                Education ({{ resume_breakdown.breakdown.sections.education.percentage }}%), 
-                and Extras ({{ resume_breakdown.breakdown.sections.extras.percentage }}%).
-            </p>
-        </div>
-        {% endif %}
-    </div>
-    
-    <!-- Improvement Tips Section -->
+    <!-- FEATURE 3: SKILL IMPROVEMENT TIPS (STATIC) -->
     {% if missing_skills and missing_skills|length > 0 %}
     <div class="report-section" style="background-color: #fff3cd; border: 2px solid #ffc107;">
         <div class="section-title" style="color: #856404;">
-            <i class="bi bi-lightbulb"></i> General Improvement Tips
+            <i class="bi bi-lightbulb"></i> Improvement Tips
         </div>
         
-        <p><strong>To improve your skills and increase your job readiness:</strong></p>
+        <p><strong>To improve your skills and increase your job readiness, consider the following:</strong></p>
         
         <ul class="skills-list">
-            <li>Focus on learning the missing skills identified in this report</li>
-            <li>Follow the learning roadmap timeline for structured skill acquisition</li>
-            <li>Build projects to demonstrate your new skills</li>
-            <li>Take online courses or certifications in your weak areas</li>
-            <li>Practice coding problems regularly on platforms like LeetCode or HackerRank</li>
-            <li>Contribute to open-source projects to gain real-world experience</li>
-            <li>Network with professionals in your target field</li>
-            <li>Update your resume regularly as you acquire new skills</li>
+            <li>Practice core technical skills through online coding platforms</li>
+            <li>Build small projects to demonstrate your abilities</li>
+            <li>Revise fundamentals and strengthen your knowledge base</li>
+            <li>Improve problem-solving skills with regular practice</li>
+            <li>Take online courses or tutorials for missing skills</li>
+            <li>Participate in hackathons and coding competitions</li>
+            <li>Contribute to open-source projects on GitHub</li>
+            <li>Network with professionals in your field</li>
         </ul>
+        
+        <p class="text-muted small mt-3" style="font-style: italic;">
+            <i class="bi bi-info-circle"></i> These are general tips to help you improve. Focus on the missing skills listed above.
+        </p>
     </div>
     {% endif %}
     
+    <!-- Visual Analytics Section -->
+    <div class="report-section">
+        <div class="section-title">
+            <i class="bi bi-bar-chart"></i> Visual Analytics
+        </div>
+        
+        <p class="text-muted small" style="font-style: italic;">
+            These charts are generated based on your resume evaluation and job analysis.
+        </p>
+        
+        <!-- Bar Chart -->
+        <div class="text-center mb-4">
+            <h6>Job Availability Across Fields</h6>
+            <img src="{{ url_for('static', filename='images/job_field_chart.png') }}" 
+                 alt="Job Field Bar Chart" 
+                 class="chart-image">
+        </div>
+        
+        <!-- Pie Chart -->
+        {% if missing_skills and missing_skills|length > 0 %}
+        <div class="text-center mb-4">
+            <h6>Skill Gap Impact Distribution</h6>
+            <img src="{{ url_for('static', filename='images/skill_gap_chart.png') }}" 
+                 alt="Skill Gap Pie Chart" 
+                 class="chart-image">
+        </div>
+        
+        <!-- Line Chart -->
+        <div class="text-center mb-4">
+            <h6>Current Skill Readiness Progress</h6>
+            <img src="{{ url_for('static', filename='images/skill_readiness_chart.png') }}" 
+                 alt="Skill Readiness Line Chart" 
+                 class="chart-image">
+        </div>
+        {% endif %}
+    </div>
+    
     <!-- Footer -->
     <div class="text-center mt-4 text-muted">
-        <p><small>Generated by NextHire.AI - Comprehensive Career Readiness Analysis</small></p>
-        <p><small>Rule-Based Evaluation System | All features use simple if/else logic</small></p>
+        <p><small>Generated by NextHire.AI - Resume Evaluation System</small></p>
     </div>
     
     <!-- Print Instructions (hidden when printing) -->
@@ -760,6 +456,7 @@
             <i class="bi bi-x-circle"></i> Close
         </button>
         
+        <!-- FEATURE 4: RESET / START NEW EVALUATION BUTTON -->
         <button onclick="window.location.href='/reset-evaluation'" class="btn btn-success btn-lg ms-2">
             <i class="bi bi-arrow-clockwise"></i> Start New Evaluation
         </button>

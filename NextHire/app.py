@@ -1928,11 +1928,11 @@ def store_job_data():
 @app.route("/download_report")
 def download_report():
     """
-    Enhanced route to display comprehensive evaluation report.
-    Includes all 6 rule-based features with only Line and Pie charts.
+    Simple route to display evaluation report.
+    Uses only basic Python - no complex logic.
     """
     
-    # Get basic data from session
+    # Get data from session (already stored)
     resume_score = session.get("last_score", 0)
     missing_skills = session.get("last_missing_skills", [])
     user_email = session.get("user_email", "Guest")
@@ -1945,12 +1945,13 @@ def download_report():
     else:
         readiness_status = "Not Ready"
     
-    # Get resume details from database
+    # Get resume details from database (simple query)
     resume_data = None
     if user_email != "Guest":
         conn = get_db()
         cur = conn.cursor()
         
+        # Get latest resume for this user
         cur.execute("""
             SELECT name, email, phone, degree, cgpa, skills, projects, city, github_username
             FROM resumes
@@ -1962,6 +1963,7 @@ def download_report():
         row = cur.fetchone()
         conn.close()
         
+        # Store in simple dictionary
         if row:
             resume_data = {
                 "name": row[0],
@@ -1975,175 +1977,12 @@ def download_report():
                 "github_username": row[8]
             }
     
-    # Get job-specific data from session
+    # Get job-specific data from session (if available)
     job_title = session.get("selected_job_title", "Not Selected")
     job_company = session.get("selected_job_company", "Not Selected")
     job_fit_score = session.get("job_fit_score", 0)
     
-    # ========== ENHANCED FEATURES DATA ==========
-    
-    # FEATURE 1: Role-Based Evaluation (if available)
-    role_evaluation = None
-    if resume_data:
-        try:
-            # Get user skills from resume data
-            user_skills = [s.strip() for s in resume_data['skills'].split(',') if s.strip()]
-            cgpa = float(resume_data['cgpa'])
-            
-            # Count projects
-            projects_str = resume_data.get('projects', '')
-            if projects_str:
-                project_lines = [line.strip() for line in projects_str.split('\n') if line.strip()]
-                projects_count = len(project_lines)
-            else:
-                projects_count = 0
-            
-            # Get all roles and find best match
-            all_roles = role_evaluator.get_all_roles()
-            best_role = None
-            best_score = 0
-            
-            for role in all_roles:
-                result = role_evaluator.calculate_role_fit_score(
-                    user_skills, cgpa, projects_count, role['name']
-                )
-                if result and result['role_fit_score'] > best_score:
-                    best_score = result['role_fit_score']
-                    # Categorize missing skills
-                    missing_categorized = role_evaluator.categorize_missing_skills(result)
-                    best_role = {
-                        'role_name': role['name'],
-                        'role_fit_score': result['role_fit_score'],
-                        'breakdown': result['breakdown'],
-                        'missing_skills': missing_categorized
-                    }
-            
-            role_evaluation = best_role
-        except Exception as e:
-            print(f"Error in role evaluation: {e}")
-            import traceback
-            traceback.print_exc()
-            role_evaluation = None
-    
-    # FEATURE 2: Skill Gap Roadmap (if available)
-    skill_roadmap_data = None
-    if resume_data and role_evaluation:
-        try:
-            roadmap = skill_roadmap.generate_skill_roadmap(role_evaluation['missing_skills'])
-            roadmap_summary = skill_roadmap.get_roadmap_summary(roadmap)
-            next_skill = skill_roadmap.get_next_skill_to_learn(roadmap)
-            
-            skill_roadmap_data = {
-                'roadmap': roadmap,
-                'summary': roadmap_summary,
-                'next_skill': next_skill
-            }
-        except Exception as e:
-            print(f"Error in roadmap generation: {e}")
-            import traceback
-            traceback.print_exc()
-            skill_roadmap_data = None
-    
-    # FEATURE 3: Confidence Index
-    confidence_data = None
-    if resume_data and role_evaluation:
-        try:
-            role_req = role_evaluator.get_role_requirements(role_evaluation['role_name'])
-            all_missing = role_evaluator.get_all_missing_skills(role_evaluation)
-            
-            confidence = confidence_calculator.calculate_confidence_index(
-                resume_score,
-                role_evaluation['role_fit_score'],
-                len(all_missing),
-                role_req
-            )
-            confidence_data = confidence
-        except Exception as e:
-            print(f"Error in confidence calculation: {e}")
-            import traceback
-            traceback.print_exc()
-            confidence_data = None
-    
-    # FEATURE 4: What-If Skill Simulation (simulate adding top missing skills)
-    simulation_data = None
-    if resume_data and role_evaluation:
-        try:
-            # Get top 3 critical missing skills
-            critical_skills = role_evaluation['missing_skills'].get('critical', [])[:3]
-            if critical_skills:
-                user_skills = [s.strip() for s in resume_data['skills'].split(',') if s.strip()]
-                cgpa = float(resume_data['cgpa'])
-                projects_str = resume_data.get('projects', '')
-                if projects_str:
-                    project_lines = [line.strip() for line in projects_str.split('\n') if line.strip()]
-                    projects_count = len(project_lines)
-                else:
-                    projects_count = 0
-                
-                sim_result = skill_simulator.simulate_skill_acquisition(
-                    user_skills,
-                    cgpa,
-                    projects_count,
-                    role_evaluation['role_name'],
-                    critical_skills
-                )
-                simulation_data = sim_result
-        except Exception as e:
-            print(f"Error in simulation: {e}")
-            import traceback
-            traceback.print_exc()
-            simulation_data = None
-    
-    # FEATURE 5: Role Switch Impact Comparison
-    role_comparison = None
-    if resume_data:
-        try:
-            user_skills = [s.strip() for s in resume_data['skills'].split(',') if s.strip()]
-            cgpa = float(resume_data['cgpa'])
-            projects_str = resume_data.get('projects', '')
-            if projects_str:
-                project_lines = [line.strip() for line in projects_str.split('\n') if line.strip()]
-                projects_count = len(project_lines)
-            else:
-                projects_count = 0
-            
-            all_roles = role_evaluator.get_all_roles()
-            role_names = [r['name'] for r in all_roles]
-            
-            comparison_result = role_comparator.compare_roles(
-                user_skills, cgpa, projects_count, role_names
-            )
-            role_comparison = comparison_result
-        except Exception as e:
-            print(f"Error in role comparison: {e}")
-            import traceback
-            traceback.print_exc()
-            role_comparison = None
-    
-    # FEATURE 6: Resume Strength Breakdown
-    resume_breakdown_data = None
-    if resume_data:
-        try:
-            user_skills = [s.strip() for s in resume_data['skills'].split(',') if s.strip()]
-            cgpa = float(resume_data['cgpa'])
-            projects_str = resume_data.get('projects', '')
-            if projects_str:
-                project_lines = [line.strip() for line in projects_str.split('\n') if line.strip()]
-                projects_count = len(project_lines)
-            else:
-                projects_count = 0
-            
-            breakdown_result = resume_breakdown.analyze_resume_strength(
-                user_skills, cgpa, projects_count, resume_data.get('degree', '')
-            )
-            resume_breakdown_data = breakdown_result
-        except Exception as e:
-            print(f"Error in resume breakdown: {e}")
-            import traceback
-            traceback.print_exc()
-            resume_breakdown_data = None
-    
-    # Pass all data to template
+    # Pass all data to template (simple variables)
     return render_template(
         "report.html",
         resume_score=resume_score,
@@ -2152,14 +1991,7 @@ def download_report():
         resume_data=resume_data,
         job_title=job_title,
         job_company=job_company,
-        job_fit_score=job_fit_score,
-        # Enhanced features data
-        role_evaluation=role_evaluation,
-        skill_roadmap=skill_roadmap_data,
-        confidence_data=confidence_data,
-        simulation_data=simulation_data,
-        role_comparison=role_comparison,
-        resume_breakdown=resume_breakdown_data
+        job_fit_score=job_fit_score
     )
 
 
