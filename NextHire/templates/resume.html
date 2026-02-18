@@ -92,8 +92,8 @@
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <input type="text" id="phone" name="phone" class="form-control" placeholder="Phone" required>
-                    <label class="fw-500">Phone</label>
+                    <input type="text" id="phone" name="phone" class="form-control" placeholder="Phone" required pattern="[9876]\d{9}" maxlength="10" title="Phone number must be exactly 10 digits and start with 9, 8, 7, or 6">
+                    <label class="fw-500">Phone (Must start with 9, 8, 7, or 6)</label>
                     <div class="invalid-feedback" id="phoneError" style="display: none;"></div>
                   </div>
                 </div>
@@ -210,8 +210,9 @@
               <button type="button" class="comic-button me-3" id="toggleViewBtn" style="display:none;" onclick="toggleResumeView()">
                 <i class="bi bi-eye"></i> Toggle View
               </button>
-              <button type="button" class="comic-button" id="evaluateBtn" style="display:none;">
-                <i class="bi bi-graph-up"></i> Evaluate Resume
+              <!-- NEW: Search For Job button - appears after resume generation -->
+              <button type="button" class="comic-button" id="searchJobBtn" style="display:none;" onclick="showJobSearchModal()">
+                <i class="bi bi-search"></i> Search For Job
               </button>
             </div>
           </div>
@@ -317,15 +318,8 @@
                 </div>
               </div>
               
-              <!-- Download Report Button -->
-              <div class="text-center mt-4">
-                <a href="/download_report" target="_blank" class="comic-button">
-                  <i class="bi bi-download"></i> Download Evaluation Report
-                </a>
-                <p class="text-muted small mt-2" style="font-style: italic;">
-                  Opens in new tab. Use browser's Print/Save as PDF to download.
-                </p>
-              </div>
+              <!-- Download Report Button - REMOVED FROM HERE -->
+              <!-- Button moved to end of evaluation section after all analytics -->
             </div>
             
             <!-- FEATURE 1: Final Summary/Verdict Box -->
@@ -479,6 +473,17 @@
               </button>
               
               <div id="breakdownResultsEnhanced" class="mt-4" style="display: none;"></div>
+            </div>
+
+            <!-- Download Evaluation Report Button - Appears ONLY after complete evaluation -->
+            <div id="download-report-container" class="text-center" style="display: none; margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+              <h5 class="text-white mb-3">
+                <i class="bi bi-file-earmark-pdf me-2"></i>Complete Evaluation Report Ready
+              </h5>
+              <p class="text-white mb-4 opacity-75">Download your comprehensive evaluation report with all analytics and recommendations</p>
+              <a href="/download_report" class="btn btn-light btn-lg" style="padding: 0.75rem 2rem; font-weight: 600; border-radius: 8px;">
+                <i class="bi bi-download me-2"></i>Download Evaluation Report
+              </a>
             </div>
             
           </div>
@@ -886,11 +891,27 @@
 
     // Validation functions
     function validatePhone(phone) {
-      // Regex for phone number: accepts 10-15 digits with optional country code, spaces, dashes, parentheses
-      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$|^[\+]?[(]?[\d\s\-\(\)]{10,20}$/;
-      // More strict validation: exactly 10 digits (US format) or 10-15 digits with country code
-      const strictPhoneRegex = /^(\+\d{1,3}[- ]?)?\d{10}$|^\d{10}$/;
-      return strictPhoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+      // STRICT VALIDATION: Must be exactly 10 digits starting with 9, 8, 7, or 6
+      // Remove any whitespace first
+      const cleanPhone = phone.trim();
+      
+      // Check 1: Must be exactly 10 characters
+      if (cleanPhone.length !== 10) {
+        return false;
+      }
+      
+      // Check 2: Must contain only digits (0-9)
+      if (!/^\d{10}$/.test(cleanPhone)) {
+        return false;
+      }
+      
+      // Check 3: Must start with 9, 8, 7, or 6
+      const firstDigit = cleanPhone.charAt(0);
+      if (firstDigit !== '9' && firstDigit !== '8' && firstDigit !== '7' && firstDigit !== '6') {
+        return false;
+      }
+      
+      return true;
     }
 
     function validateEmail(email) {
@@ -988,27 +1009,47 @@
     function validateForm() {
       let isValid = true;
       
-      const phone = document.getElementById("phone").value.trim();
-      const email = document.getElementById("email").value.trim();
+      // Define all required fields with their display names
+      const requiredFields = [
+        { id: 'name', name: 'Full Name' },
+        { id: 'phone', name: 'Phone' },
+        { id: 'email', name: 'Email' },
+        { id: 'city', name: 'City' },
+        { id: 'degree', name: 'Degree' },
+        { id: 'cgpa', name: 'CGPA' },
+        { id: 'about_yourself', name: 'About Yourself' },
+        { id: 'skills', name: 'Skills' },
+        { id: 'projects', name: 'Projects' }
+      ];
       
-      // Validate phone
-      if (!phone) {
-        showFieldError('phone', 'phoneError', 'Phone number is required.');
-        isValid = false;
-      } else if (!validatePhone(phone)) {
-        showFieldError('phone', 'phoneError', 'Please enter a valid phone number (10 digits).');
-        isValid = false;
+      // Check each required field
+      for (const field of requiredFields) {
+        const element = document.getElementById(field.id);
+        const value = element.value.trim();
+        
+        if (!value) {
+          alert(`Please fill the ${field.name} field.`);
+          element.focus();
+          return false;
+        }
+      }
+      
+      // Validate phone format
+      const phone = document.getElementById("phone").value.trim();
+      if (!validatePhone(phone)) {
+        showFieldError('phone', 'phoneError', 'Phone number must be exactly 10 digits and start with 9, 8, 7, or 6.');
+        document.getElementById("phone").focus();
+        return false;
       } else {
         clearFieldError('phone', 'phoneError');
       }
       
-      // Validate email
-      if (!email) {
-        showFieldError('email', 'emailError', 'Email address is required.');
-        isValid = false;
-      } else if (!validateEmail(email)) {
+      // Validate email format
+      const email = document.getElementById("email").value.trim();
+      if (!validateEmail(email)) {
         showFieldError('email', 'emailError', 'Please enter a valid email address.');
-        isValid = false;
+        document.getElementById("email").focus();
+        return false;
       } else {
         clearFieldError('email', 'emailError');
       }
@@ -1028,7 +1069,7 @@
     document.getElementById('phone').addEventListener('input', function() {
       const phone = this.value.trim();
       if (phone && !validatePhone(phone)) {
-        showFieldError('phone', 'phoneError', 'Please enter a valid phone number (10 digits).');
+        showFieldError('phone', 'phoneError', 'Phone number must be exactly 10 digits and start with 9, 8, 7, or 6.');
       } else if (phone) {
         clearFieldError('phone', 'phoneError');
       }
@@ -1122,12 +1163,16 @@
             window.location.href = `/download/${filename}`;
           };
 
-          // Show evaluate button
-          document.getElementById("evaluateBtn").style.display = "inline-block";
+          // PHASE 1: ONLY show resume preview - NO automatic job modal
+          // Do NOT show evaluate button at this stage
+          // Do NOT show job selection modal automatically
           
           // Show toggle view button
           document.getElementById("toggleViewBtn").style.display = "inline-block";
           document.getElementById("toggleViewBtn").innerHTML = '<i class="bi bi-file-text"></i> Plain Text';
+          
+          // Show "Search For Job" button
+          document.getElementById("searchJobBtn").style.display = "inline-block";
           
           // Smooth scroll to preview
           setTimeout(() => {
@@ -1140,8 +1185,8 @@
         } else {
           // Handle validation errors from backend
           if (data.validation_error) {
-            // Show professional validation message
-            showValidationModal(data.validation_error);
+            // Show alert for validation error
+            alert(data.validation_error);
           } else if (data.message && (data.message.includes('phone') || data.message.includes('email'))) {
             // Handle phone/email validation errors
             if (data.message.includes('phone')) {
@@ -1166,13 +1211,9 @@
       });
     }
 
-    document.getElementById("evaluateBtn").addEventListener("click", () => {
-      // Show loading state
-      const evaluateBtn = document.getElementById("evaluateBtn");
-      const originalText = evaluateBtn.innerHTML;
-      evaluateBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Evaluating...';
-      evaluateBtn.disabled = true;
-
+    // PHASE 2: Evaluation triggered ONLY after job selection
+    // This function is now called from handleJobSelection() instead of button click
+    function triggerResumeEvaluation() {
       fetch("/evaluate_resume")
         .then(res => res.json())
         .then(data => {
@@ -1208,8 +1249,6 @@
 
           // Lock resume fields
           lockResumeFields();
-
-          evaluateBtn.innerHTML = '<i class="bi bi-check-circle"></i> Resume Evaluated';
           
           // Load and display evaluation summary (5 features)
           loadEvaluationSummary();
@@ -1220,29 +1259,14 @@
               behavior: 'smooth',
               block: 'start'
             });
-            
-            // CONDITIONAL LOGIC: Show interest field modal ONLY if resume is ready
-            setTimeout(() => {
-              if (data.status === "Ready" || data.status === "Partially Ready") {
-                // Resume is ready - show interest field modal
-                const interestModal = new bootstrap.Modal(document.getElementById('interestFieldModal'));
-                interestModal.show();
-              } else {
-                // Resume is NOT ready - show "Not Ready" message
-                showNotReadyMessage();
-              }
-            }, 500);
           }, 100);
 
         })
         .catch(err => {
           console.error(err);
           alert("Evaluation failed");
-          // Reset button state on error
-          evaluateBtn.innerHTML = originalText;
-          evaluateBtn.disabled = false;
         });
-    });
+    }
     
     // Function to load and display evaluation summary (5 simple features)
     async function loadEvaluationSummary() {
@@ -1831,6 +1855,7 @@
     });
 
     // Toggle job skills display - shows/hides missing skills for specific job
+    // PHASE 2: This now triggers evaluation when job is selected
     function toggleJobSkills(jobId, jobRequiredSkills, jobTitle, jobCompany) {
       const skillsDiv = document.getElementById(`skills-${jobId}`);
       
@@ -1864,12 +1889,16 @@
         }
         
         // Calculate job-specific score based on missing skills - derives from existing evaluation
-        calculateJobSpecificScore(jobId, jobRequiredSkills, actuallyMissingSkills);
+        const jobSpecificScore = calculateJobSpecificScore(jobId, jobRequiredSkills, actuallyMissingSkills);
         
-        // Display charts with company information
-        displayJobCharts(jobId, jobCompany);
+        // Display charts with company information and pass the calculated score
+        displayJobCharts(jobId, jobCompany, jobTitle, jobSpecificScore);
         
         skillsDiv.style.display = 'block'; // Show missing skills for this job
+        
+        // PHASE 2: TRIGGER EVALUATION NOW (after job selection)
+        // This is the key change - evaluation happens ONLY after job is selected
+        triggerResumeEvaluation();
         
         // Clear processing flag after display
         skillsDiv.dataset.processing = 'false';
@@ -1879,12 +1908,14 @@
         document.getElementById('job-specific-evaluation').style.display = 'none';
         // Hide charts when skills are hidden
         document.getElementById('chart-visualization-section').style.display = 'none';
+        // Hide download report button when job is deselected
+        document.getElementById('download-report-container').style.display = 'none';
         skillsDiv.dataset.processing = 'false';
       }
     }
     
     // Display job charts - shows bar and pie charts for the selected job
-    async function displayJobCharts(jobId, jobCompany) {
+    async function displayJobCharts(jobId, jobCompany, jobTitle, calculatedJobFitScore) {
       const chartSection = document.getElementById('chart-visualization-section');
       const barChartImage = document.getElementById('barChartImage');
       const pieChartImage = document.getElementById('pieChartImage');
@@ -1894,6 +1925,21 @@
       const companyNameElement = document.getElementById('chartCompanyName');
       
       try {
+        // Store job data in session IMMEDIATELY with the calculated score
+        // This ensures the score is available when loadEvaluationSummary() is called
+        await fetch('/api/store-job-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            job_title: jobTitle,
+            job_company: jobCompany,
+            job_fit_score: calculatedJobFitScore
+          })
+        });
+        
+        // Now refresh evaluation summary with the stored score
+        loadEvaluationSummary();
+        
         // Call backend to generate charts for this specific job
         const response = await fetch(`/api/generate-job-charts/${jobId}`);
         const data = await response.json();
@@ -1903,17 +1949,6 @@
           alert('Failed to generate charts for this job');
           return;
         }
-        
-        // Store job data in session for report (simple fetch call)
-        fetch('/api/store-job-data', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            job_title: data.job_title,
-            job_company: data.job_company,
-            job_fit_score: data.job_fit_score  // Use job fit score instead of resume score
-          })
-        });
         
         // CRITICAL: Check resume status - hide charts if "Not Ready"
         if (data.resume_status === "Not Ready") {
@@ -2080,8 +2115,8 @@
       // Show job-specific evaluation section
       document.getElementById('job-specific-evaluation').style.display = 'block';
       
-      // Refresh evaluation summary to update eligibility badge
-      loadEvaluationSummary();
+      // Return the calculated score so it can be stored immediately
+      return jobSpecificScore;
       
       // Scroll to job-specific evaluation - maintains existing scroll behavior
       setTimeout(() => {
@@ -2311,6 +2346,13 @@
       }
     }
     
+    // NEW: Show job search modal when "Search For Job" button is clicked
+    // This implements the two-phase workflow: Phase 1 (Resume) → Phase 2 (Job Search)
+    function showJobSearchModal() {
+      const interestModal = new bootstrap.Modal(document.getElementById('interestFieldModal'));
+      interestModal.show();
+    }
+    
     // ========== ENHANCED FEATURES JAVASCRIPT ==========
     
     let currentRoleEnhanced = '';
@@ -2341,6 +2383,9 @@
           document.getElementById('enhanced-roadmap').style.display = 'block';
           document.getElementById('enhanced-comparison').style.display = 'block';
           document.getElementById('enhanced-breakdown').style.display = 'block';
+          
+          // Show Download Report button after all evaluation sections are visible
+          document.getElementById('download-report-container').style.display = 'block';
         }
       } catch (error) {
         console.error('Error loading roles:', error);

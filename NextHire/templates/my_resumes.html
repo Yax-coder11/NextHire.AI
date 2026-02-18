@@ -86,7 +86,8 @@
                     <th class="primary-data">Name</th>
                     <th class="primary-data">Degree</th>
                     <th class="primary-data">CGPA</th>
-                    <th class="primary-data">Score</th>
+                    <th class="primary-data">Resume Score</th>
+                    <th class="primary-data">Job Fit Score</th>
                     <th class="primary-data">Status</th>
                     <th class="primary-data">Created At</th>
                     <th class="primary-data">Download</th>
@@ -102,9 +103,16 @@
                     <td class="secondary-data">{{ r[3] }}</td>
                     <td>
                       {% if r[4] %}
-                        <span class="dashboard-badge">{{ r[4] }}</span>
+                        <span class="dashboard-badge">{{ r[4] }}/100</span>
                       {% else %}
                         <span class="text-muted">N/A</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if r[8] and r[8] > 0 %}
+                        <span class="dashboard-badge">{{ r[8] }}/100</span>
+                      {% else %}
+                        <span class="text-muted">-</span>
                       {% endif %}
                     </td>
                     <td>

@@ -187,18 +187,76 @@ def save_resume():
 
         data = request.get_json()
 
+        # ========== BACKEND VALIDATION - ALL REQUIRED FIELDS ==========
+        # Define all required fields with their display names
+        required_fields = {
+            'name': 'Full Name',
+            'phone': 'Phone',
+            'email': 'Email',
+            'city': 'City',
+            'degree': 'Degree',
+            'cgpa': 'CGPA',
+            'about_yourself': 'About Yourself',
+            'skills': 'Skills',
+            'projects': 'Projects'
+        }
+        
+        # Validate each required field
+        for field_key, field_name in required_fields.items():
+            field_value = data.get(field_key, '').strip() if data.get(field_key) else ''
+            
+            if not field_value:
+                return jsonify({
+                    "success": False,
+                    "validation_error": f"{field_name} is required."
+                })
+        # ========== END REQUIRED FIELDS VALIDATION ==========
+
         user_email = session["user_email"]
-        name = data["name"]
-        phone = data["phone"]
-        email = data["email"]
-        city = data.get("city", "")
-        degree = data["degree"]
-        github_username = data.get("github_username", "")
-        cgpa = data["cgpa"]
-        about_yourself = data.get("about_yourself", "")
-        skills = data["skills"]
-        projects = data["projects"]
+        name = data["name"].strip()
+        phone = data["phone"].strip()
+        email = data["email"].strip()
+        city = data.get("city", "").strip()
+        degree = data["degree"].strip()
+        github_username = data.get("github_username", "").strip()
+        cgpa = data["cgpa"].strip()
+        about_yourself = data.get("about_yourself", "").strip()
+        skills = data["skills"].strip()
+        projects = data["projects"].strip()
         education_data = data.get("education", [])
+
+        # ========== BACKEND PHONE VALIDATION (STRICT) ==========
+        # REQUIREMENT: Phone must be exactly 10 digits starting with 9, 8, 7, or 6
+        # This validation cannot be bypassed even if frontend is disabled
+        
+        # Remove any whitespace
+        phone_clean = phone.strip()
+        
+        # Validation Check 1: Must be exactly 10 characters
+        if len(phone_clean) != 10:
+            return jsonify({
+                "success": False,
+                "validation_error": "Phone number must be exactly 10 digits and start with 9, 8, 7, or 6."
+            })
+        
+        # Validation Check 2: Must contain only digits (0-9)
+        if not phone_clean.isdigit():
+            return jsonify({
+                "success": False,
+                "validation_error": "Phone number must be exactly 10 digits and start with 9, 8, 7, or 6."
+            })
+        
+        # Validation Check 3: Must start with 9, 8, 7, or 6
+        first_digit = phone_clean[0]
+        if first_digit not in ['9', '8', '7', '6']:
+            return jsonify({
+                "success": False,
+                "validation_error": "Phone number must be exactly 10 digits and start with 9, 8, 7, or 6."
+            })
+        
+        # If all validations pass, use the cleaned phone number
+        phone = phone_clean
+        # ========== END PHONE VALIDATION ==========
 
         # Calculate score with validation
         score, missing_skills, validation_error = calculate_resume_score(
@@ -305,6 +363,7 @@ PROJECTS
             -- Evaluation
             score INTEGER NOT NULL,
             status TEXT NOT NULL,
+            job_fit_score INTEGER DEFAULT 0,
 
             -- Metadata
             created_at TEXT NOT NULL
@@ -327,11 +386,11 @@ PROJECTS
 
         cur.execute("""
             INSERT INTO resumes (user_email, name, phone, email, degree, cgpa, skills, projects, 
-                               about_yourself, github_username, city, file_path, score, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                               about_yourself, github_username, city, file_path, score, status, job_fit_score, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             user_email, name, phone, email, degree, cgpa, skills, projects,
-            about_yourself, github_username, city, file_path, score, status, created_at
+            about_yourself, github_username, city, file_path, score, status, 0, created_at
         ))
 
         conn.commit()  
@@ -1176,6 +1235,169 @@ def admin_dashboard():
     return render_template("admin.html",users=users,resumes=resumes,ds_history=user_resume_history)
 
 
+# ---------------- ADMIN DOWNLOAD EVALUATION REPORT ----------------
+@app.route("/admin/download_report/<int:resume_id>")
+def admin_download_report(resume_id):
+    """
+    Admin route to download evaluation report for a specific user.
+    Fetches stored resume data and generates report without recalculating scores.
+    """
+    
+    # Validate admin session
+    if not session.get("admin"):
+        return "Unauthorized - Admin access required", 401
+    
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        
+        # Fetch resume data by ID
+        cur.execute("""
+            SELECT id, user_email, name, email, phone, degree, cgpa, skills, projects, 
+                   city, github_username, about_yourself, score, status, job_fit_score
+            FROM resumes
+            WHERE id = ?
+        """, (resume_id,))
+        
+        row = cur.fetchone()
+        conn.close()
+        
+        # Check if resume exists
+        if not row:
+            return "Evaluation report not available - Resume not found", 404
+        
+        # Extract data from database row
+        resume_id_db = row[0]
+        user_email = row[1]
+        resume_data = {
+            "name": row[2],
+            "email": row[3],
+            "phone": row[4],
+            "degree": row[5],
+            "cgpa": row[6],
+            "skills": row[7],
+            "projects": row[8],
+            "city": row[9],
+            "github_username": row[10],
+            "about_yourself": row[11]
+        }
+        resume_score = row[12] if row[12] is not None else 0
+        readiness_status = row[13] if row[13] else "Not Evaluated"
+        job_fit_score = row[14] if row[14] is not None else 0
+        
+        # Calculate missing skills from stored data (simple logic)
+        user_skills = resume_data.get('skills', '').lower().split(',')
+        user_skills = [s.strip() for s in user_skills if s.strip()]
+        
+        # Basic missing skills detection (simplified for admin view)
+        all_required_skills = ['Python', 'Java', 'SQL', 'JavaScript', 'React', 'Node.js', 
+                               'Machine Learning', 'Data Structures', 'Algorithms', 'Git']
+        missing_skills = [skill for skill in all_required_skills 
+                         if not any(skill.lower() in us for us in user_skills)]
+        
+        # Job-specific data (default values if not stored)
+        job_title = "Not Selected"
+        job_company = "Not Selected"
+        
+        # ========== ANALYTICAL SECTIONS (Same as user download) ==========
+        
+        # 1. Role Based Evaluation
+        role_readiness_status = "Not Evaluated"
+        if job_fit_score > 0:
+            if job_fit_score >= 70:
+                role_readiness_status = "Ready for Role"
+            elif job_fit_score >= 50:
+                role_readiness_status = "Partially Ready"
+            else:
+                role_readiness_status = "Not Ready"
+        
+        # 2. Skill Gap Learning Roadmap
+        skill_roadmap = None
+        if missing_skills and len(missing_skills) > 0:
+            phase1_skills = missing_skills[:3] if len(missing_skills) >= 3 else missing_skills
+            phase2_skills = missing_skills[3:6] if len(missing_skills) > 3 else []
+            phase3_skills = missing_skills[6:] if len(missing_skills) > 6 else []
+            
+            skill_roadmap = {
+                'phase1': phase1_skills,
+                'phase2': phase2_skills,
+                'phase3': phase3_skills,
+                'total_skills': len(missing_skills)
+            }
+        
+        # 3. Role Switch Impact Analysis
+        role_impact = None
+        if job_fit_score > 0:
+            score_difference = resume_score - job_fit_score
+            
+            if abs(score_difference) > 20:
+                impact_level = "Significant"
+                if score_difference > 0:
+                    impact_message = "Significant role mismatch detected. General resume is stronger than role fit."
+                else:
+                    impact_message = "Strong role alignment! Better suited for this role than general resume suggests."
+            elif abs(score_difference) >= 10:
+                impact_level = "Moderate"
+                if score_difference > 0:
+                    impact_message = "Moderate skill alignment gap. Some role-specific skills need improvement."
+                else:
+                    impact_message = "Good role alignment with room for general resume improvement."
+            else:
+                impact_level = "Minimal"
+                impact_message = "Strong alignment between resume and role. Skills match well with job requirements."
+            
+            role_impact = {
+                'difference': score_difference,
+                'impact_level': impact_level,
+                'message': impact_message,
+                'resume_score': resume_score,
+                'job_fit_score': job_fit_score
+            }
+        
+        # 4. Resume Strength Breakdown
+        resume_breakdown_data = None
+        try:
+            breakdown = resume_breakdown.calculate_resume_breakdown(
+                cgpa=resume_data.get('cgpa', '0'),
+                skills=resume_data.get('skills', ''),
+                projects=resume_data.get('projects', ''),
+                education_count=1,
+                extras={
+                    'github_username': resume_data.get('github_username'),
+                    'about_yourself': resume_data.get('about_yourself'),
+                    'city': resume_data.get('city')
+                }
+            )
+            resume_breakdown_data = breakdown
+        except Exception as e:
+            print(f"Error calculating resume breakdown: {e}")
+            resume_breakdown_data = None
+        
+        # Render report template with all data
+        return render_template(
+            "report.html",
+            resume_score=resume_score,
+            readiness_status=readiness_status,
+            missing_skills=missing_skills,
+            resume_data=resume_data,
+            job_title=job_title,
+            job_company=job_company,
+            job_fit_score=job_fit_score,
+            # Analytical sections
+            role_readiness_status=role_readiness_status,
+            skill_roadmap=skill_roadmap,
+            role_impact=role_impact,
+            resume_breakdown_data=resume_breakdown_data,
+            # Admin context
+            is_admin_view=True,
+            viewed_user_email=user_email
+        )
+        
+    except Exception as e:
+        print(f"Error generating admin report: {e}")
+        return f"Evaluation report not available - Error: {str(e)}", 500
+
+
 # ---------------- RESUME EVALUATOR ----------------
 @app.route("/evaluate_resume")
 def evaluate_resume():
@@ -1212,7 +1434,7 @@ def my_resumes():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT id, name, degree, cgpa, score, status, created_at, file_path
+        SELECT id, name, degree, cgpa, score, status, created_at, file_path, job_fit_score
         FROM resumes
         WHERE user_email = ?
         ORDER BY created_at DESC
@@ -1702,6 +1924,16 @@ def search_jobs():
 def generate_job_charts(job_id):
     """Generate charts dynamically for a specific job"""
     try:
+        # Check if user has skills in session
+        if 'user_skills' not in session or not session.get('user_skills'):
+            print("ERROR: No user_skills in session")
+            return jsonify({
+                "success": False,
+                "error": "Please create and evaluate a resume first"
+            }), 400
+        
+        print(f"DEBUG: Generating charts for job_id: {job_id}")
+        print(f"DEBUG: User skills in session: {session.get('user_skills')}")
         # Mock job database (same as in search_jobs route)
         mock_jobs = [
             {"id": "job_001", "title": "Software Developer", "company": "TechCorp Solutions", "location": "Bangalore, India", "type": "Full-time", "description": "Join our team to build cutting-edge software solutions using modern technologies.", "missing_skills": ["Python", "React", "Node.js"]},
@@ -1827,6 +2059,8 @@ def generate_job_charts(job_id):
         
     except Exception as e:
         print(f"Chart generation error: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
 
@@ -1907,20 +2141,51 @@ def reset_evaluation():
 @app.route("/api/store-job-data", methods=["POST"])
 def store_job_data():
     """
-    Simple route to store job data in session.
-    Uses only basic Python.
+    Store job data in session AND update database with job_fit_score.
     """
     try:
-        # Get data from request (simple)
+        # Get data from request
         data = request.get_json()
         
-        # Store in session (simple assignment)
+        # Store in session
         session["selected_job_title"] = data.get("job_title", "Not Selected")
         session["selected_job_company"] = data.get("job_company", "Not Selected")
-        session["job_fit_score"] = data.get("job_fit_score", 0)
+        job_fit_score = data.get("job_fit_score", 0)
+        session["job_fit_score"] = job_fit_score
+        
+        # Update database with job_fit_score for the latest resume
+        if "user_email" in session:
+            user_email = session["user_email"]
+            
+            conn = get_db()
+            cur = conn.cursor()
+            
+            # Get the latest resume ID for this user
+            cur.execute("""
+                SELECT id FROM resumes
+                WHERE user_email = ?
+                ORDER BY created_at DESC
+                LIMIT 1
+            """, (user_email,))
+            
+            result = cur.fetchone()
+            if result:
+                resume_id = result[0]
+                
+                # Update job_fit_score in database
+                cur.execute("""
+                    UPDATE resumes
+                    SET job_fit_score = ?
+                    WHERE id = ?
+                """, (job_fit_score, resume_id))
+                
+                conn.commit()
+            
+            conn.close()
         
         return jsonify({"success": True})
-    except:
+    except Exception as e:
+        print(f"Error storing job data: {e}")
         return jsonify({"success": False})
 
 
@@ -1953,7 +2218,7 @@ def download_report():
         
         # Get latest resume for this user
         cur.execute("""
-            SELECT name, email, phone, degree, cgpa, skills, projects, city, github_username
+            SELECT name, email, phone, degree, cgpa, skills, projects, city, github_username, about_yourself
             FROM resumes
             WHERE user_email = ?
             ORDER BY id DESC
@@ -1974,13 +2239,94 @@ def download_report():
                 "skills": row[5],
                 "projects": row[6],
                 "city": row[7],
-                "github_username": row[8]
+                "github_username": row[8],
+                "about_yourself": row[9]
             }
     
     # Get job-specific data from session (if available)
     job_title = session.get("selected_job_title", "Not Selected")
     job_company = session.get("selected_job_company", "Not Selected")
     job_fit_score = session.get("job_fit_score", 0)
+    
+    # ========== NEW ANALYTICAL SECTIONS ==========
+    
+    # 1. Role Based Evaluation - Calculate role readiness status
+    role_readiness_status = "Not Evaluated"
+    if job_title != "Not Selected" and job_fit_score > 0:
+        if job_fit_score >= 70:
+            role_readiness_status = "Ready for Role"
+        elif job_fit_score >= 50:
+            role_readiness_status = "Partially Ready"
+        else:
+            role_readiness_status = "Not Ready"
+    
+    # 2. Skill Gap Learning Roadmap - Generate phases from missing skills
+    skill_roadmap = None
+    if missing_skills and len(missing_skills) > 0:
+        # Categorize skills into phases based on priority
+        # Phase 1: First 3 skills (Core)
+        # Phase 2: Next 3 skills (Intermediate)
+        # Phase 3: Remaining skills (Advanced)
+        phase1_skills = missing_skills[:3] if len(missing_skills) >= 3 else missing_skills
+        phase2_skills = missing_skills[3:6] if len(missing_skills) > 3 else []
+        phase3_skills = missing_skills[6:] if len(missing_skills) > 6 else []
+        
+        skill_roadmap = {
+            'phase1': phase1_skills,
+            'phase2': phase2_skills,
+            'phase3': phase3_skills,
+            'total_skills': len(missing_skills)
+        }
+    
+    # 3. Role Switch Impact Analysis - Calculate difference between scores
+    role_impact = None
+    if job_title != "Not Selected" and job_fit_score > 0:
+        score_difference = resume_score - job_fit_score
+        
+        # Determine impact level
+        if abs(score_difference) > 20:
+            impact_level = "Significant"
+            if score_difference > 0:
+                impact_message = "Significant role mismatch detected. Your general resume is stronger than your fit for this specific role."
+            else:
+                impact_message = "Strong role alignment! You are better suited for this role than your general resume suggests."
+        elif abs(score_difference) >= 10:
+            impact_level = "Moderate"
+            if score_difference > 0:
+                impact_message = "Moderate skill alignment gap. Some role-specific skills need improvement."
+            else:
+                impact_message = "Good role alignment with room for general resume improvement."
+        else:
+            impact_level = "Minimal"
+            impact_message = "Strong alignment between resume and role. Your skills match well with job requirements."
+        
+        role_impact = {
+            'difference': score_difference,
+            'impact_level': impact_level,
+            'message': impact_message,
+            'resume_score': resume_score,
+            'job_fit_score': job_fit_score
+        }
+    
+    # 4. Resume Strength Breakdown - Use resume_breakdown module
+    resume_breakdown_data = None
+    if resume_data:
+        try:
+            breakdown = resume_breakdown.calculate_resume_breakdown(
+                cgpa=resume_data.get('cgpa', '0'),
+                skills=resume_data.get('skills', ''),
+                projects=resume_data.get('projects', ''),
+                education_count=1,
+                extras={
+                    'github_username': resume_data.get('github_username'),
+                    'about_yourself': resume_data.get('about_yourself'),
+                    'city': resume_data.get('city')
+                }
+            )
+            resume_breakdown_data = breakdown
+        except Exception as e:
+            print(f"Error calculating resume breakdown: {e}")
+            resume_breakdown_data = None
     
     # Pass all data to template (simple variables)
     return render_template(
@@ -1991,7 +2337,12 @@ def download_report():
         resume_data=resume_data,
         job_title=job_title,
         job_company=job_company,
-        job_fit_score=job_fit_score
+        job_fit_score=job_fit_score,
+        # New analytical sections
+        role_readiness_status=role_readiness_status,
+        skill_roadmap=skill_roadmap,
+        role_impact=role_impact,
+        resume_breakdown_data=resume_breakdown_data
     )
 
 
