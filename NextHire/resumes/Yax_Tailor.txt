@@ -10,21 +10,19 @@ GitHub: yax-11
 
 ABOUT
 ----------------------------------------
-i am best
+i am the best
 
 SKILLS
 ----------------------------------------
-- python
-- react
-- node.js
-- html
-- css
-- sql
+- Python
 - java
+- css
+- html
+- react
 
 
 PROJECTS
 ----------------------------------------
 atm
 nexthire
-braincrate
+library

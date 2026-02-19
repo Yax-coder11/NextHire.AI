@@ -27,7 +27,20 @@
   <!-- Header -->
   <header class="border-bottom py-3">
     <div class="container d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold">NextHire.AI</h5>
+      <a href="/" class="navbar-brand d-flex align-items-center gap-2 text-decoration-none">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+          <defs>
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ff6b00;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#ff8c42;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <!-- Stylized N with upward arrow -->
+          <path d="M8 24V8L16 16L24 8V16L20 20L24 24V28H20L16 24L12 28H8V24Z" fill="url(#logoGradient)"/>
+          <path d="M20 4L24 8L20 12L16 8L20 4Z" fill="url(#logoGradient)"/>
+        </svg>
+        <h5 class="mb-0 fw-bold">NextHire.AI</h5>
+      </a>
       
       <!-- Desktop Navigation -->
       <nav class="d-none d-md-flex gap-4">
@@ -86,13 +99,13 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <input type="text" id="name" name="name" class="form-control" placeholder="Full Name" required>  
+                    <input type="text" id="name" name="name" class="form-control"  required>  
                     <label class="fw-500">Full Name</label>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <input type="text" id="phone" name="phone" class="form-control" placeholder="Phone" required pattern="[9876]\d{9}" maxlength="10" title="Phone number must be exactly 10 digits and start with 9, 8, 7, or 6">
+                    <input type="text" id="phone" name="phone" class="form-control"  required pattern="[9876]\d{9}" maxlength="10" title="Phone number must be exactly 10 digits and start with 9, 8, 7, or 6">
                     <label class="fw-500">Phone (Must start with 9, 8, 7, or 6)</label>
                     <div class="invalid-feedback" id="phoneError" style="display: none;"></div>
                   </div>
@@ -102,14 +115,14 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+                    <input type="email" id="email" name="email" class="form-control"  required>
                     <label class="fw-500">Email</label>
                     <div class="invalid-feedback" id="emailError" style="display: none;"></div>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <input type="text" id="city" name="city" class="form-control" placeholder="City" required>
+                    <input type="text" id="city" name="city" class="form-control"  required>
                     <label class="fw-500">City</label>
                   </div>
                 </div>
@@ -118,25 +131,26 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <input type="text" id="degree" name="degree" class="form-control" placeholder="Degree" required>
+                    <input type="text" id="degree" name="degree" class="form-control"  required>
                     <label class="fw-500">Degree</label>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <input type="text" id="github_username" name="github_username" class="form-control" placeholder="GitHub Username">
+                    <input type="text" id="github_username" name="github_username" class="form-control" >
                     <label class="fw-500">GitHub Username</label>
                   </div>
                 </div>
               </div>
               
               <div class="form-floating mb-3">
-                <input type="text" id="cgpa" name="cgpa" class="form-control" placeholder="CGPA" required>
-                <label class="fw-500">CGPA</label>
+                <input type="number" id="cgpa" name="cgpa" class="form-control"  required min="0" max="10" step="0.01">
+                <label class="fw-500">CGPA (0 to 10)</label>
+                <div class="invalid-feedback" id="cgpaError" style="display: none;"></div>
               </div>
               
               <div class="form-floating mb-3">
-                <textarea id="about_yourself" class="form-control" name="about_yourself" placeholder="Tell us about yourself" style="height: 120px;" required></textarea>
+                <textarea id="about_yourself" class="form-control" name="about_yourself"  style="height: 120px;" required></textarea>
                 <label class="fw-500">Tell Us About Yourself</label>
               </div>
 
@@ -154,12 +168,12 @@
               </div>
               
               <div class="form-floating mb-3">
-                <textarea id="skills" class="form-control" name="skills" placeholder="Skills (comma separated)" style="height: 100px;"></textarea>
+                <textarea id="skills" class="form-control" name="skills"  style="height: 100px;"></textarea>
                 <label class="fw-500">Skills (comma separated)</label>
               </div>
               
               <div class="form-floating mb-4">
-                <textarea id="projects" class="form-control" name="projects" placeholder="Projects" style="height: 120px;"></textarea>
+                <textarea id="projects" class="form-control" name="projects"  style="height: 120px;"></textarea>
                 <label class="fw-500">Projects</label>
               </div>
               
@@ -920,6 +934,30 @@
       return emailRegex.test(email);
     }
 
+    function validateCGPA(cgpa) {
+      // STRICT VALIDATION: CGPA must be between 0 and 10 (inclusive)
+      // Remove any whitespace first
+      const cleanCGPA = cgpa.trim();
+      
+      // Check 1: Must be a valid number
+      const cgpaNum = parseFloat(cleanCGPA);
+      if (isNaN(cgpaNum)) {
+        return false;
+      }
+      
+      // Check 2: Must be between 0 and 10 (inclusive)
+      if (cgpaNum < 0 || cgpaNum > 10) {
+        return false;
+      }
+      
+      // Check 3: No alphabets or special characters (except decimal point)
+      if (!/^[0-9]+(\.[0-9]+)?$/.test(cleanCGPA)) {
+        return false;
+      }
+      
+      return true;
+    }
+
     function validateYear(year) {
       // Check if year is a valid 4-digit number between 1900 and current year + 10
       const currentYear = new Date().getFullYear();
@@ -1054,6 +1092,16 @@
         clearFieldError('email', 'emailError');
       }
       
+      // Validate CGPA (STRICT: must be between 0 and 10)
+      const cgpa = document.getElementById("cgpa").value.trim();
+      if (!validateCGPA(cgpa)) {
+        showFieldError('cgpa', 'cgpaError', 'CGPA cannot be greater than 10 or less than 0.');
+        document.getElementById("cgpa").focus();
+        return false;
+      } else {
+        clearFieldError('cgpa', 'cgpaError');
+      }
+      
       // Validate all education entries
       const educationEntries = document.querySelectorAll('.education-entry');
       educationEntries.forEach((entry, index) => {
@@ -1081,6 +1129,16 @@
         showFieldError('email', 'emailError', 'Please enter a valid email address.');
       } else if (email) {
         clearFieldError('email', 'emailError');
+      }
+    });
+
+    // Add real-time validation for CGPA
+    document.getElementById('cgpa').addEventListener('input', function() {
+      const cgpa = this.value.trim();
+      if (cgpa && !validateCGPA(cgpa)) {
+        showFieldError('cgpa', 'cgpaError', 'CGPA cannot be greater than 10.');
+      } else if (cgpa) {
+        clearFieldError('cgpa', 'cgpaError');
       }
     });
 

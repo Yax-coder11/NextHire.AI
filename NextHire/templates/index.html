@@ -38,7 +38,20 @@
   <!-- Header -->
   <header class="border-bottom py-3">
     <div class="container d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold">NextHire.AI</h5>
+      <a href="/" class="navbar-brand d-flex align-items-center gap-2 text-decoration-none">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+          <defs>
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ff6b00;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#ff8c42;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <!-- Stylized N with upward arrow -->
+          <path d="M8 24V8L16 16L24 8V16L20 20L24 24V28H20L16 24L12 28H8V24Z" fill="url(#logoGradient)"/>
+          <path d="M20 4L24 8L20 12L16 8L20 4Z" fill="url(#logoGradient)"/>
+        </svg>
+        <h5 class="mb-0 fw-bold">NextHire.AI</h5>
+      </a>
       
       <!-- Desktop Navigation -->
       <nav class="d-none d-md-flex gap-4">
@@ -213,7 +226,10 @@
             <div class="feature-step active" data-step="1">
               <div class="heading-icon-container p-3 rounded" style="cursor: pointer; transition: all 0.3s ease;">
                 <div class="panel-icon">
-                  <i class="bi bi-robot"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-robot" viewBox="0 0 16 16">
+                    <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/>
+                    <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
+                  </svg>
                 </div>
                 <div>
                   <h6 class="mb-0">AI-Powered Analysis</h6>
@@ -267,7 +283,9 @@
                   <div class="col-md-6">
                     <h3 class="mb-3">AI-Powered Analysis</h3>
                     <p class="text-muted">
-                     Our AI analyzes your resume’s structure, content, and formatting to ensure it aligns with modern hiring and recruiter expectations.<div class="d-flex align-items-center gap-2 mt-3">
+                     Our AI analyzes your resume’s structure, content, and formatting to ensure it aligns with modern hiring and recruiter expectations.
+                    </p>
+                    <div class="d-flex align-items-center gap-2 mt-3">
                       <div class="panel-icon" style="width: 30px; height: 30px; font-size: 0.9rem;">
                         <i class="bi bi-robot"></i>
                       </div>
@@ -277,7 +295,7 @@
                   <div class="col-md-6">
                     <div class="image-card">
                       <div class="d-flex align-items-center justify-content-center" style="height: 200px; background-color: var(--background); border-radius: var(--radius);">
-                        <i class="bi bi-robot" style="font-size: 4rem; color: var(--primary);"></i>
+                        <i class="bi bi-robot" style="font-size: 4rem; "></i>
                       </div>
                     </div>
                   </div>
@@ -290,7 +308,9 @@
                   <div class="col-md-6">
                     <h3 class="mb-3">Real-time Scoring</h3>
                     <p class="text-muted">
-                      Get instant ATS compatibility scores and clear improvement suggestions to strengthen your resume and increase visibility with recruiters.<div class="d-flex align-items-center gap-2 mt-3">
+                      Get instant ATS compatibility scores and clear improvement suggestions to strengthen your resume and increase visibility with recruiters.
+                    </p>
+                    <div class="d-flex align-items-center gap-2 mt-3">
                       <div class="panel-icon" style="width: 30px; height: 30px; font-size: 0.9rem;">
                         <i class="bi bi-speedometer2"></i>
                       </div>
@@ -300,7 +320,7 @@
                   <div class="col-md-6">
                     <div class="image-card">
                       <div class="d-flex align-items-center justify-content-center" style="height: 200px; background-color: var(--background); border-radius: var(--radius);">
-                        <i class="bi bi-speedometer2" style="font-size: 4rem; color: var(--primary);"></i>
+                        <i class="bi bi-speedometer2" style="font-size: 4rem; "></i>
                       </div>
                     </div>
                   </div>
@@ -313,7 +333,9 @@
                   <div class="col-md-6">
                     <h3 class="mb-3">Keyword Optimization</h3>
                     <p class="text-muted">
-                      Identify missing industry keywords and optimize your resume to perform better in applicant tracking systems and recruiter searches. <div class="d-flex align-items-center gap-2 mt-3">
+                      Identify missing industry keywords and optimize your resume to perform better in applicant tracking systems and recruiter searches.
+                    </p>
+                    <div class="d-flex align-items-center gap-2 mt-3">
                       <div class="panel-icon" style="width: 30px; height: 30px; font-size: 0.9rem;">
                         <i class="bi bi-tags"></i>
                       </div>
@@ -323,7 +345,7 @@
                   <div class="col-md-6">
                     <div class="image-card">
                       <div class="d-flex align-items-center justify-content-center" style="height: 200px; background-color: var(--background); border-radius: var(--radius);">
-                        <i class="bi bi-tags" style="font-size: 4rem; color: var(--primary);"></i>
+                        <i class="bi bi-tags" style="font-size: 4rem; "></i>
                       </div>
                     </div>
                   </div>
@@ -336,7 +358,9 @@
                   <div class="col-md-6">
                     <h3 class="mb-3">Export Options</h3>
                     <p class="text-muted">
-                      Download your optimized resume in PDF or DOCX formats, ensuring compatibility across platforms and application systems.<div class="d-flex align-items-center gap-2 mt-3">
+                      Download your optimized resume in PDF or DOCX formats, ensuring compatibility across platforms and application systems.
+                    </p>
+                    <div class="d-flex align-items-center gap-2 mt-3">
                       <div class="panel-icon" style="width: 30px; height: 30px; font-size: 0.9rem;">
                         <i class="bi bi-download"></i>
                       </div>
@@ -346,7 +370,7 @@
                   <div class="col-md-6">
                     <div class="image-card">
                       <div class="d-flex align-items-center justify-content-center" style="height: 200px; background-color: var(--background); border-radius: var(--radius);">
-                        <i class="bi bi-download" style="font-size: 4rem; color: var(--primary);"></i>
+                        <i class="bi bi-download" style="font-size: 4rem; "></i>
                       </div>
                     </div>
                   </div>
@@ -360,102 +384,7 @@
   </section>
 
   <!-- Enhanced CTA Section -->
-  <section class="cta-section">
-    <!-- Scrollable Resume Background -->
-    <div class="resume-background">
-      <div class="resume-grid">
-        <!-- Resume Preview Cards -->
-        <div class="resume-card">
-          <div class="resume-header"></div>
-          <div class="resume-line"></div>
-          <div class="resume-line short"></div>
-          <div class="resume-line"></div>
-          <div class="resume-section">
-            <div class="resume-line"></div>
-            <div class="resume-line short"></div>
-          </div>
-        </div>
-        
-        <div class="resume-card">
-          <div class="resume-header"></div>
-          <div class="resume-line"></div>
-          <div class="resume-line short"></div>
-          <div class="resume-line"></div>
-          <div class="resume-section">
-            <div class="resume-line"></div>
-            <div class="resume-line short"></div>
-          </div>
-        </div>
-        
-        <div class="resume-card">
-          <div class="resume-header"></div>
-          <div class="resume-line"></div>
-          <div class="resume-line short"></div>
-          <div class="resume-line"></div>
-          <div class="resume-section">
-            <div class="resume-line"></div>
-            <div class="resume-line short"></div>
-          </div>
-        </div>
-        
-        <div class="resume-card">
-          <div class="resume-header"></div>
-          <div class="resume-line"></div>
-          <div class="resume-line short"></div>
-          <div class="resume-line"></div>
-          <div class="resume-section">
-            <div class="resume-line"></div>
-            <div class="resume-line short"></div>
-          </div>
-        </div>
-        
-        <div class="resume-card">
-          <div class="resume-header"></div>
-          <div class="resume-line"></div>
-          <div class="resume-line short"></div>
-          <div class="resume-line"></div>
-          <div class="resume-section">
-            <div class="resume-line"></div>
-            <div class="resume-line short"></div>
-          </div>
-        </div>
-        
-        <div class="resume-card">
-          <div class="resume-header"></div>
-          <div class="resume-line"></div>
-          <div class="resume-line short"></div>
-          <div class="resume-line"></div>
-          <div class="resume-section">
-            <div class="resume-line"></div>
-            <div class="resume-line short"></div>
-          </div>
-        </div>
-        
-        <!-- Duplicate cards for seamless loop -->
-        <div class="resume-card">
-          <div class="resume-header"></div>
-          <div class="resume-line"></div>
-          <div class="resume-line short"></div>
-          <div class="resume-line"></div>
-          <div class="resume-section">
-            <div class="resume-line"></div>
-            <div class="resume-line short"></div>
-          </div>
-        </div>
-        
-        <div class="resume-card">
-          <div class="resume-header"></div>
-          <div class="resume-line"></div>
-          <div class="resume-line short"></div>
-          <div class="resume-line"></div>
-          <div class="resume-section">
-            <div class="resume-line"></div>
-            <div class="resume-line short"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
+  <section class="cta-section">    
     <!-- Fixed Foreground Content -->
     <div class="container">
       <div class="row justify-content-center">

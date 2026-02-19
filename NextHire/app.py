@@ -258,6 +258,39 @@ def save_resume():
         phone = phone_clean
         # ========== END PHONE VALIDATION ==========
 
+        # ========== BACKEND CGPA VALIDATION (STRICT) ==========
+        # REQUIREMENT: CGPA must be numeric and between 0 and 10 (inclusive)
+        # This validation cannot be bypassed even if frontend is disabled
+        
+        # Remove any whitespace
+        cgpa_clean = cgpa.strip()
+        
+        # Validation Check 1: Must be a valid number
+        try:
+            cgpa_float = float(cgpa_clean)
+        except ValueError:
+            return jsonify({
+                "success": False,
+                "validation_error": "CGPA must be between 0 and 10."
+            })
+        
+        # Validation Check 2: Must be between 0 and 10 (inclusive)
+        if cgpa_float < 0:
+            return jsonify({
+                "success": False,
+                "validation_error": "CGPA must be between 0 and 10."
+            })
+        
+        if cgpa_float > 10:
+            return jsonify({
+                "success": False,
+                "validation_error": "CGPA must be between 0 and 10."
+            })
+        
+        # If all validations pass, use the cleaned CGPA
+        cgpa = cgpa_clean
+        # ========== END CGPA VALIDATION ==========
+
         # Calculate score with validation
         score, missing_skills, validation_error = calculate_resume_score(
             cgpa=cgpa,
