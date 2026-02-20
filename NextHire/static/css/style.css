@@ -1078,7 +1078,7 @@ textarea.form-control {
   width: 56px;
   height: 56px;
   background: linear-gradient(135deg, #ff6b00 0%, #ff8c42 100%);
-  color: #ffffff;
+  /* color: #ffffff; */
   border-radius: 12px;
   font-size: 1.5rem;
   font-weight: 600;
@@ -1813,14 +1813,14 @@ i.bi, .bi {
 }
 
 /* Ensure icons inherit color properly */
-i, svg {
+/* i, svg {
   color: currentColor;
-}
+} */
 
 /* Fix icon visibility in all contexts */
-.bi, [class^="bi-"], [class*=" bi-"] {
+/* .bi, [class^="bi-"], [class*=" bi-"] {
   color: currentColor;
-}
+} */
 
 /* Ensure all headings have strong contrast */
 h1, h2, h3, h4, h5, h6 {
@@ -1885,6 +1885,14 @@ a:hover {
 .panel-icon {
   background: linear-gradient(135deg, #ff6b00 0%, #ff8c42 100%);
   color: #ffffff !important;
+
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 20px;
 }
 
 .panel-icon i {
@@ -1981,12 +1989,12 @@ footer * {
 }
 
 /* Ensure all text on dark backgrounds is white */
-[style*="background: linear-gradient"] *:not(.panel-icon):not(.badge):not(.btn):not(button),
+/* [style*="background: linear-gradient"] *:not(.panel-icon):not(.badge):not(.btn):not(button),
 [style*="background:linear-gradient"] *:not(.panel-icon):not(.badge):not(.btn):not(button),
 .features-section *:not(.panel-icon):not(.badge):not(.btn):not(button),
 .cta-section *:not(.cta-content):not(.cta-content *) {
   color: #ffffff !important;
-}
+} */
 
 /* Fix z-index layering for icons */
 i, svg, .bi {
@@ -2256,4 +2264,18 @@ i, .bi {
 .features-section .image-card i,
 .features-section .d-flex i {
   color: #ff6b00 !important;
+}
+
+
+
+/* HARD RESET FOR BOOTSTRAP ICONS */
+.bi {
+  font-family: "bootstrap-icons" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+}
+
+.bi::before {
+  font-family: "bootstrap-icons" !important;
+  display: inline-block !important;
 }
